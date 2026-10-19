@@ -101,5 +101,6 @@ function overview(){
  }).join("");
  const agentsPanel='<section class="ov3-panel ov3-agents">'+ov3CardHeader(ov2T("Ваши агенты","Your agents"),"go-agents",ov2T("Все агенты","All agents"),'<span class="ov3-active-count"><i></i>'+ov2Number(active)+' '+ov2T("из","of")+' '+ov2Number(agents.length)+' '+ov2T("активны","active")+'</span>')+
  '<div class="ov3-panel-scroll">'+(agentRows||'<div class="ov3-empty">'+ov2T("Агенты ещё не созданы","No agents yet")+'</div>')+'</div></section>';
- return '<div class="ov3-overview"><div class="ov3-layout">'+activity+integration+activityLog+agentsPanel+'</div></div>';
+ const tabs=[['activity',ov2T('Активность','Activity')],['connections',ov2T('Интеграции','Integrations')],['events',ov2T('События','Events')],['agents',ov2T('Агенты','Agents')]].map(([key,label])=>'<button data-action="ov3-tab" data-tab="'+key+'" aria-pressed="'+((state.ov3Tab||'activity')===key)+'" class="'+((state.ov3Tab||'activity')===key?'selected':'')+'">'+label+'</button>').join('');
+ return '<div class="ov3-overview"><div class="ov3-mobile-tabs" role="group" aria-label="'+ov2T('Панели обзора','Overview panels')+'">'+tabs+'</div><div class="ov3-layout ov3-show-'+(state.ov3Tab||'activity')+'">'+activity+integration+activityLog+agentsPanel+'</div></div>';
 }
