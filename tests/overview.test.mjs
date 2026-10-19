@@ -49,8 +49,9 @@ test('exactly four functional blocks, without KPI strip or dialog-specific stati
 test('every actual connector has its own provider-specific visual identifier',()=>{
  const {run}=harness();const ui=run('overview()');
  for(const cls of ['telegram','max','bitrix','calendar'])assert.ok(ui.includes('ov3-provider-icon '+cls),cls);
- assert.match(ui,/<svg class="ov3-logo-vector" viewBox="0 0 24 24"/);
- assert.match(ui,/ov3-logo-max/);assert.match(ui,/ov3-logo-bitrix/);
+ for(const logo of ['telegram','max','bitrix24'])assert.ok(ui.includes('./src/assets/integrations/'+logo+'.svg'),'true SVG logo: '+logo);
+ assert.match(ui,/class="ov3-service-mark"/);
+ assert.doesNotMatch(ui,/ov3-logo-type|ov3-logo-max|ov3-logo-bitrix/);
  assert.match(ui,/data-id="tg1"/);assert.match(ui,/data-id="b1"/);
  assert.match(ui,/Ошибка/);
 });
@@ -83,4 +84,20 @@ test('English interface is complete with English-only fixtures and independent m
  for(const text of ['Overall activity','Integration status','Recent activity','Your agents','No integrations yet','No agents yet','View all','7 days','30 days'])assert.ok(ui.includes(text),text);
  assert.doesNotMatch(ui,/[А-Яа-яЁё]/);
  assert.match(ui,/data-action="ov3-tab" data-tab="agents"/);
+});
+
+test('brand assets are real SVGs rather than text placeholders and mapping stays provider-correct',()=>{
+ const {state,run}=harness();
+ const logos=['telegram','max','bitrix24','whatsapp','vk','viber','googlecalendar'];
+ for(const name of logos){
+  const data=fs.readFileSync(new URL('../src/assets/integrations/'+name+'.svg',import.meta.url),'utf8');
+  assert.match(data,/<svg\b/,'SVG asset '+name);
+  assert.match(data,/<path\b/,'vector artwork '+name);
+  assert.doesNotMatch(data,/<script\b|<foreignObject\b/i);
+ }
+ assert.equal(run('ov3Provider({name:"Битрикс24 · Основной",type:"CRM"})'),'bitrix');
+ assert.equal(run('ov3Provider({name:"MAX · Кандидаты",type:"MAX Bot"})'),'max');
+ assert.equal(run('ov3Provider({name:"Календарь HR",type:"Календарь"})'),'calendar');
+ assert.equal(run('ov3Provider({name:"Google Calendar · HR",type:"calendar"})'),'googlecalendar');
+ assert.equal(run('ov3Provider({name:"amoCRM",type:"CRM"})'),'crm');
 });

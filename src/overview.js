@@ -13,30 +13,34 @@ function ov2Metrics(){
  const done=rows.reduce((n,r)=>n+r.ok,0),failed=rows.reduce((n,r)=>n+r.failed,0);
  return {period,rows,done,failed,total:done+failed,successRate:done+failed?Math.round(done/(done+failed)*1000)/10:0,cost:state.activeOrgId==="org1"?(period===7?72.4:261.2):0};
 }
+// Brand identity is resolved from the connection provider where known.
+// Icons are local, stable SVG assets; never infer Google from a generic calendar.
 function ov3Provider(c){
- const name=String(c?.name||""),type=String(c?.type||"");
- if(/telegram/i.test(type+" "+name))return "telegram";
- if(/max bot|^max\s|^max$|макс/i.test(type+" "+name))return "max";
- if(/битрикс|bitrix/i.test(name+type))return "bitrix";
- if(/google calendar/i.test(name+type))return "google-calendar";
- if(/календарь|calendar/i.test(name+type))return "calendar";
- if(/whatsapp/i.test(type+" "+name))return "whatsapp";
- if(/viber/i.test(type+" "+name))return "viber";
- if(/email|почта/i.test(type+" "+name))return "mail";
- if(/crm/i.test(type+" "+name))return "crm";
+ const provider=String(c?.provider||"").trim().toLowerCase();
+ const value=[provider,c?.name||"",c?.type||""].join(" ");
+ if(/telegram/i.test(value))return "telegram";
+ if(/(^|\W)max(\W|$)|макс/i.test(value))return "max";
+ if(/битрикс|bitrix24|bitrix/i.test(value))return "bitrix";
+ if(/google[\s-]*calendar/i.test(value))return "googlecalendar";
+ if(/whatsapp/i.test(value))return "whatsapp";
+ if(/(^|\W)vk(\W|$)|вконтакте/i.test(value))return "vk";
+ if(/viber/i.test(value))return "viber";
+ if(/календарь|calendar/i.test(value))return "calendar";
+ if(/e-?mail|почта/i.test(value))return "mail";
+ if(/amocrm|(^|\W)crm(\W|$)/i.test(value))return "crm";
  return "other";
 }
 function ov3Icon(c){
- const p=ov3Provider(c);
- if(p==="telegram")return '<svg class="ov3-logo-vector" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>';
- if(p==="max")return '<span class="ov3-logo-type ov3-logo-max" aria-hidden="true">MAX</span>';
- if(p==="bitrix")return '<span class="ov3-logo-type ov3-logo-bitrix" aria-hidden="true">24</span>';
- if(p==="google-calendar")return '<span class="ov3-logo-type" aria-hidden="true">31</span>';
- if(p==="calendar")return I("calendar",21);
- if(p==="whatsapp")return '<span class="ov3-logo-type" aria-hidden="true">W</span>';
- if(p==="viber")return '<span class="ov3-logo-type" aria-hidden="true">V</span>';
- if(p==="mail")return I("mail",21);
- if(p==="crm")return I("building",21);
+ const provider=ov3Provider(c);
+ const known=new Set(["telegram","max","bitrix","googlecalendar","whatsapp","vk","viber"]);
+ const names={telegram:"Telegram",max:"MAX",bitrix:"Битрикс24",googlecalendar:"Google Calendar",whatsapp:"WhatsApp",vk:"ВКонтакте",viber:"Viber"};
+ if(known.has(provider)){
+  const alt=names[provider];
+  return '<img class="ov3-service-mark" src="./src/assets/integrations/'+(provider==="bitrix"?"bitrix24":provider)+'.svg" alt="'+esc(alt)+'" loading="eager" decoding="async">';
+ }
+ if(provider==="calendar")return I("calendar",21);
+ if(provider==="mail")return I("mail",21);
+ if(provider==="crm")return I("building",21);
  return I("plug",21);
 }
 function ov3ConnectionState(c){
