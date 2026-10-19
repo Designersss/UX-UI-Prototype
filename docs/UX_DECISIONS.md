@@ -60,3 +60,15 @@ Replace visually promotional / hollow overview cards with a dense operational co
 - Both RU/EN and Light/Dark need to remain complete and accessible.
 
 **Prototype-only limitation:** The operational KPI timeseries and spending breakdown for Nord Group are fixed *sample fixtures*. There is no event aggregation backend in the prototype. Figures are consistent internally within the dashboard but should not be represented as real, authoritative billing or operating metrics until connected to the future API and ledger. UI deliberately uses product-oriented copy without a demo banner.
+
+## Workspace Overview + sidebar visual direction v0.6 — awaiting user design review
+
+Based on the user's October 19 reference image (minimal white analytics product, narrow icon-first left rail, softly rounded white cards and restrained accent).
+
+- Visual style is **a candidate**, not globally approved. Apply it only to Workspace left navigation and Overview; all other content screens and Admin content are unchanged.
+- Sidebar is an icon rail with accessible labels/tooltips on desktop; on mobile the same actions expand to a drawer with visible text labels. The bottom avatar still opens the full account/organization switcher and sign-out.
+- White/off-white low-shadow cards and calm typography in Light; fully coordinated dark surface palette in Dark, with a single restrained violet accent and one soft green KPI highlight.
+- Remove the duplicate Overview content heading. Keep hierarchical breadcrumbs and browser Back/Forward functionality in top bar.
+- Move the 7/30-day period switcher into the **Agent activity** card, where it controls the execution metrics and chart; preserve RU/EN and mobile tabs.
+- Maintain screen-height fit and scroll only within dense data panes; hover/focus and reduced-motion rules are explicit.
+- Track the pending critique on composition, color, font, microinteraction and density before propagating a style to the rest of AIMock.
