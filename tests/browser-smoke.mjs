@@ -17,6 +17,18 @@ try{
   page.on('pageerror',error=>errors.push(resolution.name+': '+error.message));
   await page.goto('http://127.0.0.1:4173',{waitUntil:'load'});
   await page.locator('.ov2-dashboard').waitFor();
+  assert.equal(await page.locator('.ov2-heading h1').count(),0,'No redundant Overview heading');
+  assert.equal(await page.locator('.ov2-activity [data-action="ov2-period"]').count(),2,'Period controls live inside activity card');
+  assert.equal(await page.locator('.ov2-dashboard > .ov2-period').count(),0,'No period controls above KPI cards');
+  assert.equal(await page.locator('.workspace-skin').count(),1,'Workspace shell uses the scoped visual direction');
+  if(resolution.width>850){
+    const railWidth=await page.locator('.workspace-skin .side').evaluate(e=>e.getBoundingClientRect().width);
+    assert.ok(railWidth<=90, 'Desktop navigation is icon-first rail: '+railWidth);
+    assert.equal(await page.locator('.side .nav-btn').first().getAttribute('aria-label'),'Обзор');
+    await page.locator('.workspace-skin .profile-trigger').click();
+    assert.ok(await page.locator('.profile-menu').isVisible(),'Profile and organization menu accessible from rail');
+    await page.locator('.workspace-skin .profile-trigger').click();
+  }
   const initial=await page.locator('.ov2-activity-summary strong').first().innerText();
   assert.match(initial,/304/,resolution.name+' weekly executions');
   await page.locator('[data-action="ov2-period"][data-days="30"]').click();
@@ -33,10 +45,13 @@ try{
    await page.screenshot({path:'artifacts/overview-dark-ru.png',fullPage:false});
    await page.locator('[data-action="toggle-locale"]').click();
    assert.equal(await page.locator('html').getAttribute('lang'),'en');
-   assert.equal(await page.locator('.ov2-heading h1').innerText(),'Overview');
+   assert.equal(await page.locator('.ov2-heading h1').count(),0,'Overview heading remains removed in EN');
    await page.screenshot({path:'artifacts/overview-dark-en.png',fullPage:false});
   }
   if(resolution.name==='mobile'){
+   await page.locator('[data-action="menu"].mobile-toggle').click();
+   assert.ok(await page.locator('.workspace-skin .side .nav-label').first().isVisible(),'Mobile drawer contains visible text labels');
+   await page.locator('[data-action="menu"].mobile-toggle').click();
    await page.screenshot({path:'artifacts/overview-mobile.png',fullPage:false});
    await page.locator('.ov2-mobile-tabs [data-tab="agents"]').click();
    assert.ok(await page.locator('.ov2-agents').isVisible(),'mobile agents panel');
