@@ -18,3 +18,18 @@ jobs:
           node --check src/overview.js
       - name: Run dependency-free UI model tests
         run: node --test tests/*.test.mjs
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0 --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Run browser layout and interaction checks
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 >/tmp/aimock-http.log 2>&1 &
+          node tests/browser-smoke.mjs
+      - name: Store responsive UI screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: overview-screenshots
+          path: artifacts/*.png
+          if-no-files-found: ignore
