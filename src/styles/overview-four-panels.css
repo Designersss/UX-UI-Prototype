@@ -334,3 +334,23 @@ body[data-theme="dark"] .workspace-skin .ov3-provider-icon.calendar{background:#
  .workspace-skin .ov3-event-row:hover,
  .workspace-skin .ov3-agent-row:hover{transform:none!important}
 }
+/* Shared service identity in the existing Integration Hub table (Workspace only). */
+.workspace-skin .integration-name{
+ display:inline-flex;align-items:center;gap:10px;min-width:0;
+ max-width:100%;vertical-align:middle;
+}
+.workspace-skin .integration-name>span:last-child{
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.workspace-skin .integration-logo{
+ width:34px;height:34px;min-width:34px;
+ border-radius:10px;display:grid;place-items:center;
+ background:rgba(216,232,255,.45);
+}
+.workspace-skin .integration-logo .ov3-service-mark{
+ display:block;width:26px;height:26px;object-fit:contain;
+}
+.workspace-skin .integration-logo svg{width:20px;height:20px;color:var(--muted)}
+body[data-theme="dark"] .workspace-skin .integration-logo{
+ background:rgba(93,117,157,.25);
+}
