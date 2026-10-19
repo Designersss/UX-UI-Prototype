@@ -33,7 +33,7 @@ function ov2Alerts(){
 function overview(){
  const stats=ov2Metrics();
  const active=state.scenario==="expired"||state.scenario==="walletZero"?0:state.agents.filter(a=>a.status==="active").length;
- const org=currentOrg(), balance=Number(org?.balance)||0,limit=Number(state.plans?.find(p=>p.name===org.plan)?.agents)||10;
+ const org=currentOrg(), balance=Number(state.orgs?.find(o=>o.id===state.activeOrgId)?.balance)||0,limit=Number(state.plans?.find(p=>p.name===org.plan)?.agents)||10;
  const days=stats.period===7?ov2T("Последние 7 дней","Last 7 days"):ov2T("Последние 30 дней","Last 30 days");
  const attention=ov2Alerts();const events=state.events.slice(0,5);const agents=state.agents.slice(0,6);
  const tab=state.ov2MobileTab||"activity";
