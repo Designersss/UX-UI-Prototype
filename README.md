@@ -2,7 +2,7 @@
 
 Interactive, framework-free design prototype for AIMock Workspace and AIMock Admin.
 
-**Current baseline:** UX/UI v0.4 functionality with experimental Workspace Overview + floating left navigation + four-panel Workspace Overview v1.0 candidate (**not yet final approved**). The approved functional source of truth is AIMock Product Specification v1.6.
+**Current baseline:** UX/UI v0.4 functionality with experimental Workspace Overview + floating left navigation + Soft System Workspace Overview v1.1 candidate (**not yet final approved**). The approved functional source of truth is AIMock Product Specification v1.6.
 
 ## Run locally
 
@@ -41,3 +41,9 @@ The original v0.4 single-file HTML was split into these files **without changing
 The UI intentionally looks like the planned product, but **its data and actions are simulated**. There is no real authentication, LLM integration, payment processing or external messaging. Do not put production credentials or customer data in this repository.
 
 Repository name and AIMock brand are working titles.
+
+## Integration brand artwork
+
+Real SVG brand marks used in the prototype are stored in `src/assets/integrations/`. Telegram, WhatsApp, VK, Viber and Google Calendar marks come from the [Simple Icons](https://github.com/simple-icons/simple-icons) collection. Bitrix24 uses the [official Bitrix24 icon library](https://github.com/bitrix24/b24icons) service icon. MAX uses the actual MAX messenger brand symbol (as published by [MAX](https://go.max.ru/brandbook), adapted from [vector artwork](https://zaplata.ru/forum/scripts/skachat-gradient-fona-messendzhera-max) with official brand colors).
+
+Logos identify **specific providers**; generic/unidentified connectors such as a calendar without a declared service use a neutral icon, never a fake Google/other brand. Keep original shapes and check trademark/brand-guide terms before commercial release.
