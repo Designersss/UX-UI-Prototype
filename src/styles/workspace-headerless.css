@@ -1,0 +1,99 @@
+/* AIMock Workspace headerless layout, floating LEFT brand and personal preferences.
+   Admin is intentionally unchanged. */
+.workspace-skin .main{display:flex;flex-direction:column;height:100%;min-height:0;min-width:0;overflow:hidden}
+.workspace-skin .workspace{flex:1;min-height:0;min-width:0;display:flex;flex-direction:column}
+.workspace-skin .side .dock-brand{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;height:50px!important;min-height:50px!important;
+  flex:0 0 50px!important;margin:0!important;padding:0 0 10px!important;
+  background:transparent!important;color:#252a3a!important;
+  border:0!important;border-bottom:1px solid #e6e9f0!important;
+  border-radius:0!important;
+  font-size:13px!important;font-weight:780!important;letter-spacing:-.55px!important;
+  white-space:nowrap;cursor:pointer;transition:color .15s ease!important;
+}
+.workspace-skin .side .dock-brand:hover{color:#625bdc!important}
+body[data-theme="dark"] .workspace-skin .side .dock-brand{
+  color:#f4f5fb!important;border-bottom-color:#43495d!important;
+}
+body[data-theme="dark"] .workspace-skin .side .dock-brand:hover{color:#c2b6ff!important}
+.workspace-skin .side .dock-brand:focus-visible{outline:2px solid var(--blue)!important;outline-offset:2px!important;border-radius:7px!important}
+.workspace-skin .workspace-context-nav{
+  min-height:36px;max-width:100%;min-width:0;
+  display:flex;align-items:center;gap:9px;flex:0 0 auto;
+  margin:0 0 12px;color:var(--muted);
+}
+.workspace-skin .context-back{
+  display:grid;place-items:center;flex:0 0 34px;
+  width:34px;height:34px;padding:0;background:var(--panel);
+  border:1px solid var(--border);border-radius:11px;color:var(--ink);cursor:pointer;
+}
+.workspace-skin .context-back:hover,.workspace-skin .context-link:hover{color:var(--blue);background:var(--blue-lite)}
+.workspace-skin .context-path{
+  display:flex;align-items:center;gap:5px;min-width:0;max-width:100%;
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:none;white-space:nowrap;
+}
+.workspace-skin .context-path::-webkit-scrollbar{display:none}
+.workspace-skin .context-link,.workspace-skin .context-current{
+  display:block;flex:0 1 auto;min-width:0;max-width:195px;
+  padding:6px 8px;border:0;border-radius:8px;text-overflow:ellipsis;
+  overflow:hidden;white-space:nowrap;font-size:12px;font-weight:560;
+}
+.workspace-skin .context-link{cursor:pointer;background:transparent;color:var(--muted)}
+.workspace-skin .context-current{color:var(--ink);font-weight:710}
+.workspace-skin .context-sep{flex:0 0 auto;font-size:12px;opacity:.55}
+.workspace-skin .context-link:focus-visible,.workspace-skin .context-back:focus-visible{
+  outline:2px solid var(--blue);outline-offset:2px;
+}
+.workspace-skin .personal-preferences{
+  max-width:880px;margin:0 auto 0 0;width:100%;padding-bottom:8px;
+}
+.workspace-skin .personal-preferences h1{font-size:24px;letter-spacing:-.5px;margin-bottom:18px}
+.workspace-skin .personal-section{
+  display:flex;flex-direction:column;gap:3px;
+  border-radius:19px!important;margin-bottom:14px;
+}
+.workspace-skin .personal-section .avatar{width:42px;height:42px;border-radius:13px}
+.workspace-skin .personal-note{margin:4px 0 12px;line-height:1.5}
+.workspace-skin .personal-option{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  padding:16px 0;border-top:1px solid var(--border);
+}
+.workspace-skin .personal-option>div:first-child{max-width:360px;min-width:0}
+.workspace-skin .personal-option strong{font-size:13px;font-weight:690;color:var(--ink)}
+.workspace-skin .personal-option p{margin-top:6px;line-height:1.45}
+.workspace-skin .personal-choice{
+  display:flex;align-items:center;gap:4px;padding:4px;flex:0 0 auto;
+  border:1px solid var(--border);border-radius:12px;background:var(--surface2);
+}
+.workspace-skin .personal-choice button{
+  display:flex;align-items:center;justify-content:center;gap:7px;min-height:35px;
+  padding:8px 13px;border:1px solid transparent;border-radius:9px;
+  background:transparent;color:var(--muted);font-size:12px;font-weight:640;cursor:pointer;
+  transition:background .14s ease,color .14s ease;
+}
+.workspace-skin .personal-choice button:hover{color:var(--blue)}
+.workspace-skin .personal-choice button.selected{
+  color:var(--ink);background:var(--panel);border-color:var(--border);
+  box-shadow:0 1px 5px rgba(15,20,45,.06);
+}
+.workspace-skin .personal-choice button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(max-width:850px){
+ .workspace-skin .side .dock-brand{height:43px!important;min-height:43px!important;flex-basis:43px!important;font-size:11px!important;padding-bottom:8px!important}
+ .workspace-skin .workspace-context-nav{margin-bottom:8px;min-height:34px}
+ .workspace-skin .context-link,.workspace-skin .context-current{max-width:135px;font-size:11px}
+ .workspace-skin .personal-option{gap:12px}
+}
+@media(max-width:620px){
+ .workspace-skin .personal-option{flex-direction:column;align-items:flex-start;gap:12px}
+ .workspace-skin .personal-choice{width:100%;max-width:340px}
+ .workspace-skin .personal-choice button{flex:1;min-width:0}
+ .workspace-skin .workspace-context-nav{gap:7px}
+ .workspace-skin .context-link,.workspace-skin .context-current{max-width:108px}
+}
+@media(max-height:720px){
+ .workspace-skin .side .dock-brand{height:40px!important;min-height:40px!important;flex-basis:40px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .workspace-skin .personal-choice button,.workspace-skin .side .dock-brand{transition:none!important}
+}
