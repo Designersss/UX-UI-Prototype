@@ -52,7 +52,7 @@ try {
    await page.screenshot({path:'artifacts/overview-light-ru.png',fullPage:false});
    await page.locator('.ov3-connection-row[data-id="tg1"]').click();
    assert.ok(await page.locator('.modal-backdrop').isVisible(),'Telegram integration opens detail');
-   await page.locator('[data-action="modal-close"]').click();
+   await page.locator('.modal-backdrop [data-action="modal-close"]').first().click();
    await page.locator('.ov3-agent-row[data-id="a1"]').click();
    assert.ok(await page.locator('.workspace-context-nav').isVisible(),'Agent detail breadcrumbs');
    await page.locator('.dock-brand').click();
