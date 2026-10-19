@@ -51,7 +51,7 @@ try{
   if(resolution.name==='mobile'){
    await page.locator('[data-action="menu"].mobile-toggle').click();
    assert.ok(await page.locator('.workspace-skin .side .nav-label').first().isVisible(),'Mobile drawer contains visible text labels');
-   await page.locator('[data-action="menu"].mobile-toggle').click();
+   await page.locator('.drawer-overlay[data-action="menu"]').click();
    await page.screenshot({path:'artifacts/overview-mobile.png',fullPage:false});
    await page.locator('.ov2-mobile-tabs [data-tab="agents"]').click();
    assert.ok(await page.locator('.ov2-agents').isVisible(),'mobile agents panel');
