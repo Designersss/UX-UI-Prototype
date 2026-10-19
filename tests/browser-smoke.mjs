@@ -28,6 +28,13 @@ try {
   assert.equal(await page.locator('.ov3-provider-icon.max').count(),1,'MAX identity visible');
   assert.equal(await page.locator('.ov3-provider-icon.bitrix').count(),1,'Bitrix24 identity visible');
   assert.equal(await page.locator('.ov3-provider-icon.calendar').count(),1,'Calendar identity visible');
+  const marks=page.locator('.ov3-connections img.ov3-service-mark');
+  assert.equal(await marks.count(),4,'Two Telegram, MAX and Bitrix24 must have true SVG brand images');
+  await page.waitForFunction(()=>{
+    const icons=Array.from(document.querySelectorAll('.ov3-connections img.ov3-service-mark'));
+    return icons.length===4&&icons.every(x=>x.complete&&x.naturalWidth>0);
+  },{timeout:6000});
+  assert.equal(await page.locator('.ov3-connections .ov3-logo-type').count(),0,'No text-only brand placeholders');
   const rail=await page.locator('.workspace-skin .side').evaluate(e=>e.getBoundingClientRect().toJSON());
   const content=await page.locator('.workspace-skin .workspace').evaluate(e=>e.getBoundingClientRect().toJSON());
   assert.ok(rail.left>=7 && rail.width<=85 && content.left>rail.right,'Floating left rail does not overlap content');
@@ -50,6 +57,9 @@ try {
   await page.locator('.ov3-activity [data-action="ov2-period"][data-days="7"]').click();
   if(size.name==='desktop'){
    await page.screenshot({path:'artifacts/overview-light-ru.png',fullPage:false});
+   await page.locator('.side [data-page="integrations"]').click();
+   assert.ok(await page.locator('.integration-name img.ov3-service-mark').count()>=4,'Integration Hub shares brand icon assets');
+   await page.locator('.dock-brand').click();
    await page.locator('.ov3-connection-row[data-id="tg1"]').click();
    assert.ok(await page.locator('.modal-backdrop').isVisible(),'Telegram integration opens detail');
    await page.locator('.modal-backdrop [data-action="modal-close"]').first().click();
