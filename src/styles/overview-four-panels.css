@@ -232,6 +232,20 @@ body[data-theme="dark"] .workspace-skin .ov3-overview{
  color:var(--v3-muted);font-size:10.5px;white-space:nowrap;
  align-self:flex-start;font-variant-numeric:tabular-nums;
 }
+.workspace-skin .ov3-agent-right .ov3-status{
+ min-height:22px;max-width:100%;padding:4px 8px;border-radius:999px;
+ font-size:10px;font-weight:680;letter-spacing:0;
+ background:rgba(89,164,120,.11);
+}
+.workspace-skin .ov3-agent-right .ov3-status.pending{
+ background:rgba(222,164,77,.13);
+}
+.workspace-skin .ov3-agent-right .ov3-status.error{
+ background:rgba(236,114,126,.12);
+}
+.workspace-skin .ov3-agent-right .ov3-status.muted{
+ background:rgba(140,156,187,.14);
+}
 .workspace-skin .ov3-agent-right{
  display:flex;flex:0 0 auto;min-width:81px;
  align-items:flex-end;flex-direction:column;gap:6px;
