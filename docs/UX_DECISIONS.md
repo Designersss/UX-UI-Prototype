@@ -100,3 +100,18 @@ Based on the user's October 19 reference image (minimal white analytics product,
 - In shorter viewports, only the middle nav list scrolls; the top brand and bottom account trigger remain visible. No mobile horizontal Dock, no overlapping content.
 - No global header in Workspace. Theme/language belong to personal profile, and breadcrumbs appear on meaningful nested pages only. Admin still retains its own independent layout.
 - This replaces the previously proposed bottom Dock; functional spec v1.6 stays approved, while the final visual design remains under review.
+
+## Workspace Overview four-panel iteration v1.0 candidate (2026-10-19; needs user review)
+
+The user likes the recently reviewed macOS/Telegram-influenced image direction, the real integration brands/services, the agent statuses and count of active agents. Agreed Overview changes:
+
+- **Remove all four** large top metric cards: AI employees, Active agents, AI wallet, Manual actions.
+- Use **exactly four** primary modules filling the available Workspace content area: «Общая активность» / Overall activity; «Состояние интеграций» / Integration status; «Последние события» / Recent activity; «Ваши агенты» / Your agents.
+- Maintain compact 7/30-day selector **inside** overall activity. Count generic **task executions**, not messages or dialogs. Success/failed and overall success rate remain internally consistent with the chart. Fake fixture data in the standalone prototype is documented, not shown as in-product marketing.
+- Integration rows use **service-specific identity**: Telegram vector icon, MAX badge, Bitrix24-marked glyph, generic calendar icon, with separate rows for multiple connections. Do not falsely label the demo's generic calendar as Google Calendar. New connectors use provider-based fallback. Rows open integration details and indicate statuses from the scoped organization dataset.
+- Agent rows show current state (Active, Paused, Stopped, Draft) and a generic **Completed / executions** metric, never 'dialogs'; draft/no historic data uses a dash, rather than fabricated data. Header shows active agents n of total.
+- Recent events reflect the actual prototype organization's audit log and navigate to event details. Each module has a link to its corresponding full screen when appropriate.
+- Full-viewport layout with independently scrolling row panels. Small screens show one of the four panels using tabs. RU/EN and Light/Dark remain required; no decorative demo labels in end-user UI.
+- Floating LEFT vertical Workspace rail, headerless layout and Admin remain unchanged in this PR.
+
+Visual prototype is **not final approved design**, and real production activity data must be derived from the secured execution and billing ledgers, not fixtures.
