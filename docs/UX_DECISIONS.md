@@ -92,3 +92,11 @@ Based on the user's October 19 reference image (minimal white analytics product,
 - Keep contextual breadcrumbs plus Back on nested object pages (agent, contact/candidate, conversation journal, journal-event); no permanent header or duplicate title on root Overview. Back restores prior navigation history.
 - On smaller screens Dock shows a subset of sections plus **More**; hidden icons must remain in overflow. Preserve Light/Dark and RU/EN, keyboard focus, minimized motion preferences, full-viewport sizing and panel-local scrolling.
 - This v0.8 visual prototype is for iterative user review; Product Specification v1.6 is the approved functional baseline, while the full visual design is not yet approved.
+
+## Workspace floating LEFT rail v0.9 — latest user direction
+
+- User selected **left**, not right: the Workspace navigation floats vertically on the left with a small inset from the window boundaries, fully rounded corners, a subtle shadow, and a coherent Light/Dark surface.
+- AIMock wordmark at top of that floating rail separated by a horizontal divider; all 12 Workspace navigation routes are reachable as icon buttons with localized native title/accessible labels. Account avatar stays at the bottom, separated from navigation by another divider.
+- In shorter viewports, only the middle nav list scrolls; the top brand and bottom account trigger remain visible. No mobile horizontal Dock, no overlapping content.
+- No global header in Workspace. Theme/language belong to personal profile, and breadcrumbs appear on meaningful nested pages only. Admin still retains its own independent layout.
+- This replaces the previously proposed bottom Dock; functional spec v1.6 stays approved, while the final visual design remains under review.
