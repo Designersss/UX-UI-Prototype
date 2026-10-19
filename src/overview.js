@@ -27,7 +27,7 @@ function ov3Provider(c){
  if(/viber/i.test(value))return "viber";
  if(/календарь|calendar/i.test(value))return "calendar";
  if(/e-?mail|почта/i.test(value))return "mail";
- if(/(^|\W)crm(\W|$)/i.test(value))return "crm";
+ if(/amocrm|(^|\W)crm(\W|$)/i.test(value))return "crm";
  return "other";
 }
 function ov3Icon(c){
