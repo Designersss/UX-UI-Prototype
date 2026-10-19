@@ -115,3 +115,16 @@ The user likes the recently reviewed macOS/Telegram-influenced image direction, 
 - Floating LEFT vertical Workspace rail, headerless layout and Admin remain unchanged in this PR.
 
 Visual prototype is **not final approved design**, and real production activity data must be derived from the secured execution and billing ledgers, not fixtures.
+
+## Workspace visual direction v1.1 — Soft System selected from user reference (2026-10-19)
+
+This is the approved direction for further UX/UI iteration on **Overview and Workspace floating left navigation**, not blanket approval of every screen.
+
+- Subtle lavender/cool-blue background atmosphere with low-contrast bloom, no full wallpaper or noisy glass effects. White/light translucent panels with a subtle border and controlled shadow, coherent charcoal/natural-blue Dark variant.
+- SF system font stack (with Inter and Segoe fallback); consistent hierarchy, clean row density, 18–22px corner radii for panels, 10–13px for controls. Small hover/state transitions; honor reduced motion and keyboard focus.
+- Preserve headerless Workspace and floating LEFT navigation, profile pinned to the bottom, brand at top.
+- Four operational Overview modules retained: **Общая активность**, **Состояние интеграций**, **Последние события**, **Ваши агенты**. No top KPI strip. Period switcher remains inside the Activity chart.
+- Real integration provider marks stored as local SVG assets and shared between Overview and Integration Hub. Telegram, MAX, Bitrix24 and future explicitly identified providers get real artwork; unresolved generic providers such as `Календарь HR` get a neutral icon, never a misleading brand.
+- Statistics are still synthetic, org-scoped illustrative prototype values. Active agent counts, states and event records use the current selected organization; generic task-execution counts, not messages or dialogs.
+- Do not change Admin or redesign unrelated Workspace screens before separately reviewing them.
+- Design remains iterative/unapproved as a final platform-wide baseline; functional Product Specification v1.6 remains approved.
