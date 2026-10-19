@@ -72,3 +72,12 @@ Based on the user's October 19 reference image (minimal white analytics product,
 - Move the 7/30-day period switcher into the **Agent activity** card, where it controls the execution metrics and chart; preserve RU/EN and mobile tabs.
 - Maintain screen-height fit and scroll only within dense data panes; hover/focus and reduced-motion rules are explicit.
 - Track the pending critique on composition, color, font, microinteraction and density before propagating a style to the rest of AIMock.
+
+## Workspace floating bottom Dock v0.7 (user-approved idea; visual design still under review)
+
+- Replace left rail in Workspace with a floating, rounded **macOS-like bottom Dock**. Avoid copying Apple trade dress, but use recognizable icon-first navigation and restrained hover lift.
+- Entire viewport above belongs to working content; reserve a bottom safe strip so the Dock does not obscure tables, Inbox composer or panels. Never add outer document scrolling.
+- Desktop Dock contains all Workspace section icons with localized hover/focus tooltips and selected state; profile avatar at right retains organization switching, profile, help and logout.
+- Small/mobile Dock shows five primary sections, a localized **More** panel for the remaining seven sections, and profile avatar. Other screens (including Admin) keep their current navigation for now.
+- Preserve Light/Dark, RU/EN, keyboard focus, accessible labels, reduced-motion preference, all existing navigation actions and contextual breadcrumbs.
+- This is the experimental Workspace design direction. The global final UX/UI remains unapproved, even though its staging PR will be merged for iterative review.
