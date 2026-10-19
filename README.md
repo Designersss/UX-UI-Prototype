@@ -2,7 +2,7 @@
 
 Interactive, framework-free design prototype for AIMock Workspace and AIMock Admin.
 
-**Current baseline:** UX/UI v0.4, with a proposed Overview v0.5 iteration (under review; **not** a final approved design). The approved functional source of truth is AIMock Product Specification v1.6.
+**Current baseline:** UX/UI v0.4 functionality with a proposed Workspace sidebar + Overview v0.6 visual direction (**not yet approved**). The approved functional source of truth is AIMock Product Specification v1.6.
 
 ## Run locally
 
@@ -21,7 +21,8 @@ Then open `http://localhost:4173`. No build step or backend is needed.
 - `src/styles/theme.css` — subsequent theme, layout and responsive overrides
 - `src/app.js` — interactive prototype data, navigation and other page rendering
 - `src/overview.js` — updated Workspace Overview (independent page renderer)
-- `src/styles/overview.css` — Workspace Overview scoped visual styles
+- `src/styles/overview.css` — Workspace Overview base layout
+- `src/styles/workspace-direction.css` — candidate reference-inspired look, scoped to Workspace left rail and Overview
 - `docs/UX_DECISIONS.md` — decisions accepted during design reviews
 
 The original v0.4 single-file HTML was split into these files **without changing application behavior**. JavaScript remains a sizeable legacy file: new changes should progressively extract independent concerns and remove accumulated CSS overrides, rather than rewriting the UI from scratch.
