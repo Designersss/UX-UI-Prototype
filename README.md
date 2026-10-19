@@ -2,7 +2,7 @@
 
 Interactive, framework-free design prototype for AIMock Workspace and AIMock Admin.
 
-**Current baseline:** UX/UI v0.4 functionality with experimental Workspace Overview + floating left navigation + headerless Workspace v0.9 (**not yet final approved**). The approved functional source of truth is AIMock Product Specification v1.6.
+**Current baseline:** UX/UI v0.4 functionality with experimental Workspace Overview + floating left navigation + four-panel Workspace Overview v1.0 candidate (**not yet final approved**). The approved functional source of truth is AIMock Product Specification v1.6.
 
 ## Run locally
 
@@ -21,7 +21,8 @@ Then open `http://localhost:4173`. No build step or backend is needed.
 - `src/styles/theme.css` — subsequent theme, layout and responsive overrides
 - `src/app.js` — interactive prototype data, navigation and other page rendering
 - `src/overview.js` — updated Workspace Overview (independent page renderer)
-- `src/styles/overview.css` — Workspace Overview base layout
+- `src/styles/overview.css` — legacy Workspace Overview layout (previous design iteration)
+- `src/styles/overview-four-panels.css` — new four-panel operational Overview, RU/EN and Light/Dark
 - `src/styles/workspace-direction.css` — reference-inspired Workspace Overview and former icon rail styling
 - `src/styles/workspace-dock.css` — floating vertical navigation to the left of Workspace (replaces bottom Dock)
 - `src/styles/workspace-headerless.css` — Workspace-only header removal, left-rail brand, contextual breadcrumbs and personal preferences

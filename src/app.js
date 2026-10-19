@@ -171,6 +171,7 @@ if(act==='open-profile-preferences'){state.profileOpen=false;navigate('profile')
 if(act==='context-journal'){navigate('journal');return}
 if(act==='ov2-period'){state.ov2Period=Number(el.dataset.days)===30?30:7;render();return}
 if(act==='ov2-tab'){state.ov2MobileTab=el.dataset.tab;render();return}
+if(act==='ov3-tab'){if(['activity','connections','events','agents'].includes(el.dataset.tab)){state.ov3Tab=el.dataset.tab;render()}return}
 if(act==='ov2-open-event'){state.eventContext=id;navigate('journal-event');return}
 if(act==='ov2-open-candidate'){state.candidateId=id;state.modal={type:'candidate',id};render();return}
 if(act==='go-approvals'){navigate('approvals');return}
