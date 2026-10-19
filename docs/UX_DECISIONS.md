@@ -43,3 +43,20 @@
 ## Next steps
 
 Continue reviewing remaining Workspace pages and Admin screen-by-screen. Record additional accepted decisions here. Do not label v0.4 a fully approved final design.
+
+## Workspace Overview — design proposal for review (v0.5, NOT approved)
+
+Replace visually promotional / hollow overview cards with a dense operational company dashboard:
+
+- Four compact metrics: all AI employees, effectively active agents, generic task executions (period-based), prepaid AI balance.
+- A 7/30 day selector controls chart data, execution counts, success rate and AI spending.
+- Main analytics graph shows successful and failed **task executions**, not only chat messages.
+- Actionable attention queue from outstanding billing/HR notifications and scenarios.
+- Dense agent status list, with direct transitions to agent detail.
+- Recent business activity events, linking to the individual journal event.
+- All sections are permission-scoped to the current organization in the future API.
+- Entire shell remains screen-fitted; inner lists scroll, mobile uses explicit panels/tabs.
+- No repeat marketing copy or redundant top-level New Agent / Analytics buttons.
+- Both RU/EN and Light/Dark need to remain complete and accessible.
+
+**Prototype-only limitation:** The operational KPI timeseries and spending breakdown for Nord Group are fixed *sample fixtures*. There is no event aggregation backend in the prototype. Figures are consistent internally within the dashboard but should not be represented as real, authoritative billing or operating metrics until connected to the future API and ledger. UI deliberately uses product-oriented copy without a demo banner.
