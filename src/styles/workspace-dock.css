@@ -1,0 +1,207 @@
+/* AIMock Workspace v0.7 — bottom floating navigation Dock.
+   Scoped to .workspace-skin; Admin keeps the existing sidebar. */
+
+/* Shell expands to full width; floating nav occupies no left column. */
+.shell.workspace-skin{grid-template-columns:minmax(0,1fr)!important}
+.workspace-skin .main{min-width:0;width:100%;height:100%;overflow:hidden}
+.workspace-skin .side{
+  position:fixed!important;top:auto!important;bottom:16px!important;left:50%!important;right:auto!important;
+  transform:translateX(-50%)!important;
+  width:max-content!important;max-width:calc(100vw - 20px)!important;
+  min-width:0!important;height:70px!important;min-height:0!important;
+  padding:9px 10px!important;
+  display:flex!important;align-items:center!important;flex-direction:row!important;gap:7px!important;
+  border:1px solid rgba(215,220,235,.82)!important;
+  border-radius:23px!important;
+  background:rgba(255,255,255,.93)!important;
+  backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%);
+  box-shadow:0 14px 40px rgba(34,47,79,.12),0 2px 6px rgba(20,32,61,.05)!important;
+  z-index:46!important;overflow:visible!important;
+}
+body[data-theme="dark"] .workspace-skin .side{
+  background:rgba(31,37,50,.94)!important;border-color:rgba(82,91,116,.78)!important;
+  box-shadow:0 16px 45px rgba(0,0,0,.34)!important;
+}
+.workspace-skin .side .brand{display:none!important}
+.workspace-skin .side .nav{
+  display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:center!important;
+  width:max-content!important;min-width:0!important;flex:0 1 auto!important;
+  gap:4px!important;margin:0!important;padding:0!important;
+  overflow:visible!important;scrollbar-width:none!important;
+}
+.workspace-skin .side .nav-btn{
+  position:relative!important;
+  width:44px!important;min-width:44px!important;height:44px!important;min-height:44px!important;
+  flex:0 0 44px!important;padding:0!important;margin:0!important;
+  border-radius:14px!important;display:grid!important;place-items:center!important;
+  color:#7c8598!important;background:transparent!important;
+  border:1px solid transparent!important;
+  transition:background .15s ease,color .15s ease,transform .18s cubic-bezier(.2,.8,.2,1)!important;
+}
+.workspace-skin .side .nav-label{display:none!important}
+.workspace-skin .side .nav-ico{display:grid!important;place-items:center!important;width:21px!important;height:21px!important;flex:0 0 21px!important}
+.workspace-skin .side .nav-btn:hover{
+  color:#5b57d7!important;background:#efeffe!important;
+  transform:translateY(-5px) scale(1.06)!important;
+}
+.workspace-skin .side .nav-btn.active{
+  color:#5f58db!important;background:#eeeeff!important;border-color:#e2dffd!important;
+}
+body[data-theme="dark"] .workspace-skin .side .nav-btn{color:#b2bcce!important}
+body[data-theme="dark"] .workspace-skin .side .nav-btn:hover{
+  color:#d4cbff!important;background:#34334b!important;
+}
+body[data-theme="dark"] .workspace-skin .side .nav-btn.active{
+  color:#d6cbff!important;background:#403b59!important;border-color:#565074!important;
+}
+.workspace-skin .side .nav-btn.active::before{
+  content:"";position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);
+  width:4px;height:4px;border-radius:50%;background:#645cea;pointer-events:none;
+}
+body[data-theme="dark"] .workspace-skin .side .nav-btn.active::before{background:#c0b6ff}
+.workspace-skin .side .nav-btn::after{
+  position:absolute!important;z-index:100!important;left:50%!important;right:auto!important;
+  top:auto!important;bottom:calc(100% + 13px)!important;
+  transform:translate(-50%,5px)!important;
+  border-radius:9px!important;padding:8px 11px!important;
+  background:#242936!important;color:#fff!important;
+  pointer-events:none;opacity:0!important;visibility:hidden!important;white-space:nowrap;
+  box-shadow:0 8px 24px rgba(11,18,36,.2)!important;
+}
+.workspace-skin .side .nav-btn:hover::after,
+.workspace-skin .side .nav-btn:focus-visible::after{
+  opacity:1!important;visibility:visible!important;transform:translate(-50%,0)!important;
+}
+.workspace-skin .side .nav-count{top:-3px!important;right:-3px!important;z-index:2}
+.workspace-skin .side-foot{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  flex:0 0 auto!important;margin:0!important;padding:0 0 0 8px!important;
+  border-top:0!important;border-left:1px solid rgba(215,220,235,.9)!important;
+  position:relative!important;
+}
+body[data-theme="dark"] .workspace-skin .side-foot{border-left-color:rgba(92,101,124,.75)!important}
+.workspace-skin .side .side-profile.profile-trigger{
+  display:grid!important;place-items:center!important;width:44px!important;height:44px!important;min-height:44px!important;
+  padding:0!important;margin:0!important;border-radius:14px!important;
+  background:transparent!important;flex:0 0 44px!important;
+  transition:background .15s ease,transform .18s ease!important;
+}
+.workspace-skin .side .side-profile.profile-trigger:hover{
+  background:#efeffe!important;transform:translateY(-4px)!important;
+}
+body[data-theme="dark"] .workspace-skin .side .side-profile.profile-trigger:hover{background:#34334b!important}
+.workspace-skin .side-profile .avatar{width:34px!important;height:34px!important;flex:0 0 34px!important;border-radius:12px!important}
+.workspace-skin .side-profile .profile-txt,
+.workspace-skin .side-profile.profile-trigger>svg{display:none!important}
+.workspace-skin .side .profile-menu{
+  left:auto!important;right:0!important;bottom:calc(100% + 17px)!important;
+  width:min(302px,calc(100vw - 26px))!important;
+  max-height:min(560px,calc(100dvh - 120px))!important;z-index:110!important;
+  background:var(--panel)!important;border:1px solid var(--border)!important;
+}
+.workspace-skin .dock-more-toggle{
+  display:none;position:relative;align-items:center;justify-content:center;
+  background:transparent;border:1px solid transparent;color:#7c8598;
+  flex:0 0 43px;width:43px;height:44px;min-width:43px;padding:0;
+  border-radius:14px;cursor:pointer;
+  transition:color .15s,background .15s,transform .18s;
+}
+.workspace-skin .dock-more-toggle:hover,.workspace-skin .dock-more-toggle.is-open{
+  color:#5f58db;background:#efeffe;
+}
+body[data-theme="dark"] .workspace-skin .dock-more-toggle{color:#b2bcce}
+body[data-theme="dark"] .workspace-skin .dock-more-toggle:hover,
+body[data-theme="dark"] .workspace-skin .dock-more-toggle.is-open{color:#d6cbff;background:#403b59}
+.workspace-skin .dock-more-toggle::after{
+  content:attr(data-hint);position:absolute;bottom:calc(100% + 13px);left:50%;transform:translateX(-50%);
+  opacity:0;visibility:hidden;background:#242936;color:#fff;border-radius:9px;
+  font-size:12px;font-weight:630;white-space:nowrap;padding:8px 11px;pointer-events:none;
+}
+.workspace-skin .dock-more-toggle:hover::after,.workspace-skin .dock-more-toggle:focus-visible::after{
+  opacity:1;visibility:visible;
+}
+.workspace-skin .dock-more-menu{
+  position:absolute;right:55px;bottom:calc(100% + 15px);z-index:110;
+  width:min(270px,calc(100vw - 25px));max-height:min(510px,calc(100dvh - 115px));overflow-y:auto;
+  background:var(--panel);border:1px solid var(--border);box-shadow:0 15px 45px rgba(20,33,61,.2);
+  border-radius:17px;padding:8px;display:grid;gap:2px;color:var(--ink);
+}
+.workspace-skin .dock-more-row{
+  display:flex;align-items:center;text-align:left;gap:12px;
+  color:var(--ink);background:transparent;border:0;min-height:41px;
+  width:100%;border-radius:10px;padding:9px 11px;font-size:12px;font-weight:620;cursor:pointer;
+}
+.workspace-skin .dock-more-row svg{width:17px;height:17px;flex:0 0 17px;color:var(--muted)}
+.workspace-skin .dock-more-row:hover,.workspace-skin .dock-more-row.active{
+  background:var(--blue-lite);color:var(--blue);
+}
+.workspace-skin .dock-more-count{margin-left:auto;min-width:18px;text-align:center}
+.workspace-skin .dock-more-row:focus-visible,
+.workspace-skin .dock-more-toggle:focus-visible,
+.workspace-skin .side .nav-btn:focus-visible,
+.workspace-skin .side-profile.profile-trigger:focus-visible{
+  outline:2px solid var(--blue)!important;outline-offset:2px!important;
+}
+/* Nav accessible from Dock on all sizes; no slide-out drawer or page overlay. */
+.workspace-skin .topbar .mobile-toggle,
+.workspace-skin .drawer-overlay{display:none!important}
+/* Reserve a permanent strip BELOW all content for the dock. */
+.workspace-skin .workspace{padding-bottom:103px!important}
+.workspace-skin .workspace:has(.ov2-dashboard){padding-bottom:103px!important}
+.workspace-skin .workspace:has(.inbox-full){padding-bottom:91px!important}
+.workspace-skin .view-stage.home-view{overflow:hidden!important}
+@media(max-width:980px){
+  .workspace-skin .side{height:63px!important;padding:7px 8px!important;gap:4px!important}
+  .workspace-skin .side .nav{gap:2px!important}
+  .workspace-skin .side .nav-btn{width:39px!important;min-width:39px!important;height:43px!important;min-height:43px!important;flex-basis:39px!important}
+  .workspace-skin .side .side-profile.profile-trigger{width:40px!important;height:43px!important;min-height:43px!important;flex-basis:40px!important}
+  .workspace-skin .side-foot{padding-left:6px!important}
+}
+@media(max-width:850px){
+  .workspace-skin .side{
+    position:fixed!important;top:auto!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;
+    left:50%!important;right:auto!important;transform:translateX(-50%)!important;
+    height:60px!important;width:max-content!important;max-width:calc(100vw - 16px)!important;min-height:0!important;
+    padding:7px 8px!important;z-index:48!important;
+  }
+  .workspace-skin.menu-open .side{transform:translateX(-50%)!important}
+  .workspace-skin .side .brand{display:none!important}
+  .workspace-skin .side .nav{
+    flex:0 1 auto!important;display:flex!important;flex-direction:row!important;
+    align-items:center!important;width:max-content!important;gap:3px!important;
+    overflow:visible!important;
+  }
+  .workspace-skin .side .nav-btn{
+    display:grid!important;width:39px!important;min-width:39px!important;
+    height:43px!important;min-height:43px!important;flex:0 0 39px!important;
+    padding:0!important;justify-content:center!important;
+  }
+  .workspace-skin .side .nav-btn:nth-child(n+6){display:none!important}
+  .workspace-skin .side .nav-label{display:none!important}
+  .workspace-skin .side .dock-more-toggle{display:flex!important}
+  .workspace-skin .side-profile .profile-txt,.workspace-skin .side-profile.profile-trigger>svg{display:none!important}
+  .workspace-skin .side .side-profile.profile-trigger{
+    display:grid!important;width:40px!important;height:43px!important;min-height:43px!important;
+    padding:0!important;justify-content:center!important;flex-basis:40px!important;
+  }
+  .workspace-skin .side .profile-menu{
+    right:-4px!important;left:auto!important;bottom:calc(100% + 15px)!important;
+  }
+  .workspace-skin .workspace{padding-bottom:calc(93px + env(safe-area-inset-bottom))!important}
+  .workspace-skin .workspace:has(.ov2-dashboard){padding-bottom:calc(93px + env(safe-area-inset-bottom))!important}
+  .workspace-skin .workspace:has(.inbox-full){padding-bottom:calc(80px + env(safe-area-inset-bottom))!important}
+}
+@media(max-width:390px){
+  .workspace-skin .side{height:56px!important;padding:6px!important;gap:3px!important}
+  .workspace-skin .side .nav{gap:1px!important}
+  .workspace-skin .side .nav-btn{width:36px!important;min-width:36px!important;height:40px!important;min-height:40px!important;flex-basis:36px!important}
+  .workspace-skin .side .dock-more-toggle{width:36px!important;min-width:36px!important;height:40px!important;flex-basis:36px!important}
+  .workspace-skin .side .side-profile.profile-trigger{width:38px!important;height:40px!important;min-height:40px!important;flex-basis:38px!important}
+  .workspace-skin .side-foot{padding-left:4px!important}
+  .workspace-skin .side .nav-btn::after{display:none!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .workspace-skin .side .nav-btn,.workspace-skin .side-profile.profile-trigger,
+  .workspace-skin .dock-more-toggle{transition:none!important}
+  .workspace-skin .side .nav-btn:hover,.workspace-skin .side-profile.profile-trigger:hover{transform:none!important}
+}
