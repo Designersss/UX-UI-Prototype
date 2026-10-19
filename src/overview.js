@@ -34,7 +34,6 @@ function overview(){
  const stats=ov2Metrics();
  const active=state.scenario==="expired"||state.scenario==="walletZero"?0:state.agents.filter(a=>a.status==="active").length;
  const org=currentOrg(), balance=Number(state.orgs?.find(o=>o.id===state.activeOrgId)?.balance)||0,limit=Number(state.plans?.find(p=>p.name===org.plan)?.agents)||10;
- const days=stats.period===7?ov2T("Последние 7 дней","Last 7 days"):ov2T("Последние 30 дней","Last 30 days");
  const attention=ov2Alerts();const events=state.events.slice(0,5);const agents=state.agents.slice(0,6);
  const tab=state.ov2MobileTab||"activity";
  const max=Math.max(1,...stats.rows.map(x=>x.ok+x.failed));
@@ -54,7 +53,7 @@ function overview(){
  const eventRows=events.map(e=>`<button class="ov2-event-row" data-action="ov2-open-event" data-id="${esc(e.id)}"><span class="ov2-event-point ${e.type==="human"?"human":e.type==="integration"?"integration":"ai"}"></span><span class="ov2-event-copy"><strong>${esc(state.locale==="en"?tUI(e.title):e.title)}</strong><small>${esc(state.locale==="en"?tUI(e.desc):e.desc)}</small></span><time>${esc(e.time)}</time></button>`).join("");
  const mobileTabs=[["activity",ov2T("Активность","Activity")],["attention",ov2T("Внимание","Attention")],["agents",ov2T("Агенты","Agents")],["events",ov2T("События","Events")]].map(([key,label])=>`<button data-action="ov2-tab" data-tab="${key}" class="${tab===key?"selected":""}" aria-pressed="${tab===key}">${label}</button>`).join("");
  return `<div class="ov2-dashboard">
- <div class="ov2-heading"><h1>${ov2T("Обзор","Overview")}</h1><div class="ov2-period" role="group" aria-label="${ov2T("Период статистики","Statistics period")}"><button data-action="ov2-period" data-days="7" aria-pressed="${stats.period===7}" class="${stats.period===7?"selected":""}">${ov2T("7 дней","7 days")}</button><button data-action="ov2-period" data-days="30" aria-pressed="${stats.period===30}" class="${stats.period===30?"selected":""}">${ov2T("30 дней","30 days")}</button></div></div>
+
  <div class="ov2-kpis">
   <button class="ov2-kpi" data-action="go-agents"><span class="ov2-kpi-label">${ov2T("ИИ-сотрудники","AI employees")}</span><strong>${ov2Number(state.agents.length)} <em>/ ${ov2Number(limit)}</em></strong><span class="ov2-kpi-icon">${I("bot",18)}</span></button>
   <button class="ov2-kpi" data-action="go-agents"><span class="ov2-kpi-label">${ov2T("Активные агенты","Active agents")}</span><strong>${ov2Number(active)}</strong><span class="ov2-kpi-icon">${I("activity",18)}</span></button>
@@ -63,7 +62,7 @@ function overview(){
  </div>
  <div class="ov2-mobile-tabs" role="group" aria-label="${ov2T("Разделы обзора","Overview panels")}">${mobileTabs}</div>
  <div class="ov2-main ov2-show-${tab}">
-  <section class="ov2-card ov2-activity"><div class="ov2-card-head"><div><h2>${ov2T("Активность агентов","Agent activity")}</h2><p>${ov2T("Выполнения задач и результаты","Task executions and outcomes")} · ${days}</p></div><span class="ov2-card-context">${I("chart",17)}</span></div>
+  <section class="ov2-card ov2-activity"><div class="ov2-card-head"><div><h2>${ov2T("Активность агентов","Agent activity")}</h2><p>${ov2T("Выполнения задач и результаты","Task executions and outcomes")}</p></div><div class="ov2-period" role="group" aria-label="${ov2T("Период статистики","Statistics period")}"><button data-action="ov2-period" data-days="7" aria-pressed="${stats.period===7}" class="${stats.period===7?"selected":""}">${ov2T("7 дней","7 days")}</button><button data-action="ov2-period" data-days="30" aria-pressed="${stats.period===30}" class="${stats.period===30?"selected":""}">${ov2T("30 дней","30 days")}</button></div></div>
   <div class="ov2-activity-summary"><div><strong>${ov2Number(stats.total)}</strong><span>${ov2T("выполнений","executions")}</span></div><div><strong>${stats.successRate.toLocaleString(state.locale==="en"?"en-US":"ru-RU")}%</strong><span>${ov2T("успешно","success rate")}</span></div><div><strong>${ov2Money(stats.cost)}</strong><span>${ov2T("расходы на ИИ","AI spending")}</span></div></div>
   <div class="ov2-chart" role="group" aria-label="${ov2T("График выполнений","Execution chart")}"><div class="ov2-grid-lines"></div>${chart}</div>
   <div class="ov2-chart-legend"><span><i class="ov2-legend-good"></i>${ov2T("Успешно","Successful")} · ${ov2Number(stats.done)}</span><span><i class="ov2-legend-bad"></i>${ov2T("С ошибкой","Failed")} · ${ov2Number(stats.failed)}</span></div>
