@@ -2,7 +2,7 @@
 
 Interactive, framework-free design prototype for AIMock Workspace and AIMock Admin.
 
-**Current baseline:** UX/UI v0.4 functionality with experimental Workspace Overview + floating Dock v0.7 (**not yet final approved**). The approved functional source of truth is AIMock Product Specification v1.6.
+**Current baseline:** UX/UI v0.4 functionality with experimental Workspace Overview + floating Dock + headerless Workspace v0.8 (**not yet final approved**). The approved functional source of truth is AIMock Product Specification v1.6.
 
 ## Run locally
 
@@ -24,6 +24,7 @@ Then open `http://localhost:4173`. No build step or backend is needed.
 - `src/styles/overview.css` — Workspace Overview base layout
 - `src/styles/workspace-direction.css` — reference-inspired Workspace Overview and former icon rail styling
 - `src/styles/workspace-dock.css` — floating bottom Dock overrides for Workspace navigation
+- `src/styles/workspace-headerless.css` — Workspace-only header removal, Dock brand, contextual breadcrumbs and personal preferences
 - `docs/UX_DECISIONS.md` — decisions accepted during design reviews
 
 The original v0.4 single-file HTML was split into these files **without changing application behavior**. JavaScript remains a sizeable legacy file: new changes should progressively extract independent concerns and remove accumulated CSS overrides, rather than rewriting the UI from scratch.
