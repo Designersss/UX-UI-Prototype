@@ -81,3 +81,14 @@ Based on the user's October 19 reference image (minimal white analytics product,
 - Small/mobile Dock shows five primary sections, a localized **More** panel for the remaining seven sections, and profile avatar. Other screens (including Admin) keep their current navigation for now.
 - Preserve Light/Dark, RU/EN, keyboard focus, accessible labels, reduced-motion preference, all existing navigation actions and contextual breadcrumbs.
 - This is the experimental Workspace design direction. The global final UX/UI remains unapproved, even though its staging PR will be merged for iterative review.
+
+## Workspace header + Dock refinement v0.8 (accepted UX decision; not final design)
+
+- **Remove the permanent top header for Workspace only.** Its theme, language, notification controls and Workspace/Admin switch no longer occupy screen space.
+- Keep notifications in the bottom Dock; do not duplicate them in the page shell.
+- Put a visible **AIMock** wordmark at the LEFT edge of the floating bottom Dock, with a divider to its right. Keep the account avatar on the RIGHT, divided on its left. Clicking AIMock navigates to the Workspace Overview.
+- Personal **theme and language** settings belong in **My profile → Appearance & language**, separate from organization Settings. Selection persists across organization switching. Existing Admin top header remains unchanged for now.
+- Workspace-to-Admin navigation is accessible from the profile menu **only when the account has platform-owner/admin privileges**; production must authorize server-side. Admin can return to Workspace via its existing header toggle.
+- Keep contextual breadcrumbs plus Back on nested object pages (agent, contact/candidate, conversation journal, journal-event); no permanent header or duplicate title on root Overview. Back restores prior navigation history.
+- On smaller screens Dock shows a subset of sections plus **More**; hidden icons must remain in overflow. Preserve Light/Dark and RU/EN, keyboard focus, minimized motion preferences, full-viewport sizing and panel-local scrolling.
+- This v0.8 visual prototype is for iterative user review; Product Specification v1.6 is the approved functional baseline, while the full visual design is not yet approved.
