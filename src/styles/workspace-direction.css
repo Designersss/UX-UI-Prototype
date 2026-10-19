@@ -426,3 +426,6 @@ body[data-theme="dark"] .workspace-skin .ov2-dashboard{
  .workspace-skin .ov2-alert-row,.workspace-skin .ov2-agent-row,
  .workspace-skin .ov2-event-row{transition:none!important;transform:none!important}
 }
+
+/* Root Overview has no parent path: avoid repeating its page name in the header. */
+.workspace-skin.overview-shell .topbar .route-crumbs{display:none!important}
