@@ -21,12 +21,20 @@ try{
   assert.equal(await page.locator('.ov2-activity [data-action="ov2-period"]').count(),2,'Period controls live inside activity card');
   assert.equal(await page.locator('.ov2-dashboard > .ov2-period').count(),0,'No period controls above KPI cards');
   assert.equal(await page.locator('.workspace-skin').count(),1,'Workspace shell uses the scoped visual direction');
+  const dock=await page.locator('.workspace-skin .side').evaluate(e=>{
+    const r=e.getBoundingClientRect();
+    return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height};
+  });
+  assert.ok(dock.left>=7 && dock.right<=resolution.width-7,'Dock stays within viewport: '+JSON.stringify(dock));
+  assert.ok(Math.abs((dock.left+dock.right)/2-resolution.width/2)<=2,'Dock is horizontally centered: '+JSON.stringify(dock));
+  assert.ok(dock.bottom<=resolution.height && dock.bottom>=resolution.height-45,'Dock floats near bottom: '+JSON.stringify(dock));
+  assert.ok(dock.top>resolution.height/2,'Dock is not a left rail');
   if(resolution.width>850){
-    const railWidth=await page.locator('.workspace-skin .side').evaluate(e=>e.getBoundingClientRect().width);
-    assert.ok(railWidth<=90, 'Desktop navigation is icon-first rail: '+railWidth);
+    assert.ok(dock.width>350,'Desktop dock exposes all routes: '+dock.width);
     assert.equal(await page.locator('.side .nav-btn').first().getAttribute('aria-label'),'Обзор');
+    assert.equal(await page.locator('.side .nav-btn:visible').count(),12,'All twelve Workspace routes visible on desktop');
     await page.locator('.workspace-skin .profile-trigger').click();
-    assert.ok(await page.locator('.profile-menu').isVisible(),'Profile and organization menu accessible from rail');
+    assert.ok(await page.locator('.profile-menu').isVisible(),'Profile and organization menu accessible from Dock');
     await page.locator('.workspace-skin .profile-trigger').click();
   }
   const initial=await page.locator('.ov2-activity-summary strong').first().innerText();
@@ -49,9 +57,15 @@ try{
    await page.screenshot({path:'artifacts/overview-dark-en.png',fullPage:false});
   }
   if(resolution.name==='mobile'){
-   await page.locator('[data-action="menu"].mobile-toggle').click();
-   assert.ok(await page.locator('.workspace-skin .side .nav-label').first().isVisible(),'Mobile drawer contains visible text labels');
-   await page.locator('.drawer-overlay[data-action="menu"]').click({position:{x:resolution.width-20,y:resolution.height/2}});
+   assert.equal(await page.locator('.side .nav-btn:visible').count(),5,'Five primary routes visible on mobile Dock');
+   await page.locator('.dock-more-toggle').click();
+   assert.ok(await page.locator('.dock-more-menu').isVisible(),'Overflow menu expands from Dock');
+   assert.ok(await page.locator('.dock-more-menu [data-page="billing"]').isVisible(),'Finances available in overflow menu');
+   await page.locator('.dock-more-toggle').click();
+   assert.equal(await page.locator('.dock-more-menu').count(),0,'Overflow can be closed');
+   await page.locator('.workspace-skin .profile-trigger').click();
+   assert.ok(await page.locator('.profile-menu').isVisible(),'Account menu accessible from mobile Dock');
+   await page.locator('.workspace-skin .profile-trigger').click();
    await page.screenshot({path:'artifacts/overview-mobile.png',fullPage:false});
    await page.locator('.ov2-mobile-tabs [data-tab="agents"]').click();
    assert.ok(await page.locator('.ov2-agents').isVisible(),'mobile agents panel');
@@ -64,5 +78,5 @@ try{
   await page.close();
  }
  assert.deepEqual(errors,[],'no unhandled browser JavaScript errors');
- console.log('Browser checks passed: responsive fit, KPI period, RU/EN, Light/Dark, agent route.');
+ console.log('Browser checks passed: floating Dock, overflow/account menus, responsive fit, KPI period, RU/EN, Light/Dark, agent route.');
 }finally{await browser.close()}
