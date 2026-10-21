@@ -22,7 +22,8 @@ Then open `http://localhost:4173`. No build step or backend is needed.
 - `src/app.js` — interactive prototype data, navigation and other page rendering
 - `src/overview.js` — updated Workspace Overview (independent page renderer)
 - `src/styles/overview.css` — legacy Workspace Overview layout (previous design iteration)
-- `src/styles/overview-four-panels.css` — new four-panel operational Overview, RU/EN and Light/Dark
+- `src/styles/overview-four-panels.css` — chosen Soft System visual direction for the four-panel Overview, RU/EN and Light/Dark
+- `src/assets/integrations/*.svg` — local, provider-specific vector marks shared by Overview and Integration Hub
 - `src/styles/workspace-direction.css` — reference-inspired Workspace Overview and former icon rail styling
 - `src/styles/workspace-dock.css` — floating vertical navigation to the left of Workspace (replaces bottom Dock)
 - `src/styles/workspace-headerless.css` — Workspace-only header removal, left-rail brand, contextual breadcrumbs and personal preferences
