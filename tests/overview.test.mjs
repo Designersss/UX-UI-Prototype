@@ -46,6 +46,16 @@ test('exactly four functional blocks, without KPI strip or dialog-specific stati
  assert.doesNotMatch(ui,/ov2-kpi|ИИ-сотрудники|AI-баланс|Ручные действия|Требует внимания|диалогов|Добрый день/);
  for(const action of ['ov2-period','go-integrations','go-journal','go-agents','connector-detail','open-agent','ov2-open-event','ov3-tab'])assert.match(ui,new RegExp('data-action="'+action+'"'));
 });
+test('brand image files are local, non-empty SVGs with a recognizable source',()=>{
+ for(const name of ['telegram','max','bitrix24','whatsapp','vk','viber','googlecalendar']){
+  const file=new URL('../src/assets/integrations/'+name+'.svg',import.meta.url);
+  const svg=fs.readFileSync(file,'utf8');
+  assert.match(svg,/<svg\b/,'Invalid SVG root for '+name);
+  assert.ok(svg.length>100,'SVG unexpectedly empty for '+name);
+ }
+ const max=fs.readFileSync(new URL('../src/assets/integrations/max.svg',import.meta.url),'utf8');
+ assert.match(max,/#471AFF/i,'MAX must use an official brand color');
+});
 test('every actual connector has its own provider-specific visual identifier',()=>{
  const {run}=harness();const ui=run('overview()');
  for(const cls of ['telegram','max','bitrix','calendar'])assert.ok(ui.includes('ov3-provider-icon '+cls),cls);
