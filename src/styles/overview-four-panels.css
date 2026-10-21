@@ -368,3 +368,15 @@ body[data-theme="dark"] .workspace-skin .ov3-provider-icon.calendar{background:#
 body[data-theme="dark"] .workspace-skin .integration-logo{
  background:rgba(93,117,157,.25);
 }
+
+/* Shared local provider icons in the organization Integration Hub.
+   Other catalog styles remain as in the current prototype. */
+.workspace-skin .integration-name{display:inline-flex;align-items:center;gap:10px;min-width:0;max-width:100%}
+.workspace-skin .integration-name>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.workspace-skin .integration-logo{
+ display:inline-flex;align-items:center;justify-content:center;
+ flex:0 0 32px;width:32px;height:32px;
+ border-radius:10px;background:rgba(226,235,255,.55);
+}
+.workspace-skin .integration-logo .ov3-service-mark{width:25px;height:25px;flex:0 0 25px}
+body[data-theme="dark"] .workspace-skin .integration-logo{background:rgba(79,99,143,.24)}
