@@ -128,3 +128,7 @@ This is the approved direction for further UX/UI iteration on **Overview and Wor
 - Statistics are still synthetic, org-scoped illustrative prototype values. Active agent counts, states and event records use the current selected organization; generic task-execution counts, not messages or dialogs.
 - Do not change Admin or redesign unrelated Workspace screens before separately reviewing them.
 - Design remains iterative/unapproved as a final platform-wide baseline; functional Product Specification v1.6 remains approved.
+
+## MAX mark source correction (2026-10-21)
+
+Replaced a hand-drawn speculative MAX vector in the prototype with the recognizable existing MAX messenger SVG mark shape published in [GREEN-API's MAX integration artwork](https://github.com/green-api/green-api-chat/blob/main/src/assets/messenger-logo/max-logo.svg). The small icon sits on a tile in MAX's [official brand colors](https://go.max.ru/brandbook). This is a local vector-derived integration graphic, **not** an unmodified file from MAX's downloadable official logo package. Obtain and verify the official MAX asset before public release and follow applicable brand rules. All other service logos remain unchanged.
