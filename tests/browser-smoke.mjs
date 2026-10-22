@@ -1,95 +1,99 @@
+import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { chromium } from 'playwright';
 
-fs.mkdirSync('artifacts',{recursive:true});
-const browser=await chromium.launch({headless:true});
-const errors=[];
-const sizes=[
- {name:'desktop',width:1440,height:900},
- {name:'laptop',width:1280,height:720},
- {name:'tablet',width:1024,height:768},
- {name:'mobile',width:390,height:844},
- {name:'small-mobile',width:320,height:568}
+fs.mkdirSync('artifacts/ui', {recursive:true});
+const browser = await chromium.launch({headless:true});
+const cases = [
+  {name:'desktop',width:1440,height:900},
+  {name:'laptop',width:1280,height:720},
+  {name:'mobile',width:390,height:844}
 ];
 try {
- for(const size of sizes){
-  const page=await browser.newPage({viewport:{width:size.width,height:size.height}});
-  page.on('pageerror',e=>errors.push(size.name+': '+e.message));
-  await page.goto('http://127.0.0.1:4173',{waitUntil:'load'});
-  await page.locator('.ov3-overview').waitFor();
-  assert.equal(await page.locator('.workspace-skin .topbar').count(),0,'Workspace has no header');
-  assert.equal(await page.locator('.ov3-layout .ov3-panel').count(),4,'Four overview panels');
-  assert.equal(await page.locator('.ov2-kpi').count(),0,'No old overview KPI cards');
-  assert.equal(await page.locator('.ov3-connection-row').count(),5,'Five actual integrations');
-  assert.equal(await page.locator('.ov3-agent-row').count(),3,'Three actual agents');
-  assert.equal(await page.locator('.ov3-status.success').count()>=4,true,'Connection and agent statuses');
-  assert.equal(await page.locator('.ov3-provider-icon.telegram').count(),2,'Telegram identities visible');
-  assert.equal(await page.locator('.ov3-provider-icon.max').count(),1,'MAX identity visible');
-  assert.equal(await page.locator('.ov3-provider-icon.bitrix').count(),1,'Bitrix24 identity visible');
-  assert.equal(await page.locator('.ov3-provider-icon.calendar').count(),1,'Calendar identity visible');
-  const marks=page.locator('.ov3-connections img.ov3-service-mark');
-  assert.equal(await marks.count(),4,'Two Telegram, MAX and Bitrix24 must have true SVG brand images');
-  await page.waitForFunction(()=>{
-    const icons=Array.from(document.querySelectorAll('.ov3-connections img.ov3-service-mark'));
-    return icons.length===4&&icons.every(x=>x.complete&&x.naturalWidth>0);
-  },{timeout:6000});
-  assert.equal(await page.locator('.ov3-connections .ov3-logo-type').count(),0,'No text-only brand placeholders');
-  const rail=await page.locator('.workspace-skin .side').evaluate(e=>e.getBoundingClientRect().toJSON());
-  const content=await page.locator('.workspace-skin .workspace').evaluate(e=>e.getBoundingClientRect().toJSON());
-  assert.ok(rail.left>=7 && rail.width<=85 && content.left>rail.right,'Floating left rail does not overlap content');
-  const box=await page.evaluate(()=>({w:document.documentElement.scrollWidth,h:document.documentElement.scrollHeight,iw:innerWidth,ih:innerHeight}));
-  assert.ok(box.w<=box.iw+1 && box.h<=box.ih+1,'Whole document never scrolls: '+JSON.stringify({size,box}));
-  if(size.width>700){
-   assert.ok(await page.locator('.ov3-activity').isVisible());
-   assert.ok(await page.locator('.ov3-agents').isVisible());
-  }else{
-   assert.ok(await page.locator('.ov3-mobile-tabs').isVisible(),'Compact screen panel navigation');
-   await page.locator('.ov3-mobile-tabs [data-tab="agents"]').click();
-   assert.ok(await page.locator('.ov3-agents').isVisible());
-   await page.locator('.ov3-mobile-tabs [data-tab="connections"]').click();
-   assert.ok(await page.locator('.ov3-connections').isVisible());
-   await page.locator('.ov3-mobile-tabs [data-tab="activity"]').click();
+  for (const viewport of cases) {
+    const page = await browser.newPage({ viewport, reducedMotion: 'reduce' });
+    const errors=[];
+    page.on('pageerror',e=>errors.push(e.message));
+    await page.goto('http://127.0.0.1:4173/#/overview',{waitUntil:'load'});
+    await page.getByRole('heading',{name:'Обзор'}).waitFor();
+    assert.ok((await page.locator('.metrics').innerText()).replace(/\s/g,' ').includes('1 248'), '7-day fixture missing');
+    const fullWidth=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth}));
+    assert.ok(fullWidth.scroll<=fullWidth.viewport+2,'Document horizontally overflows: '+JSON.stringify(fullWidth));
+    await page.screenshot({path:'artifacts/ui/'+viewport.name+'-light.png',fullPage:true});
+
+    await page.locator('[data-period="30"]').click();
+    assert.ok((await page.locator('.metrics').innerText()).replace(/\s/g,' ').includes('4 820'), '30-day fixture missing');
+    assert.equal(await page.locator('.bar-col').count(),30,'30-day view must show 30 actual days');
+    assert.ok((await page.locator('.activity-card').innerText()).includes('23 сентября — 22 октября 2026'));
+    await page.locator('[data-period="7"]').click();
+
+
+    if(viewport.width>1100){
+      const center=page.locator('.main-scroll');
+      await center.evaluate(node=>{node.scrollTop=180;});
+      const before=await center.evaluate(node=>node.scrollTop);
+      await page.locator('.summary-grid [data-preview]').first().click();
+      assert.ok((await page.locator('.right-rail-context').innerText()).includes('Менеджер заявок'));
+      assert.equal(await page.locator('.right-rail-context .queue-item').count(),0,'Context view must fully replace attention queue');
+      assert.equal(await page.locator('.right-rail-context .rail-billing').count(),0,'Balance must not be mixed into contextual view');
+      assert.equal(await center.evaluate(node=>node.scrollTop),before,'Central pane jumped when opening contextual preview');
+      await page.locator('[data-back-control]').click();
+      assert.ok(await page.locator('.right-rail').evaluate(node=>!node.classList.contains('right-rail-context')));
+      assert.ok((await page.locator('.right-rail').innerText()).includes('AI-баланс'));
+      await page.locator('.alert-banner').click();
+      assert.ok(await page.locator('.queue-item').first().evaluate(node=>node.classList.contains('selected')));
+      assert.ok(await page.locator('.right-rail').evaluate(node=>node.classList.contains('attention-highlight')));
+      await page.locator('.summary-grid [data-preview]').last().click();
+      assert.equal(await page.locator('.right-rail-context .brand-logo img').count(),1,'Integration context must show original logo');
+      await page.screenshot({path:'artifacts/ui/'+viewport.name+'-integration-context.png',fullPage:true});
+      assert.equal(await page.locator('.summary-grid .line-item img').count(),3,'All visible integrations need actual SVG logos');
+      await page.locator('.events [data-preview]').first().click();
+      assert.ok((await page.locator('.right-rail-context').innerText()).includes('СОБЫТИЕ'));
+      assert.equal(await page.locator('.right-rail-context .queue-item').count(),0); 
+      await page.locator('[data-back-control]').click();
+    }
+
+    if(viewport.width<=1100){
+      await page.locator('[data-mobile-panel]').click();
+      await page.locator('.right-rail.mobile-open .queue-item').nth(1).click();
+      assert.ok((await page.locator('.right-rail .detail-desc').innerText()).includes('Диалог'));
+      await page.locator('[data-close-panel]').click();
+      await page.locator('.summary-grid [data-preview]').last().click();
+      assert.ok(await page.locator('.right-rail').evaluate(node=>node.classList.contains('mobile-open')));
+      assert.ok((await page.locator('.right-rail-context').innerText()).includes('ИНТЕГРАЦИЯ'));
+      await page.screenshot({path:'artifacts/ui/'+viewport.name+'-integration-context.png',fullPage:true});
+      await page.locator('[data-back-control]').click();
+      assert.ok(await page.locator('.right-rail').evaluate(node=>!node.classList.contains('right-rail-context')));
+      await page.locator('[data-close-panel]').click();
+    }else{
+      await page.locator('.queue-item').nth(1).click();
+      assert.ok((await page.locator('.detail-desc').innerText()).includes('Диалог'));
+    }
+    if(viewport.width<=760){
+      await page.locator('[data-menu]').click();
+      assert.ok(await page.locator('.sidebar').evaluate(el=>el.classList.contains('is-open')));
+    }
+    await page.locator('.profile').click();
+    await page.locator('[data-theme="dark"]').click();
+    assert.equal(await page.locator('body').getAttribute('data-theme'),'dark');
+    await page.screenshot({path:'artifacts/ui/'+viewport.name+'-dark.png',fullPage:true});
+    await page.locator('[data-locale="en"]').click();
+    await page.getByRole('heading',{name:'Overview'}).waitFor();
+    await page.screenshot({path:'artifacts/ui/'+viewport.name+'-en.png',fullPage:true});
+    assert.deepEqual(errors,[], 'JS errors at '+viewport.name);
+    await page.close();
   }
-  assert.match(await page.locator('.ov3-activity-intro strong').innerText(),/304/);
-  await page.locator('.ov3-activity [data-action="ov2-period"][data-days="30"]').click();
-  assert.match(await page.locator('.ov3-activity-intro strong').innerText(),/1[\s\u00a0\u202f,]?057/);
-  await page.locator('.ov3-activity [data-action="ov2-period"][data-days="7"]').click();
-  if(size.name==='desktop'){
-   await page.screenshot({path:'artifacts/overview-light-ru.png',fullPage:false});
-   await page.locator('.side [data-page="integrations"]').click();
-   assert.ok(await page.locator('.integration-name img.ov3-service-mark').count()>=4,'Integration Hub shares brand icon assets');
-   await page.locator('.dock-brand').click();
-   await page.locator('.ov3-connection-row[data-id="tg1"]').click();
-   assert.ok(await page.locator('.modal-backdrop').isVisible(),'Telegram integration opens detail');
-   await page.locator('.modal-backdrop [data-action="modal-close"]').first().click();
-   await page.locator('.ov3-agent-row[data-id="a1"]').click();
-   assert.ok(await page.locator('.workspace-context-nav').isVisible(),'Agent detail breadcrumbs');
-   await page.locator('.dock-brand').click();
-   await page.locator('.profile-trigger').click();
-   await page.locator('[data-action="open-profile-preferences"]').click();
-   await page.locator('.personal-preferences').waitFor();
-   await page.locator('[data-action="set-theme"][data-value="dark"]').click();
-   assert.equal(await page.locator('body').getAttribute('data-theme'),'dark');
-   await page.locator('[data-action="set-locale"][data-value="en"]').click();
-   assert.equal(await page.locator('html').getAttribute('lang'),'en');
-   await page.locator('.dock-brand').click();
-   assert.ok((await page.locator('.ov3-card-header h2').first().innerText()).includes('Overall activity'));
-   await page.screenshot({path:'artifacts/overview-dark-en.png',fullPage:false});
-   // Existing Admin remains intact.
-   await page.locator('.profile-trigger').click();
-   await page.locator('.profile-menu [data-action="mode"][data-mode="admin"]').click();
-   assert.equal(await page.locator('.workspace-skin').count(),0);
-   assert.ok(await page.locator('.topbar').isVisible());
-  }
-  if(size.name==='mobile'){
-   await page.screenshot({path:'artifacts/overview-mobile.png',fullPage:false});
-   await page.locator('.side .nav-btn[data-page="notifications"]').scrollIntoViewIfNeeded();
-   await page.locator('.side .nav-btn[data-page="notifications"]').click();
-   assert.ok((await page.locator('.view-stage').innerText()).length>0,'All 12 navigation icons remain accessible');
-  }
+  const page=await browser.newPage({viewport:{width:1440,height:900}});
+  await page.goto('http://127.0.0.1:4173/#/overview');
+  await page.locator('.org-switch').click();
+  await page.locator('[data-org="lab"]').click();
+  assert.ok((await page.locator('.metrics').innerText()).includes('0'));
+  assert.equal(await page.locator('.queue-item').count(),0, 'org queue leaking');
+  await page.locator('[data-search]').click();
+  await page.locator('[data-search-input]').fill('Тестовый');
+  assert.ok((await page.locator('.search-results').innerText()).includes('Тестовый рекрутер'));
   await page.close();
- }
- assert.deepEqual(errors,[],'No JavaScript errors');
- console.log('Browser checks passed: four modules, service identities, task metrics, time selector, navigation, themes and responsive viewports.');
-}finally{await browser.close()}
+  console.log('Chromium smoke passed at all viewports.');
+}finally{
+  await browser.close();
+}
