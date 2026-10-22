@@ -139,9 +139,16 @@ function controlPanel(o){
  '<div class="queue-list">'+(rowList||'<p class="empty">'+T("empty")+'</p>')+'</div>'+subHtml+
  '<div class="rail-billing"><p class="eyebrow">'+T("balanceTitle")+'</p><strong>'+escapeHtml(o.plan)+' · '+ (state.locale==="ru"?"до ":"until ")+escapeHtml(o.periodEnd)+'</strong><div class="balance-row"><span>'+T("aiBalance")+'</span><a href="#/finance">'+T("openFinance")+'</a></div><div class="balance-number">'+o.balance.toLocaleString("ru-RU")+' ₽</div></div></aside>';
 }
-function placeholder(section,id){
+function placeholder(section,id,sub,step){
  const n=T(section)||section;
- return '<header class="page-head"><div><h1>'+escapeHtml(n)+'</h1><p>'+T("mockLabel")+'</p></div></header><div class="surface coming-page"><span class="coming-icon">'+icon(section==="agents"?"agents":section==="integrations"?"integrations":"overview",32)+'</span><h2>'+T("underConstruction")+'</h2><p>'+T("underConstructionDesc")+'</p>'+(id?'<p class="placeholder-id">ID: '+escapeHtml(id)+'</p>':'')+'<a class="btn btn-dark" href="#/overview">'+T("back")+'</a></div>';
+ const fromAgent=id==="from-agent"&&sub&&Creator.draft(org(),sub)&&["knowledge","integrations","help"].includes(section);
+ const target=fromAgent?"#/agents/"+encodeURIComponent(sub)+"/"+(section==="knowledge"?"setup/4":section==="integrations"?"setup/5":step==="testing"?"testing":"setup/"+Math.max(1,Math.min(7,Number(step)||2))):"#/overview";
+ const caption=fromAgent?(state.locale==="ru"?"Вернуться к настройке агента":"Back to agent setup"):T("back");
+ return '<header class="page-head"><div>'+(fromAgent?'<a class="wizard-back-link" href="'+target+'">← '+caption+'</a>':'')+
+ '<h1>'+escapeHtml(n)+'</h1><p>'+T("mockLabel")+'</p></div></header>'+
+ '<div class="surface coming-page"><span class="coming-icon">'+icon(section==="agents"?"agents":section==="integrations"?"integrations":"overview",32)+'</span><h2>'+T("underConstruction")+'</h2><p>'+T("underConstructionDesc")+'</p>'+
+ (id&&!fromAgent?'<p class="placeholder-id">ID: '+escapeHtml(id)+'</p>':'')+
+ '<a class="btn btn-dark" href="'+target+'">← '+caption+'</a></div>';
 }
 function render(){
  const o=org(),r=route();
@@ -155,9 +162,9 @@ function render(){
  const catalog=r.section==="agents"&&!r.id;
  const wizard=r.section==="agents"&&(r.id==="new"||r.sub==="setup"||r.sub==="testing");
  const catalogOrg=catalog?{...o,agents:[...o.agents,...Creator.catalogRecords(o)]}:o;
- const content=r.section==="overview"?overview(o):catalog?Agents.page(catalogOrg,state.locale,icon):wizard?Creator.page(o,state.locale,icon,r.id,r.sub,r.step):placeholder(r.section,r.id);
+ const content=r.section==="overview"?overview(o):catalog?Agents.page(catalogOrg,state.locale,icon):wizard?Creator.page(o,state.locale,icon,r.id,r.sub,r.step):placeholder(r.section,r.id,r.sub,r.step);
  const panel=catalog?Agents.panel(catalogOrg,state.locale,icon,state.panelOpen):wizard?Creator.panel(o,state.locale,icon,r.id,state.panelOpen):controlPanel(o);
- root.innerHTML='<div class="shell">'+sidebar(r.section,o)+'<main class="main" id="main"><div class="mobile-toolbar"><button type="button" data-menu="1" aria-label="Menu">'+icon("menu")+'</button><strong>AIMock</strong><button type="button" data-mobile-panel="1" aria-label="'+T("control")+'">'+icon("notifications")+'</button></div><div class="main-scroll">'+content+'</div></main>'+panel+'</div>'+
+ root.innerHTML='<div class="shell">'+sidebar(r.section,o)+'<main class="main" id="main"><div class="mobile-toolbar"><button type="button" data-menu="1" aria-label="Menu">'+icon("menu")+'</button><strong>AIMock</strong><button type="button" data-mobile-panel="1" aria-label="'+T("control")+'">'+icon("notifications")+'</button></div><div class="main-scroll'+(wizard?" wizard-main":"")+'">'+content+'</div></main>'+panel+'</div>'+
  (catalog?Agents.modal(catalogOrg,state.locale):"")+
  '<dialog class="search-dialog" id="search-dialog"><div class="search-modal-head">'+icon("search")+'<input aria-label="'+T("search")+'" placeholder="'+T("searchPlaceholder")+'" autocomplete="off" data-search-input><button data-close-search type="button" aria-label="Close">'+icon("close")+'</button></div><div class="search-results" id="search-results"></div></dialog>';
  root.querySelector(".main-scroll").scrollTop=previousMain;

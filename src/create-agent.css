@@ -207,3 +207,10 @@
 .wizard-knowledge-item:disabled{cursor:not-allowed}
 .wizard-knowledge-item .wizard-integration-action{font-size:19px}
 .wizard-knowledge-item.disabled .wizard-integration-action{font-size:10px}
+
+/* Full-height wizard: one scrolling main viewport, no independent card scrollbar. */
+.main-scroll.wizard-main{height:100%;min-height:0;display:flex;flex-direction:column;overflow-y:auto;scrollbar-gutter:stable}
+.wizard-main>.wizard-heading,.wizard-main>.wizard-steps,.wizard-main>.wizard-footer{flex-shrink:0}
+.wizard-main>.wizard-body{flex:1 0 auto;min-height:0}
+.wizard-main>.wizard-footer{margin-top:auto;padding-top:14px}
+@media(max-width:760px){.main-scroll.wizard-main{scrollbar-gutter:auto}}

@@ -93,7 +93,7 @@ function section3(d,loc){
  '<span class="wizard-check-icon">▤</span><span class="wizard-check-main"><strong>'+E(k.title)+'</strong><small>'+E(k.detail)+'</small></span>'+
  '<span class="wizard-integration-action">'+(selected?"✓":k.disabled?L(loc,"Неактуально","Outdated"):"+")+'</span></button>';
  }).join("")+'</div>'+
- '<a class="wizard-inline-link" href="#/knowledge">'+L(loc,"Открыть базу знаний","Open Knowledge Base")+' ↗</a>';
+ '<a class="wizard-inline-link" href="#/knowledge/from-agent/'+encodeURIComponent(d.id)+'">'+L(loc,"Открыть базу знаний","Open Knowledge Base")+' ↗</a>';
 }
 function section4(d,o,loc,icon){
  const brand={telegram:"telegram.svg",max:"max.svg",bitrix:"bitrix24.svg",bitrix24:"bitrix24.svg",vk:"vk.svg",whatsapp:"whatsapp.svg",viber:"viber.svg",googlecalendar:"googlecalendar.svg"};
@@ -113,7 +113,7 @@ function section4(d,o,loc,icon){
  '<span class="wizard-integration-logo">'+logo(i)+'</span><span class="wizard-integration-copy"><strong>'+E(i.name)+'</strong><small>'+E(desc(i))+'</small></span>'+
  '<span class="wizard-integration-action">'+(enabled?selected?icon("check",19):"+":L(loc,"Вход","Sign in"))+'</span></button>';}).join("")+
  '</div></section>').join("")+'</div>'+
- '<a class="wizard-inline-link" href="#/integrations">'+L(loc,"Открыть Integration Hub","Open Integration Hub")+' ↗</a>'+
+ '<a class="wizard-inline-link" href="#/integrations/from-agent/'+encodeURIComponent(d.id)+'">'+L(loc,"Открыть Integration Hub","Open Integration Hub")+' ↗</a>'+
  '<p class="wizard-footnote">'+L(loc,"Добавление подключений и проверка эксклюзивных назначений выполняются сервером в боевой версии. Здесь только мок-выбор.","Connecting providers and checking exclusive assignments require the production backend. This step only stores demo selections.")+'</p>';
 }
 function section5(d,loc){
@@ -173,7 +173,7 @@ function panel(o,loc,icon,id,open){
  '<h2>'+E(d?.name||L(loc,"Перед началом","Before you begin"))+'</h2><span class="wizard-rail-status">'+L(loc,"Локальный черновик · демо","Local draft · demo")+'</span>'+
  '<div class="wizard-rail-group"><strong>'+L(loc,"Сохранение","Save status")+'</strong><p class="wizard-save" data-wizard-save>'+L(loc,memory.saveError?"Ошибка локального сохранения":d?"Локально сохранено":"Черновик ещё не создан",memory.saveError?"Local save failed":d?"Saved locally":"Draft not created")+'</p><small>'+L(loc,"Синхронизация между устройствами пока недоступна.","Cross-device sync is not available yet.")+'</small></div>'+
  '<div class="wizard-rail-group"><strong>'+L(loc,"Готовность","Readiness")+'</strong><div class="wizard-rail-checklist">'+headings.map((title,i)=>'<div><span class="'+(scores[i]?.ok?"done":"pending")+'">'+icon(scores[i]?.ok?"check":"chevron",13)+'</span><small>'+title+'</small></div>').join("")+'</div></div>'+
- '<div class="wizard-rail-bottom"><strong>'+L(loc,"Перед запуском","Before launch")+'</strong><p>'+L(loc,"Проверьте знания, подключённые каналы и разрешения, затем протестируйте сценарий. Реальный запуск здесь недоступен.","Check knowledge, channels and permissions; then test the workflow. Live launch is disabled in this demo.")+'</p><a href="#/help">'+L(loc,"Помощь по созданию агента","Agent setup help")+' ↗</a></div></aside>';
+ '<div class="wizard-rail-bottom"><strong>'+L(loc,"Перед запуском","Before launch")+'</strong><p>'+L(loc,"Проверьте знания, подключённые каналы и разрешения, затем протестируйте сценарий. Реальный запуск здесь недоступен.","Check knowledge, channels and permissions; then test the workflow. Live launch is disabled in this demo.")+'</p><a href="#/help/from-agent/'+encodeURIComponent(d.id||"new")+'/'+(location.hash.slice(2).split("/")[3]||"2")+'">'+L(loc,"Помощь по созданию агента","Agent setup help")+' ↗</a></div></aside>';
 }
 function refreshRail(o,loc,icon){
  const old=document.querySelector(".wizard-rail");if(!old)return;
