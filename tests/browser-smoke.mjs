@@ -23,7 +23,25 @@ try {
 
     await page.locator('[data-period="30"]').click();
     assert.ok((await page.locator('.metrics').innerText()).replace(/\s/g,' ').includes('4 820'), '30-day fixture missing');
+    assert.equal(await page.locator('.bar-col').count(),30,'30-day view must show 30 actual days');
+    assert.ok((await page.locator('.activity-card').innerText()).includes('23 сентября — 22 октября 2026'));
     await page.locator('[data-period="7"]').click();
+
+
+    if(viewport.width>1100){
+      const center=page.locator('.main-scroll');
+      await center.evaluate(node=>{node.scrollTop=180;});
+      const before=await center.evaluate(node=>node.scrollTop);
+      await page.locator('.summary-grid [data-preview]').first().click();
+      assert.ok((await page.locator('.preview-content').innerText()).includes('Менеджер заявок'));
+      assert.equal(await center.evaluate(node=>node.scrollTop),before,'Central pane jumped when opening contextual preview');
+      await page.locator('.alert-banner').click();
+      assert.ok(await page.locator('.queue-item').first().evaluate(node=>node.classList.contains('selected')));
+      assert.ok(await page.locator('.right-rail').evaluate(node=>node.classList.contains('attention-highlight')));
+      await page.locator('.summary-grid [data-preview]').last().click();
+      assert.equal(await page.locator('.preview-content .brand-logo img').count(),1,'Integration preview must show original logo');
+      assert.equal(await page.locator('.summary-grid .line-item img').count(),3,'All visible integrations need actual SVG logos');
+    }
 
     if(viewport.width<=1100){
       await page.locator('[data-mobile-panel]').click();

@@ -33,3 +33,15 @@ test('all references from attention queue point to valid areas',()=>{
   const valid=new Set(['approvals','inbox','integrations']);
   for(const org of orgs){for(const q of org.queue)assert.ok(valid.has(q.route));}
 });
+
+test('30-day chart uses one value per actual day and includes the last 7 days',()=>{
+  for(const org of orgs){
+    const week=org.activity[7], month=org.activity[30];
+    assert.equal(week.counts.length,7);
+    assert.equal(month.counts.length,30);
+    assert.equal(month.days.length,30);
+    assert.deepEqual(Array.from(month.counts.slice(-7)),Array.from(week.counts));
+    assert.equal(month.counts.reduce((a,b)=>a+b,0),month.total);
+    assert.ok(typeof month.range.ru==='string'&&month.range.ru.includes('2026'));
+  }
+});
