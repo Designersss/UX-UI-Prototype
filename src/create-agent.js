@@ -292,5 +292,24 @@ function handleToggle(el,o){
  save();
  return true;
 }
-globalThis.AIMockCreator={page,panel,handleClick,handleInput,handleToggle,catalogRecords,draft,ready,refreshRail,refreshProfessionList,setProfessionSearch,setProfessionCategory};
+function upsertEditorDraft(o,changes,id){
+ const existing=id?draft(o,id):null;
+ if(id&&!existing)return {error:"not_found"};
+ const fresh=!existing;
+ const key=fresh?"draft-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8):id;
+ const agent=existing||{id:key,orgId:o.id,status:"draft",type:null,name:"",description:"",company:"",task:"",handoff:"",knowledge:[],connections:[],group:"",handoffTarget:"",tested:false,createdAt:Date.now()};
+ const allowed=["name","description","company","task","handoff","type","group","handoffTarget","knowledge","connections","communicationStyle","instructions","quickRules","avatar"];
+ const valid=Object.fromEntries(Object.entries(changes||{}).filter(([k,v])=>allowed.includes(k)&&(typeof v==="string"||Array.isArray(v))));
+ if("name" in valid)valid.name=valid.name.slice(0,80);
+ if("description" in valid)valid.description=valid.description.slice(0,500);
+ if("type" in valid&&!professions.some(p=>p.id===valid.type&&p.available))delete valid.type;
+ if("knowledge" in valid)valid.knowledge=valid.knowledge.filter(x=>typeof x==="string");
+ if("connections" in valid)valid.connections=valid.connections.filter(x=>o.integrations.some(i=>i.id===x&&i.status==="connected"));
+ Object.assign(agent,valid,{tested:false});
+ if(fresh)drafts[key]=agent;
+ const saved=save();
+ if(!saved&&fresh)delete drafts[key];
+ return {id:key,draft:saved?agent:null,saved,error:saved?null:"storage_unavailable"};
+}
+globalThis.AIMockCreator={page,panel,handleClick,handleInput,handleToggle,catalogRecords,draft,ready,refreshRail,refreshProfessionList,setProfessionSearch,setProfessionCategory,upsertEditorDraft,professions};
 })();
