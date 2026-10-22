@@ -50,6 +50,8 @@ function click(el,o,loc,icon){
        const marker=b.querySelector(".ae-role-status");if(marker&&!b.disabled)marker.innerHTML=selected?icon("check",14):"";
      });
      if(now.group)document.querySelectorAll('[data-editor-input="group"]').forEach(b=>b.value=now.group);
+     const knowledgeBlock=document.getElementById("ae-block-4");
+     if(knowledgeBlock)knowledgeBlock.outerHTML=E.toolsSection(now,o,loc,icon);
      if(now.handoffTarget)document.querySelectorAll('[data-editor-input="handoffTarget"]').forEach(b=>b.value=now.handoffTarget);
      const label=document.querySelector("#ae-block-2 .ae-section-header>small");if(label)label.textContent=L(loc,"Выбрано: ","Selected: ")+E.roleName(now,loc);
      E.refresh(o,loc,icon);

@@ -79,5 +79,5 @@ function page(o,loc,icon,key){
  '<div class="ae-sections">'+basic(d,loc,icon)+professions(d,loc,icon)+instructions(d,loc,icon)+tools(d,o,loc,icon)+access(d,loc,icon)+readiness(d,o,loc,icon)+'</div>'+
  '<footer class="ae-footer"><span>'+icon("check",14)+' '+L(loc,"Автоматическое сохранение черновика","Draft autosaves")+'</span><div><a href="#/agents">'+L(loc,"Отмена","Cancel")+'</a><button data-editor-action="test" class="ae-test">'+L(loc,"Протестировать","Test agent")+'</button><button class="ae-publish" disabled title="'+L(loc,"Запуск недоступен","Launch unavailable")+'">'+L(loc,"Опубликовать агента","Publish agent")+'</button></div></footer>';
 }
-globalThis.AIMockApprovedEditor={ui,L,X,id,get,model,page,roleList,matching,logo:logos,roleName};
+globalThis.AIMockApprovedEditor={ui,L,X,id,get,model,page,roleList,matching,logo:logos,roleName,toolsSection:tools};
 })();

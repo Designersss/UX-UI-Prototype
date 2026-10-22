@@ -11,7 +11,7 @@ const labels=[["Основное","Basics"],["Профессия","Profession"],
 const label=(i,loc)=>labels[i-1]?.[loc==="en"?1:0]||"";
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(drafts));memory.saveError=false;return true;}catch(_){memory.saveError=true;return false;}};
 const draftsFor=o=>Object.values(drafts).filter(d=>d.orgId===o.id&&d.status==="draft");
-const catalogRecords=o=>draftsFor(o).map(d=>({id:d.id,name:d.name,type:d.type,state:"draft",last:L("ru","Локальный черновик","Local draft"),group:d.type==="hr"?"HR":d.type==="sales"?"Продажи":"Без группы",tags:[],taskCount:0,issues:0}));
+const catalogRecords=o=>draftsFor(o).map(d=>({id:d.id,name:d.name,type:d.type,state:"draft",last:L("ru","Локальный черновик","Local draft"),group:d.group||(d.type==="hr"?"HR":d.type==="sales"?"Продажи":"Без группы"),tags:[],taskCount:0,issues:0}));
 const draft=(o,id)=>{const d=drafts[id];return d&&d.orgId===o.id?d:null;};
 const ready=(d,o)=>{
  const connected=(d.connections||[]).filter(id=>o.integrations.some(i=>i.id===id&&i.status==="connected"));
