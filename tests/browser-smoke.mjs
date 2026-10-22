@@ -182,6 +182,7 @@ try {
   await setup.locator('[data-wizard-action="create"]').click();
   assert.match(setup.url(),/#\/agents\/draft-[^/]+\/setup\/2$/);
   const id=setup.url().split('#/agents/')[1].split('/')[0];
+  await setup.getByRole('heading',{name:'Выберите профессию'}).waitFor();
   assert.equal(await setup.locator('.profession-row').count(),8);
   assert.ok((await setup.locator('.profession-results').innerText()).includes('36'));
   assert.equal(await setup.locator('.profession-row:not([disabled])').count(),2);
