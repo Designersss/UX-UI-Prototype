@@ -180,8 +180,16 @@ document.addEventListener("click",e=>{
    }
    return;
  }
- const owner=e.target.closest("[data-agent-dropdown]");
- document.querySelectorAll("[data-agent-dropdown][open]").forEach(d=>{if(d!==owner)d.open=false;});
+ const dropdownTrigger=e.target.closest("[data-agent-dropdown] > summary");
+ if(dropdownTrigger){
+   e.preventDefault();
+   const dropdown=dropdownTrigger.parentElement;
+   const shouldOpen=!dropdown.open;
+   document.querySelectorAll("[data-agent-dropdown][open]").forEach(d=>{d.open=false;});
+   dropdown.open=shouldOpen;
+   return;
+ }
+ if(!e.target.closest("[data-agent-dropdown]"))document.querySelectorAll("[data-agent-dropdown][open]").forEach(d=>{d.open=false;});
  const agentAction=e.target.closest("[data-agent-action]");
  if(agentAction&&route().section==="agents"&&!route().id){
    const action=agentAction.dataset.agentAction;
