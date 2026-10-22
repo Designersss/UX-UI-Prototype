@@ -191,6 +191,20 @@ document.addEventListener("click",e=>{
      if(field){field.value=result.exampleValue;Creator.handleInput(field,org());field.focus({preventScroll:true});}
      Creator.refreshRail(org(),state.locale,icon);
    }
+   else if(result?.choiceField){
+     const dropdown=wizardButton.closest("[data-wizard-select]");
+     if(dropdown){
+       const text=wizardButton.firstChild?.textContent?.trim()||wizardButton.textContent.replace("✓","").trim();
+       dropdown.querySelector(".wizard-select-current").textContent=text;
+       dropdown.querySelectorAll('[data-wizard-action="select-choice"]').forEach(b=>{
+         b.setAttribute("aria-pressed",String(b===wizardButton));
+         b.querySelector("span")?.remove();
+       });
+       const mark=document.createElement("span");mark.setAttribute("aria-hidden","true");mark.textContent="✓";wizardButton.append(mark);
+       dropdown.open=false;dropdown.querySelector("summary")?.focus({preventScroll:true});
+     }
+     Creator.refreshRail(org(),state.locale,icon);
+   }
    else if(result?.integrationButton){
      wizardButton.classList.toggle("selected",result.selected);
      wizardButton.setAttribute("aria-pressed",String(result.selected));
@@ -201,6 +215,8 @@ document.addEventListener("click",e=>{
    else if(result?.rerender)render();
    return;
  }
+ const wizardDropdown=e.target.closest("[data-wizard-select]");
+ document.querySelectorAll("[data-wizard-select][open]").forEach(d=>{if(d!==wizardDropdown)d.open=false;});
  const option=e.target.closest("[data-agent-filter-option]");
  if(option&&route().section==="agents"&&!route().id){
    const field=option.dataset.agentFilterOption;
@@ -279,6 +295,7 @@ document.addEventListener("change",e=>{
  if(select&&route().section==="agents"&&!route().id&&Agents.setFilter(select.dataset.agentFilter,select.value))render();
 });
 document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"&&document.querySelector("[data-wizard-select][open]")){document.querySelector("[data-wizard-select][open]").open=false;e.preventDefault();return;}
  if(e.key==="Escape"&&document.querySelector("[data-agent-dropdown][open]")){document.querySelector("[data-agent-dropdown][open]").open=false;e.preventDefault();return;}
  if(e.key==="Escape"&&Agents.hasModal()){e.preventDefault();Agents.dismiss();render();return;}
  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();showSearch();}

@@ -21,7 +21,7 @@ const ready=(d,o)=>{
  {name:"instructions",ok:!!d.company.trim()&&!!d.task.trim()},
  {name:"knowledge",ok:(d.knowledge||[]).length>0},
  {name:"connections",ok:connected.length>0},
- {name:"permissions",ok:!!d.handoff.trim()&&!!d.group},
+ {name:"permissions",ok:!!(d.handoff||"").trim()&&!!d.group&&!!(d.handoffTarget||d.group)},
  {name:"testing",ok:!!d.tested}
  ];
 };
@@ -130,13 +130,24 @@ function section4(d,o,loc,icon){
  '<a class="wizard-inline-link" href="#/integrations/from-agent/'+encodeURIComponent(d.id)+'">'+L(loc,"Открыть Integration Hub","Open Integration Hub")+' ↗</a>'+
  '<p class="wizard-footnote">'+L(loc,"Добавление подключений и проверка эксклюзивных назначений выполняются сервером в боевой версии. Здесь только мок-выбор.","Connecting providers and checking exclusive assignments require the production backend. This step only stores demo selections.")+'</p>';
 }
+const groupOptions=[["Продажи","Отдел продаж","Sales team"],["HR","HR-команда","HR team"],["Поддержка","Поддержка","Support team"]];
+function wizardDropdown(d,loc,field,title,description){
+ const selected=d[field]||d.group||"Продажи",item=groupOptions.find(g=>g[0]===selected)||groupOptions[0];
+ return '<div class="wizard-permission-setting"><div class="wizard-setting-label"><strong>'+title+'</strong><small>'+description+'</small></div>'+
+ '<details class="wizard-select" data-wizard-select="'+field+'"><summary aria-label="'+title+'"><span class="wizard-select-current">'+E(L(loc,item[1],item[2]))+'</span><span class="wizard-select-arrow" aria-hidden="true">⌄</span></summary>'+
+ '<div class="wizard-select-options" role="group" aria-label="'+title+'">'+groupOptions.map(g=>'<button type="button" data-wizard-action="select-choice" data-field="'+field+'" data-value="'+E(g[0])+'" aria-pressed="'+(g[0]===selected)+'">'+E(L(loc,g[1],g[2]))+(g[0]===selected?'<span aria-hidden="true">✓</span>':'')+'</button>').join("")+'</div></details></div>';
+}
 function section5(d,loc){
- const action=(text,detail,kind)=>'<div class="wizard-permission"><div><strong>'+text+'</strong><small>'+detail+'</small></div><span class="wizard-permission-'+kind+'">'+(kind==="allowed"?L(loc,"Разрешено","Allowed"):kind==="approval"?L(loc,"По согласованию","Approval required"):L(loc,"Запрещено","Forbidden"))+'</span></div>';
- return '<div class="wizard-section-intro"><h2>'+L(loc,"Действия и ограничения","Permissions & safeguards")+'</h2><p>'+L(loc,"Действия разрешаются отдельно от текста инструкций.","Permissions are independent of instructions.")+'</p></div>'+
- '<div class="wizard-permissions">'+action(L(loc,"Читать входящие сообщения","Read incoming messages"),L(loc,"Только через назначенный канал","Only via an assigned channel"),"allowed")+
- action(d.type==="hr"?L(loc,"Создать карточку кандидата","Create candidate record"):L(loc,"Создать лид в CRM","Create CRM lead"),L(loc,"После проверки данных","Only after verifying information"),"approval")+
- action(d.type==="hr"?L(loc,"Автоматически отклонять кандидата","Automatically reject candidates"):L(loc,"Изменять цены и скидки","Change prices or discounts"),L(loc,"Недоступно для этого типа агента","Not permitted for this agent type"),"denied")+'</div>'+
- '<div class="wizard-two-cols"><label class="wizard-field"><span>'+L(loc,"Группа доступа","Access group")+'</span><select data-wizard-field="group"><option value="Продажи" '+(d.group==="Продажи"?"selected":"")+'>'+L(loc,"Продажи","Sales")+'</option><option value="HR" '+(d.group==="HR"?"selected":"")+'">HR</option><option value="Поддержка" '+(d.group==="Поддержка"?"selected":"")+'>'+L(loc,"Поддержка","Support")+'</option></select></label><label class="wizard-field"><span>'+L(loc,"Эскалация человеку","Human escalation")+'</span><input data-wizard-field="handoff" value="'+E(d.handoff)+'" placeholder="'+L(loc,"Куда передать сложный случай","Where to escalate cases")+'"></label></div>';
+ const action=(title,detail,kind)=>'<div class="wizard-permission"><div><strong>'+title+'</strong><small>'+detail+'</small></div><span class="wizard-permission-'+kind+'">'+(kind==="allowed"?L(loc,"Разрешено","Allowed"):kind==="approval"?L(loc,"После подтверждения","Approval required"):L(loc,"Запрещено","Forbidden"))+'</span></div>';
+ return '<div class="wizard-section-intro"><h2>'+L(loc,"Действия и ограничения","Permissions & safeguards")+'</h2><p>'+L(loc,"Кто может управлять агентом и какой команде передать разговор, если AI не должен отвечать самостоятельно?","Who can manage the agent and which team receives a conversation when AI should stop replying?")+'</p></div>'+
+ '<div class="wizard-permissions">'+
+ action(L(loc,"Читать сообщения","Read messages"),L(loc,"Только в назначенных каналах","Only in assigned channels"),"allowed")+
+ action(d.type==="hr"?L(loc,"Создать карточку кандидата","Create candidate record"):L(loc,"Создать лид в CRM","Create CRM lead"),L(loc,"После проверки данных","After data verification"),"approval")+
+ action(d.type==="hr"?L(loc,"Самостоятельно отклонять кандидатов","Reject candidates independently"):L(loc,"Менять цены и скидки","Change prices and discounts"),L(loc,"Недоступно этому типу агента","Not available to this agent type"),"denied")+
+ '</div><div class="wizard-settings-grid">'+
+ wizardDropdown(d,loc,"group",L(loc,"Кто может управлять агентом?","Who can manage this agent?"),L(loc,"Сотрудники выбранной группы смогут видеть и настраивать агента. Пока это демо без реального доступа.","Employees in the chosen group can manage the agent. This is a demo, with no actual permission changes."))+
+ wizardDropdown(d,loc,"handoffTarget",L(loc,"Кому передавать диалоги?","Who receives handed-off conversations?"),L(loc,"Если агент не может продолжить сам, эту команду нужно подключить к диалогу. Реальная передача пока отключена.","This team takes over when the agent must stop answering. Live handoff is disabled."))+
+ '</div><div class="wizard-handoff-note"><strong>'+L(loc,"Что означает передача человеку?","What does a human handoff mean?")+'</strong><p>'+L(loc,"Агент перестаёт отвечать самостоятельно, а вопрос получает сотрудник. Условия передачи вы описали на шаге «Инструкции».","The AI stops responding independently and a teammate takes over. You defined the trigger on the Instructions step.")+'</p><a href="#/agents/'+E(d.id)+'/setup/3">'+L(loc,"Посмотреть правила передачи","Review handoff rules")+' →</a></div>';
 }
 function section6(d,o,loc,icon){
  const items=ready(d,o);
@@ -202,7 +213,7 @@ function handleClick(el,o){
   const name=memory.name.trim();
   if(!name){memory.error="Укажите название агента";return {rerender:true};}
   const id="draft-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,7);
-  drafts[id]={id,orgId:o.id,status:"draft",type:null,name,description:memory.description.trim(),company:"",task:"",handoff:"",knowledge:[],connections:[],group:"",tested:false,createdAt:Date.now()};
+  drafts[id]={id,orgId:o.id,status:"draft",type:null,name,description:memory.description.trim(),company:"",task:"",handoff:"",knowledge:[],connections:[],group:"",handoffTarget:"",tested:false,createdAt:Date.now()};
   if(!save()){memory.error="Не удалось сохранить локальный черновик";delete drafts[id];return {rerender:true};}
   memory.name="";memory.description="";memory.error="";memory.professionSearch="";memory.professionCategory="all";memory.professionPage=1;
   return {navigate:"#/agents/"+id+"/setup/2"};
@@ -213,7 +224,7 @@ function handleClick(el,o){
    const item=professions.find(p=>p.id===el.dataset.value&&p.available);
    if(!item)return null;
    d.type=item.id;
-   d.group=item.category==="hr"?"HR":"Продажи";d.knowledge=[];d.connections=[];d.tested=false;
+   d.group=item.category==="hr"?"HR":"Продажи";d.handoffTarget=d.group;d.knowledge=[];d.connections=[];d.tested=false;
    save();return {rerender:true};
  }
  if(action==="profession-page"){
@@ -228,6 +239,12 @@ function handleClick(el,o){
  if(action==="fill-example"){
   if(!["company","task","handoff"].includes(el.dataset.value))return null;
   return {exampleField:el.dataset.value,exampleValue:instructionExamples(d.type,document.documentElement.lang)[el.dataset.value]};
+ }
+ if(action==="select-choice"){
+  const field=el.dataset.field;
+  if(!["group","handoffTarget"].includes(field)||!groupOptions.some(g=>g[0]===el.dataset.value))return null;
+  d[field]=el.dataset.value;d.tested=false;save();
+  return {choiceField:field};
  }
  if(action==="toggle-knowledge"){
   const item=knowledgeFor(d).find(k=>k.id===el.dataset.value&&!k.disabled);
