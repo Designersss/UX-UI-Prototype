@@ -136,6 +136,7 @@ try {
   assert.equal(await agentPage.locator('[data-agent-dropdown="tag"]').count(),1);
   assert.equal((await agentPage.locator('.agent-toolbar-title').innerText()).trim(),'Каталог агентов');
   assert.ok((await agentPage.locator('.agent-context-rail').innerText()).includes('Менеджер заявок'));
+  await agentPage.locator('[data-agents-search]').fill('HR-рекрутер');
   await agentPage.locator('[data-agent-action="select"][data-value="a2"]').click();
   assert.ok((await agentPage.locator('.agent-context-rail').innerText()).includes('HR-рекрутер'));
   assert.ok(await agentPage.locator('.agent-row[data-value="a2"]').evaluate(el=>el.classList.contains('selected')));
@@ -145,6 +146,7 @@ try {
   assert.ok((await agentPage.locator('.agent-results').innerText()).includes('из 4'));
   await agentPage.locator('[data-agent-action="reset"]').click();
   assert.equal(await agentPage.locator('.agent-row').count(),5);
+  await agentPage.locator('[data-agents-search]').fill('Менеджер заявок');
   await agentPage.locator('[data-agent-action="select"][data-value="a1"]').click();
   await agentPage.locator('[data-agent-action="stop-open"]').click();
   assert.ok(await agentPage.getByRole('alertdialog').isVisible());
