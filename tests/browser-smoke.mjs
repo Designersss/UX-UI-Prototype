@@ -190,7 +190,7 @@ try {
   await setup.locator('[data-wizard-action="profession-page"][data-value="2"]').last().click();
   assert.equal(await setup.locator('.profession-row').count(),8);
   await setup.locator('[data-profession-category]').selectOption('hr');
-  assert.ok((await setup.locator('.profession-results').innerText()).includes('5'));
+  assert.ok((await setup.locator('.profession-results').innerText()).includes('6'),'HR category contains six roles');
   await setup.locator('[data-profession-search]').fill('HR-рекрутер');
   assert.equal(await setup.locator('.profession-row').count(),1);
   await setup.locator('[data-wizard-action="select-profession"][data-value="hr"]').click();
