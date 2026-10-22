@@ -1,0 +1,17 @@
+name: Temporary source snapshot for UI debugging
+on:
+  push:
+    branches:
+      - feature/premium-calm-create-agent
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package current prototype sources
+        run: tar -czf /tmp/ui-source.tgz index.html src tests README.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ui-source-debug
+          path: /tmp/ui-source.tgz
+          retention-days: 1
