@@ -10,5 +10,20 @@
     {id:"lab",name:"Север · Лаборатория",plan:"Free",user:"Александр",role:"Владелец",balance:420,periodEnd:"—",
       agents:[{id:"b1",name:"Тестовый рекрутер",type:"hr",state:"draft",last:"—"}],integrations:[],queue:[],events:[],activity:{7:{days:["Пт 16","Сб 17","Вс 18","Пн 19","Вт 20","Ср 21","Чт 22"],counts:[0,0,0,0,0,0,0],range:{ru:"16–22 октября 2026",en:"Oct 16–22, 2026"},total:0,success:0,errors:0},30:{days:["23 сен","24 сен","25 сен","26 сен","27 сен","28 сен","29 сен","30 сен","1 окт","2 окт","3 окт","4 окт","5 окт","6 окт","7 окт","8 окт","9 окт","10 окт","11 окт","12 окт","13 окт","14 окт","15 окт","16 окт","17 окт","18 окт","19 окт","20 окт","21 окт","22 окт"],counts:Array(30).fill(0),range:{ru:"23 сентября — 22 октября 2026",en:"Sep 23 – Oct 22, 2026"},total:0,success:0,errors:0}}}
   ];
+  const agentMeta={
+    a1:{group:"Продажи",tags:["Лиды","CRM"],taskCount:312,issues:1},
+    a2:{group:"HR",tags:["Кандидаты","Вакансии"],taskCount:180,issues:0},
+    a3:{group:"Поддержка",tags:["Сайт"],taskCount:0,issues:0},
+    a4:{group:"HR",tags:["Дизайн","Кандидаты"],taskCount:126,issues:0},
+    a5:{group:"Продажи",tags:["Партнёры","CRM"],taskCount:214,issues:0},
+    a6:{group:"HR",tags:["Регионы"],taskCount:139,issues:0},
+    a7:{group:"Поддержка",tags:["Сайт","FAQ"],taskCount:92,issues:0},
+    a8:{group:"HR",tags:["Черновик"],taskCount:0,issues:0},
+    b1:{group:"HR",tags:["Тест"],taskCount:0,issues:0}
+  };
+  for(const org of orgs)for(const a of org.agents){
+    Object.assign(a,agentMeta[a.id]||{});
+    if(a.id==="a3")a.state="stopped";
+  }
   globalThis.AIMockData=Object.freeze({orgs});
 })();

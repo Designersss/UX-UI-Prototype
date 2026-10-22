@@ -1,6 +1,7 @@
 (function appSource(){
 "use strict";
 const data=globalThis.AIMockData;
+const Agents=globalThis.AIMockAgents;
 const storageKey="aimock-premium-calm-preferences-v1";
 let stored={};
 try{stored=JSON.parse(localStorage.getItem(storageKey)||"{}");}catch(_){}
@@ -50,7 +51,7 @@ function sidebar(section,o){
  (state.account?'<div class="account-menu" role="group" aria-label="Preferences"><p>'+T("switchOrg")+'</p>'+data.orgs.map(x=>'<button type="button" data-org="'+x.id+'" class="'+(x.id===state.org?'selected':'')+'">'+escapeHtml(x.name)+(x.id===state.org?' ✓':'')+'</button>').join('')+'<hr><p>'+T("profileMode")+'</p><div class="account-row"><button data-theme="light" aria-pressed="'+(state.theme==="light")+'">'+icon("sun")+'</button><button data-theme="dark" aria-pressed="'+(state.theme==="dark")+'">'+icon("moon")+'</button></div><p>'+T("language")+'</p><div class="account-row"><button data-locale="ru" aria-pressed="'+(state.locale==="ru")+'">RU</button><button data-locale="en" aria-pressed="'+(state.locale==="en")+'">EN</button></div></div>':'')+
  '</aside>';
 }
-const statusLabel=(s)=>s==="active"?T("active"):s==="paused"?T("paused"):s==="draft"?T("draft"):s==="auth"?T("auth"):T("connected");
+const statusLabel=(s)=>s==="active"?T("active"):s==="stopped"?(state.locale==="ru"?"Остановлен вручную":"Manually stopped"):s==="paused"?T("paused"):s==="draft"?T("draft"):s==="auth"?T("auth"):T("connected");
 const brandAssets=Object.freeze({telegram:"telegram.svg",max:"max.svg",vk:"vk.svg",whatsapp:"whatsapp.svg",viber:"viber.svg",bitrix:"bitrix24.svg",bitrix24:"bitrix24.svg",googlecalendar:"googlecalendar.svg"});
 const brandIcon=(provider)=>{const key=brandAssets[provider];return key?'<span class="brand-logo"><img src="./src/assets/logos/'+key+'" alt="'+escapeHtml(provider)+'" width="26" height="26"></span>':'<span class="brand-logo generic" aria-hidden="true">'+icon("integrations",17)+'</span>';};
 function chart(activity){
@@ -150,7 +151,11 @@ function render(){
  const root=document.getElementById("app");
  const previousMain=root.querySelector(".main-scroll")?.scrollTop||0;
  const previousRail=root.querySelector(".right-rail")?.scrollTop||0;
- root.innerHTML='<div class="shell">'+sidebar(r.section,o)+'<main class="main" id="main"><div class="mobile-toolbar"><button type="button" data-menu="1" aria-label="Menu">'+icon("menu")+'</button><strong>AIMock</strong><button type="button" data-mobile-panel="1" aria-label="'+T("control")+'">'+icon("notifications")+'</button></div><div class="main-scroll">'+(r.section==="overview"?overview(o):placeholder(r.section,r.id))+'</div></main>'+controlPanel(o)+'</div>'+
+ const catalog=r.section==="agents"&&!r.id;
+ const content=r.section==="overview"?overview(o):catalog?Agents.page(o,state.locale,icon):placeholder(r.section,r.id);
+ const panel=catalog?Agents.panel(o,state.locale,icon,state.panelOpen):controlPanel(o);
+ root.innerHTML='<div class="shell">'+sidebar(r.section,o)+'<main class="main" id="main"><div class="mobile-toolbar"><button type="button" data-menu="1" aria-label="Menu">'+icon("menu")+'</button><strong>AIMock</strong><button type="button" data-mobile-panel="1" aria-label="'+T("control")+'">'+icon("notifications")+'</button></div><div class="main-scroll">'+content+'</div></main>'+panel+'</div>'+
+ (catalog?Agents.modal(o,state.locale):"")+
  '<dialog class="search-dialog" id="search-dialog"><div class="search-modal-head">'+icon("search")+'<input aria-label="'+T("search")+'" placeholder="'+T("searchPlaceholder")+'" autocomplete="off" data-search-input><button data-close-search type="button" aria-label="Close">'+icon("close")+'</button></div><div class="search-results" id="search-results"></div></dialog>';
  root.querySelector(".main-scroll").scrollTop=previousMain;
  root.querySelector(".right-rail").scrollTop=previousRail;
@@ -166,6 +171,16 @@ function updateSearch(q){
  el.innerHTML=matches.length?matches.map(m=>'<a href="#/'+escapeHtml(m.route)+'"><span>'+escapeHtml(m.name)+'</span><small>'+escapeHtml(m.type)+'</small></a>').join(''):'<p>'+T("noMatches")+'</p>';
 }
 document.addEventListener("click",e=>{
+ const agentAction=e.target.closest("[data-agent-action]");
+ if(agentAction&&route().section==="agents"&&!route().id){
+   const action=agentAction.dataset.agentAction;
+   if(Agents.handleClick(agentAction,org())){
+     if(action==="select")state.panelOpen=matchMedia("(max-width: 1100px)").matches;
+     render();
+     if(action==="stop-open")document.querySelector('[data-agent-action="stop-cancel"]')?.focus();
+   }
+   return;
+ }
  const el=e.target.closest("[data-preview],[data-back-control],[data-period],[data-theme],[data-locale],[data-org],[data-account],[data-search],[data-close-search],[data-menu],[data-mobile-panel],[data-close-panel],[data-queue],[data-reconnect]");
  if(!el)return;
  if(el.dataset.preview){const [type,id]=el.dataset.preview.split(":");state.context={type,id};state.panelOpen=matchMedia("(max-width: 1100px)").matches;render();document.querySelector(".right-rail").scrollTop=0;}
@@ -183,8 +198,26 @@ document.addEventListener("click",e=>{
  else if("queue" in el.dataset){state.context=null;state.selected=org().queue[0]?.id||"";state.panelOpen=matchMedia("(max-width: 1100px)").matches;render();const rail=document.querySelector(".right-rail");if(rail)rail.scrollTop=0;const item=document.querySelector(".queue-item.selected");item?.focus({preventScroll:true});if(rail)rail.classList.add("attention-highlight");}
  else if("reconnect" in el.dataset){const btn=el;btn.textContent=state.locale==="ru"?"Откройте Integration Hub для переподключения":"Open Integration Hub to reconnect";btn.disabled=true;}
 });
-document.addEventListener("input",e=>{if(e.target.matches("[data-search-input]"))updateSearch(e.target.value);});
-document.addEventListener("keydown",e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();showSearch();}if(e.key==="Escape"&&state.menu){state.menu=false;render();}});
+document.addEventListener("input",e=>{
+ if(e.target.matches("[data-search-input]"))updateSearch(e.target.value);
+ if(e.target.matches("[data-agents-search]")){
+  Agents.setSearch(e.target.value);
+  const caret=e.target.selectionStart;
+  render();
+  const field=document.querySelector("[data-agents-search]");
+  field?.focus({preventScroll:true});
+  if(caret!==null)field?.setSelectionRange(caret,caret);
+ }
+});
+document.addEventListener("change",e=>{
+ const select=e.target.closest("[data-agent-filter]");
+ if(select&&route().section==="agents"&&!route().id&&Agents.setFilter(select.dataset.agentFilter,select.value))render();
+});
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"&&Agents.hasModal()){e.preventDefault();Agents.dismiss();render();return;}
+ if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();showSearch();}
+ if(e.key==="Escape"&&state.menu){state.menu=false;render();}
+});
 window.addEventListener("hashchange",()=>{state.menu=false;state.account=false;state.panelOpen=false;state.context=null;render();const main=document.querySelector(".main-scroll");if(main)main.scrollTop=0;});
 render();
 })();
