@@ -236,7 +236,10 @@ document.addEventListener("click",e=>{
  else if("reconnect" in el.dataset){const btn=el;btn.textContent=state.locale==="ru"?"Откройте Integration Hub для переподключения":"Open Integration Hub to reconnect";btn.disabled=true;}
 });
 document.addEventListener("input",e=>{
- if(e.target.matches("[data-wizard-field]")){Creator.handleInput(e.target,org());if(e.target.dataset.wizardField==="name"||e.target.dataset.wizardField==="company"||e.target.dataset.wizardField==="task"||e.target.dataset.wizardField==="handoff")Creator.refreshRail(org(),state.locale,icon);}
+ if(e.target.matches("[data-wizard-field]")){
+   // Keep the active text control mounted throughout typing. Only persist the value here.
+   Creator.handleInput(e.target,org());
+ }
  if(e.target.matches("[data-profession-search]")){
    Creator.setProfessionSearch(e.target.value);
    Creator.refreshProfessionList(org(),state.locale,icon);
@@ -252,6 +255,11 @@ document.addEventListener("input",e=>{
  }
 });
 document.addEventListener("change",e=>{
+ if(e.target.matches("[data-wizard-field]")&&e.target.dataset.wizardField!=="group"){
+   // Update readiness after the user commits a field, never in its input event.
+   Creator.refreshRail(org(),state.locale,icon);
+   return;
+ }
  if(e.target.matches("[data-wizard-toggle]")){if(Creator.handleToggle(e.target,org()))Creator.refreshRail(org(),state.locale,icon);return;}
  if(e.target.matches("[data-profession-category]")){Creator.setProfessionCategory(e.target.value);Creator.refreshProfessionList(org(),state.locale,icon);return;}
  if(e.target.matches('[data-wizard-field="group"]')){Creator.handleInput(e.target,org());Creator.refreshRail(org(),state.locale,icon);return;}
@@ -269,7 +277,14 @@ const viewportCategory=()=>innerWidth<=760?"mobile":innerHeight<800?"compact":in
 let lastViewport=viewportCategory();
 window.addEventListener("resize",()=>{
  const current=viewportCategory();
- if(current!==lastViewport){lastViewport=current;render();}
+ if(current===lastViewport)return;
+ lastViewport=current;
+ // The browser's virtual keyboard and responsive chrome can resize the viewport
+ // while an input has focus. Rebuilding #app here would detach the active field.
+ if(document.activeElement?.matches('input,textarea,select,[contenteditable="true"]'))return;
+ // Only the paginated catalog needs JS-driven viewport capacity changes.
+ // All other screens are responsive through CSS without a full repaint.
+ if(route().section==="agents"&&!route().id)render();
 });
 render();
 })();

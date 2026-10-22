@@ -175,6 +175,19 @@ try {
   setup.on('pageerror',e=>setupErrors.push(e.message));
   await setup.goto('http://127.0.0.1:4173/#/agents/new');
   await setup.getByRole('heading',{name:'Создать агента',exact:true}).waitFor();
+  // Real pointer focus: .fill() alone can conceal an input that blurs on click.
+  const focusCheck=async (pg,selector,value)=>{
+    const field=pg.locator(selector);
+    await field.click();
+    assert.ok(await field.evaluate(el=>document.activeElement===el),'Focus lost immediately after click: '+selector);
+    await pg.keyboard.insertText(value);
+    assert.ok(await field.evaluate(el=>document.activeElement===el),'Focus lost during typing: '+selector);
+    assert.equal(await field.inputValue(),value,'Text did not persist in active input: '+selector);
+  };
+  await focusCheck(setup,'[data-wizard-field="new-name"]','Фокус тест');
+  await setup.locator('[data-wizard-field="new-name"]').fill('');
+  await focusCheck(setup,'[data-wizard-field="new-description"]','Проверка фокуса');
+  await setup.locator('[data-wizard-field="new-description"]').fill('');
   assert.equal(await setup.locator('.wizard-template').count(),0,'No oversized profession cards in basic form');
   await setup.locator('[data-wizard-field="new-name"]').fill('HR · Прототип');
   await setup.locator('[data-wizard-field="new-description"]').fill('Помогает рекрутерам обрабатывать отклики');
@@ -191,11 +204,13 @@ try {
   assert.equal(await setup.locator('.profession-row').count(),8);
   await setup.locator('[data-profession-category]').selectOption('hr');
   assert.ok((await setup.locator('.profession-results').innerText()).includes('6'),'HR category contains six roles');
+  await focusCheck(setup,'[data-profession-search]','HR');
   await setup.locator('[data-profession-search]').fill('HR-рекрутер');
   assert.equal(await setup.locator('.profession-row').count(),1);
   await setup.locator('[data-wizard-action="select-profession"][data-value="hr"]').click();
   assert.equal(await setup.locator('.profession-row.selected').count(),1);
   await setup.locator('.wizard-footer a[href$="/setup/3"]').click();
+  await focusCheck(setup,'[data-wizard-field="company"]','Тест');
   await setup.locator('[data-wizard-field="company"]').fill('Тестовая организация');
   await setup.locator('[data-wizard-field="task"]').fill('Собирать отклики и передавать сводки HR');
   await setup.locator('[data-wizard-field="handoff"]').fill('Эскалация HR-сотруднику');
@@ -241,6 +256,7 @@ try {
   small.on('pageerror',e=>mobileErrors.push(e.message));
   await small.goto('http://127.0.0.1:4173/#/agents/new');
   assert.ok(await small.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'Mobile horizontal overflow');
+  await focusCheck(small,'[data-wizard-field="new-name"]','Мобильный ввод');
   await small.locator('[data-wizard-field="new-name"]').fill('Мобильный тест');
   await small.locator('[data-wizard-action="create"]').click();
   await small.locator('[data-wizard-action="select-profession"][data-value="sales"]').click();
