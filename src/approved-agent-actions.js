@@ -41,7 +41,7 @@ function click(el,o,loc,icon){
  if(action==="role"){
    const p=C.professions.find(x=>x.id===value&&x.available);if(!p)return true;
    const selectedGroup=p.category==="hr"?"HR":"Продажи";
-   const updates={type:p.id,...(!d.group?{group:selectedGroup}:{}),...(!d.handoffTarget?{handoffTarget:selectedGroup}:{})};
+   const updates={type:p.id,...(d.type!==p.id?{knowledge:[]}:{}),...(!d.group?{group:selectedGroup}:{}),...(!d.handoffTarget?{handoffTarget:selectedGroup}:{})};
    const res=persist(o,updates);
    if(res.saved){
      const now=res.draft;
