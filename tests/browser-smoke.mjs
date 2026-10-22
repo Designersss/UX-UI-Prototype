@@ -140,6 +140,7 @@ try {
   await agentPage.locator('[data-agent-action="select"][data-value="a2"]').click();
   assert.ok((await agentPage.locator('.agent-context-rail').innerText()).includes('HR-рекрутер'));
   assert.ok(await agentPage.locator('.agent-row[data-value="a2"]').evaluate(el=>el.classList.contains('selected')));
+  await agentPage.locator('[data-agents-search]').fill('');
   await agentPage.locator('[data-agent-dropdown="type"] summary').click();
   assert.ok(await agentPage.locator('[data-agent-dropdown="type"]').evaluate(el=>el.open));
   await agentPage.locator('[data-agent-filter-option="type"][data-value="hr"]').click();
