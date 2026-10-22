@@ -16,13 +16,13 @@ try {
     page.on('pageerror',e=>errors.push(e.message));
     await page.goto('http://127.0.0.1:4173/#/overview',{waitUntil:'load'});
     await page.getByRole('heading',{name:'Обзор'}).waitFor();
-    assert.ok((await page.locator('.metrics').innerText()).includes('1 248'), '7-day fixture missing');
+    assert.ok((await page.locator('.metrics').innerText()).replace(/\s/g,' ').includes('1 248'), '7-day fixture missing');
     const fullWidth=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth}));
     assert.ok(fullWidth.scroll<=fullWidth.viewport+2,'Document horizontally overflows: '+JSON.stringify(fullWidth));
     await page.screenshot({path:'artifacts/ui/'+viewport.name+'-light.png',fullPage:true});
 
     await page.locator('[data-period="30"]').click();
-    assert.ok((await page.locator('.metrics').innerText()).includes('4 820'), '30-day fixture missing');
+    assert.ok((await page.locator('.metrics').innerText()).replace(/\s/g,' ').includes('4 820'), '30-day fixture missing');
     await page.locator('[data-period="7"]').click();
 
     if(viewport.width<=1100){
@@ -42,7 +42,6 @@ try {
     await page.locator('[data-theme="dark"]').click();
     assert.equal(await page.locator('body').getAttribute('data-theme'),'dark');
     await page.screenshot({path:'artifacts/ui/'+viewport.name+'-dark.png',fullPage:true});
-    await page.locator('.profile').click();
     await page.locator('[data-locale="en"]').click();
     await page.getByRole('heading',{name:'Overview'}).waitFor();
     await page.screenshot({path:'artifacts/ui/'+viewport.name+'-en.png',fullPage:true});
