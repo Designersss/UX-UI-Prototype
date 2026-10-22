@@ -45,6 +45,7 @@ try {
       assert.ok(await page.locator('.right-rail').evaluate(node=>node.classList.contains('attention-highlight')));
       await page.locator('.summary-grid [data-preview]').last().click();
       assert.equal(await page.locator('.right-rail-context .brand-logo img').count(),1,'Integration context must show original logo');
+      await page.screenshot({path:'artifacts/ui/'+viewport.name+'-integration-context.png',fullPage:true});
       assert.equal(await page.locator('.summary-grid .line-item img').count(),3,'All visible integrations need actual SVG logos');
       await page.locator('.events [data-preview]').first().click();
       assert.ok((await page.locator('.right-rail-context').innerText()).includes('СОБЫТИЕ'));
@@ -56,6 +57,13 @@ try {
       await page.locator('[data-mobile-panel]').click();
       await page.locator('.right-rail.mobile-open .queue-item').nth(1).click();
       assert.ok((await page.locator('.right-rail .detail-desc').innerText()).includes('Диалог'));
+      await page.locator('[data-close-panel]').click();
+      await page.locator('.summary-grid [data-preview]').last().click();
+      assert.ok(await page.locator('.right-rail').evaluate(node=>node.classList.contains('mobile-open')));
+      assert.ok((await page.locator('.right-rail-context').innerText()).includes('ИНТЕГРАЦИЯ'));
+      await page.screenshot({path:'artifacts/ui/'+viewport.name+'-integration-context.png',fullPage:true});
+      await page.locator('[data-back-control]').click();
+      assert.ok(await page.locator('.right-rail').evaluate(node=>!node.classList.contains('right-rail-context')));
       await page.locator('[data-close-panel]').click();
     }else{
       await page.locator('.queue-item').nth(1).click();
