@@ -212,3 +212,103 @@ button.line-item:focus-visible,button.event-row:focus-visible{position:relative;
 .context-actions>span{text-align:center;color:var(--muted);font-size:11px;line-height:1.5}
 button.line-item.is-context-selected,button.event-row.is-context-selected{background:var(--sage);border-radius:9px;margin-left:-8px;margin-right:-8px;width:calc(100% + 16px);padding-left:8px;padding-right:8px}
 @media(max-width:1100px){.right-rail-context.mobile-open{display:flex}}
+
+/* Desktop fit-to-viewport: prevent redundant nested scrolling at common heights.
+   Content remains in flow and can still scroll when a genuinely small viewport requires it. */
+@media (min-width:1101px) and (max-height:940px){
+ .sidebar{gap:8px;padding-top:16px;padding-bottom:12px}
+ .brand{height:38px;font-size:21px}
+ .org-switch{min-height:53px;padding:9px}
+ .sidebar-search{min-height:34px}
+ .nav-list{gap:0;margin-top:0}
+ .nav-item{min-height:34px;font-size:12px;gap:11px}
+ .profile{min-height:52px;padding:7px 10px}
+ .main-scroll{padding-top:20px;padding-bottom:13px}
+ .page-head{min-height:73px}
+ .page-head h1{font-size:29px}
+ .page-head p{margin-top:7px;font-size:12px}
+ .alert-banner{min-height:43px;margin-bottom:10px;padding:7px 13px}
+ .activity-card{padding:17px 18px 13px}
+ .card-title h2{font-size:15px}
+ .card-title p{margin-top:5px}
+ .metrics{margin:14px 0 9px}
+ .metrics strong{font-size:27px}
+ .metrics>div{gap:4px}
+ .chart{height:97px}
+ .summary-grid{margin-top:9px;gap:10px}
+ .compact-card{min-height:0;padding:14px 15px 10px}
+ .compact-card .card-title{margin-bottom:6px}
+ .line-item{height:37px}
+ .events-card{margin-top:9px;padding:14px 15px 8px}
+ .events{padding-top:7px}
+ .event-row{min-height:30px}
+ .right-rail{padding:16px 18px 14px}
+ .rail-top{height:28px}
+ .right-rail>h2{font-size:22px;margin-top:10px}
+ .rail-sub{margin-top:3px}
+ .queue-list{padding:11px 0 9px}
+ .queue-item{min-height:57px;padding:6px}
+ .detail-content{padding:13px 0}
+ .detail-leading{margin:11px 0}
+ .detail-desc{margin:10px 0 13px;line-height:1.45;font-size:11.8px}
+ .detail-label{margin-bottom:5px}
+ .btn{min-height:36px;padding:8px 11px}
+ .rail-billing{padding-top:12px}
+ .rail-billing>strong{margin:8px 0 10px}
+ .balance-number{font-size:22px;margin-top:3px}
+ .agent-context-rail .agent-panel-identity{padding:16px 0}
+ .agent-context-rail .agent-panel-avatar{height:40px;width:40px;margin-bottom:10px}
+ .agent-context-rail .agent-panel-identity h2{font-size:20px}
+ .agent-context-rail .agent-panel-section{padding:15px 0}
+ .agent-context-rail .agent-panel-section h3{margin-bottom:12px}
+ .agent-context-rail .agent-panel-section dl{gap:11px}
+ .agent-context-rail .agent-panel-actions{padding-top:15px}
+ .agent-context-rail .agent-context-note{margin-top:13px;padding:9px}
+}
+@media (min-width:1101px) and (max-height:770px){
+ .sidebar{gap:6px;padding-top:11px;padding-bottom:9px}
+ .brand{height:30px;font-size:19px}
+ .brand-mark{grid-template-columns:repeat(2,10px);grid-template-rows:repeat(2,10px)}
+ .org-switch{min-height:46px;padding:6px}
+ .org-avatar{height:30px;width:30px}
+ .sidebar-search{min-height:31px}
+ .nav-item{min-height:29px;font-size:11px}
+ .nav-item svg{height:16px;width:16px}
+ .profile{min-height:44px;padding:5px 7px}
+ .main-scroll{padding-top:13px;padding-bottom:10px}
+ .page-head{min-height:60px}
+ .page-head h1{font-size:26px}
+ .page-head p{margin-top:5px;font-size:11px}
+ .alert-banner{min-height:36px;margin-bottom:8px}
+ .activity-card{padding:13px 15px 10px}
+ .metrics{margin:10px 0 7px}
+ .metrics strong{font-size:24px}
+ .chart{height:79px}
+ .summary-grid{margin-top:8px}
+ .compact-card{padding:11px 13px 8px}
+ .line-item{height:31px}
+ .mini-glyph{height:25px;width:25px}
+ .brand-logo{height:26px;width:26px}
+ .brand-logo img{height:24px;width:24px}
+ .events-card{margin-top:8px;padding:12px 13px 6px}
+ .events{padding-top:5px}
+ .event-row{min-height:27px}
+ .right-rail{padding-top:12px;padding-bottom:10px}
+ .right-rail>h2{font-size:20px;margin-top:6px}
+ .queue-list{padding:7px 0}
+ .queue-item{min-height:49px;padding:4px}
+ .queue-item small{font-size:10px}
+ .detail-content{padding:10px 0}
+ .detail-leading{margin:8px 0}
+ .detail-desc{margin:8px 0 10px;font-size:11px}
+ .rail-billing{padding-top:10px}
+ .agent-page-head{margin-bottom:10px}
+ .agent-page-head h1{font-size:26px}
+ .agent-toolbar{padding-top:12px;padding-bottom:8px}
+ .agent-tabs{margin:9px 0}
+ .agent-row{min-height:55px}
+ .agent-row-head{height:35px}
+ .agent-pagination{height:43px}
+ .agent-filterbar .agent-search{height:39px}
+ .agent-dropdown>summary{height:39px}
+}
