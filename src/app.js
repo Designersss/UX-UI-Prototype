@@ -36,7 +36,11 @@ menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
 close:'<path d="M5 5 19 19M19 5 5 19"/>',
 sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2m0-14-2 2M7 17l-2 2"/>',
 moon:'<path d="M20 14A8 8 0 0 1 10 4 8 8 0 1 0 20 14"/>',
-check:'<path d="m5 12 4 4L19 6"/>'
+check:'<path d="m5 12 4 4L19 6"/>',
+sparkles:'<path d="m12 2 2.1 6.4L21 11l-6.9 2.3L12 20l-2.1-6.7L3 11l6.9-2.6z"/><path d="m19 19 .7 1.3L21 21l-1.3.6L19 23l-.7-1.4L17 21l1.3-.7z"/>',
+message:'<path d="M4 5h16v12H9l-5 4z"/>',
+clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+info:'<circle cx="12" cy="12" r="9"/><path d="M12 10v7m0-10h.01"/>'
 };
 const icon=(name,size=18)=>'<svg aria-hidden="true" viewBox="0 0 24 24" width="'+size+'" height="'+size+'" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+(icons[name]||icons.overview)+'</svg>';
 const org=()=>data.orgs.find(o=>o.id===state.org)||data.orgs[0];
