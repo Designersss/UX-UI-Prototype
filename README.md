@@ -47,3 +47,12 @@ node --test tests/*.test.mjs
 ## Workflow
 
 One reviewed page at a time; no feature PR is merged without approval. The old source remains available on branch `archive/legacy-prototype-2026-10-22`. The new source **replaces** all previous files, so no legacy CSS cascade is carried forward.
+
+## Create Agent (mock-only)
+
+Third page under review on \`feature/premium-calm-create-agent\`:
+- \`#/agents/new\`: choose type and name, and create a **local browser draft** (no server).
+- \`#/agents/:id/setup/1..6\`: editable six-step configuration; saved locally across reloads.
+- \`#/agents/:id/testing\`: safe scripted test only, with no model or external-service calls.
+- Drafts appear in Catalog → Drafts, scoped to the active mock organization.
+- No cross-device sync, real server autosave or live launch is implemented. Do not treat local save as backend confirmation.

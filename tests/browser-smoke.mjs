@@ -167,6 +167,49 @@ try {
   assert.equal(await agentPage.getByRole('alertdialog').count(),0);
   assert.deepEqual(catalogErrors,[]);
   await agentPage.close();
+
+  // Create Agent UI: dedicated route + organization-scoped local draft.
+  const setup=await browser.newPage({viewport:{width:1440,height:900}});
+  const setupErrors=[];
+  setup.on('pageerror',err=>setupErrors.push(err.message));
+  await setup.goto('http://127.0.0.1:4173/#/agents/new');
+  await setup.getByRole('heading',{name:'Создать агента',exact:true}).waitFor();
+  assert.equal(await setup.getByRole('alertdialog').count(),0);
+  await setup.screenshot({path:'artifacts/ui/create-agent-step-1.png',fullPage:true});
+  await setup.locator('[data-wizard-action="template"][data-value="hr"]').click();
+  await setup.locator('[data-wizard-field="new-name"]').fill('HR · Прототип');
+  await setup.locator('[data-wizard-action="create"]').click();
+  assert.match(setup.url(),/#\/agents\/draft-[^/]+\/setup\/2$/);
+  const draftId=setup.url().split('#/agents/')[1].split('/')[0];
+  await setup.locator('[data-wizard-field="company"]').fill('Тестовая организация');
+  await setup.locator('[data-wizard-field="task"]').fill('Собирать отклики и передавать сводки кадровой команде');
+  await setup.locator('[data-wizard-field="handoff"]').fill('Эскалация HR-сотруднику');
+  await setup.reload();
+  assert.equal(await setup.locator('[data-wizard-field="company"]').inputValue(),'Тестовая организация');
+  await setup.screenshot({path:'artifacts/ui/create-agent-instructions.png',fullPage:true});
+  await setup.locator('.wizard-step[href$="/setup/3"]').click();
+  await setup.locator('[data-wizard-toggle="knowledge"][value="vacancies"]').check();
+  await setup.locator('.wizard-step[href$="/setup/4"]').click();
+  await setup.locator('[data-wizard-toggle="connections"][value="max"]').check();
+  await setup.locator('.wizard-step[href$="/setup/5"]').click();
+  assert.ok((await setup.locator('.wizard-permissions').innerText()).includes('Автоматически отклонять кандидата'));
+  await setup.locator('.wizard-step[href$="/setup/6"]').click();
+  assert.ok((await setup.locator('.wizard-readiness-list').innerText()).includes('Тестирование'));
+  assert.equal(await setup.locator('.wizard-footer button[disabled]').count(),1,'Live activation must remain disabled');
+  await setup.screenshot({path:'artifacts/ui/create-agent-readiness.png',fullPage:true});
+  await setup.getByRole('link',{name:'Открыть тестирование'}).click();
+  assert.match(setup.url(),/\/testing$/);
+  await setup.locator('[data-wizard-field="simulation"]').fill('Хочу узнать о вакансии');
+  await setup.locator('[data-wizard-action="simulate"]').click();
+  assert.ok((await setup.locator('.wizard-chat').innerText()).includes('демонстрационный ответ'));
+  await setup.goto('http://127.0.0.1:4173/#/agents');
+  await setup.locator('[data-agent-action="view"][data-value="draft"]').click();
+  assert.ok((await setup.locator('.agent-table').innerText()).includes('HR · Прототип'));
+  await setup.goto('http://127.0.0.1:4173/#/agents/'+draftId+'/setup/2');
+  assert.equal(await setup.locator('[data-wizard-field="company"]').inputValue(),'Тестовая организация');
+  assert.deepEqual(setupErrors,[],'Create Agent page errors');
+  await setup.close();
+
   console.log('Chromium smoke passed at all viewports.');
 }finally{
   await browser.close();
