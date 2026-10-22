@@ -48,25 +48,17 @@ node --test tests/*.test.mjs
 
 One reviewed page at a time; no feature PR is merged without approval. The old source remains available on branch `archive/legacy-prototype-2026-10-22`. The new source **replaces** all previous files, so no legacy CSS cascade is carried forward.
 
-## Create Agent (mock-only)
+## Create Agent — approved option #1 (under code review)
 
-Third page under review on \`feature/premium-calm-create-agent\`:
-- \`#/agents/new\`: choose type and name, and create a **local browser draft** (no server).
-- \`#/agents/:id/setup/1..7\`: editable seven-step configuration; saved locally across reloads.
-- \`#/agents/:id/testing\`: safe scripted test only, with no model or external-service calls.
-- Drafts appear in Catalog → Drafts, scoped to the active mock organization.
-- No cross-device sync, real server autosave or live launch is implemented. Do not treat local save as backend confirmation.
+**Reference:** `docs/CREATE_AGENT_APPROVED_OPTION_1.md`. This is the **light, full-page editor with numbered stacked sections and a detailed preview on the right**, not the previously rejected dark wizard. The approved Overview and Agents Catalog are unchanged.
 
-### Profession selection and full-row integration controls
+- `#/agents/new`: single-page editor with a visual introductory banner and inline sections for basics, profession selection, behavior, knowledge and integrations, access and readiness.
+- `#/agents/:id/edit`: same page reopening a locally autosaved organization-scoped draft. Typing or selecting a role creates the draft automatically; there is **no Save Draft button**.
+- Profession catalog starts compact and expands into searchable, category-filterable paginated results. Only the two validated mock professions can be selected.
+- Knowledge and connected provider choices work across whole rows and show updates in the right preview. Original provider icons are used where available.
+- `#/agents/:id/testing`: a separate scripted simulation, not a live AI call. Production activation stays disabled.
+- Links into Knowledge Base and Integration Hub preserve a contextual back action.
+- Full central page scrolls as one coherent document; individual cards do not scroll on their own.
+- Local browser state is **not** server/cloud storage. Backend writes, production integration requests, access permissions and real publishing are deliberately out of scope.
 
-- **Step 1:** provide a name and short purpose. **Step 2:** select a profession on its own routed page.
-- The 36-entry **demonstration catalog** has search, category filters, and pagination; only two approved role templates can be selected. All other names are non-functional future previews, not production commitments.
-- Knowledge and integration selections use full-row accessible buttons (not nested checkboxes) and persist in the same browser without remounting the clicked control.
-- Other stages shift to 3: instructions, 4: knowledge, 5: integrations, 6: permissions, 7: readiness. Live agent deployment is disabled.
-
-### Wizard UX review: full-height forms and clear routing
-
-- The central `wizard-main` uses the available desktop viewport height; the main viewport scrolls only when content genuinely needs more room. No nested card scrolling.
-- Step 3 is guided by three plain-language questions with profession-specific expandable examples that can be used and edited. The `handoff` text describes **when** the AI should stop answering, not its destination.
-- Step 6 separately configures **who may manage the agent** (`group`) and **which team receives an escalated conversation** (`handoffTarget`). Both use consistent Premium Calm custom dropdowns; the feature is mock-only and performs no live handoff.
-- Knowledge Base and Integration Hub links carry a `from-agent` context route; their placeholders include a visible link back to the originating wizard step. Help links also preserve return context.
+Review and merge policy: code stays in draft PR until the user has inspected and approved the working implementation.

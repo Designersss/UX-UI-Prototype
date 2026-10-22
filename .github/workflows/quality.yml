@@ -15,6 +15,9 @@ jobs:
           node --check src/data.js
           node --check src/app.js
           node --check src/create-agent.js
+          node --check src/approved-agent-editor.js
+          node --check src/approved-agent-preview.js
+          node --check src/approved-agent-actions.js
       - name: Mock contract tests
         run: node --test tests/*.test.mjs
       - name: Reject legacy sources
