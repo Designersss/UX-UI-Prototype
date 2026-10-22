@@ -60,9 +60,9 @@ function chart(activity){
 function overview(o){
  const activity=o.activity[state.period];const success=activity.total?(activity.success/activity.total*100).toLocaleString(state.locale==="ru"?"ru-RU":"en-US",{maximumFractionDigits:1})+"%":"—";
  const attention=o.queue.length;
- const agentRows=o.agents.slice(0,3).map(a=>'<button type="button" class="line-item" data-preview="agent:'+escapeHtml(a.id)+'"><span class="mini-glyph '+(a.type==="hr"?"lilac":"")+'">'+icon("agents",16)+'</span><span class="line-name">'+escapeHtml(a.name)+'</span><span class="line-status '+a.state+'">'+statusLabel(a.state)+'</span></button>').join('');
- const integRows=o.integrations.slice(0,3).map(i=>'<button type="button" class="line-item" data-preview="integration:'+escapeHtml(i.id)+'">'+brandIcon(i.brand)+'<span class="line-name">'+escapeHtml(i.name)+'</span><span class="line-status '+i.status+'">'+statusLabel(i.status)+'</span></button>').join('');
- const eventRows=o.events.slice(0,3).map(e=>'<button type="button" class="event-row" data-preview="event:'+escapeHtml(e.id)+'"><time>'+escapeHtml(e.time)+'</time><span>'+escapeHtml(e.text)+'</span><small class="'+e.state+'">'+(e.state==="success"?T("success"):e.state==="pending"?(state.locale==="ru"?"Ожидает":"Pending"):(state.locale==="ru"?"Передан":"Handed off"))+'</small></button>').join('');
+ const agentRows=o.agents.slice(0,3).map(a=>'<button type="button" class="line-item '+(state.context?.type==="agent"&&state.context.id===a.id?"is-context-selected":"")+'" data-preview="agent:'+escapeHtml(a.id)+'" aria-pressed="'+!!(state.context?.type==="agent"&&state.context.id===a.id)+'"><span class="mini-glyph '+(a.type==="hr"?"lilac":"")+'">'+icon("agents",16)+'</span><span class="line-name">'+escapeHtml(a.name)+'</span><span class="line-status '+a.state+'">'+statusLabel(a.state)+'</span></button>').join('');
+ const integRows=o.integrations.slice(0,3).map(i=>'<button type="button" class="line-item '+(state.context?.type==="integration"&&state.context.id===i.id?"is-context-selected":"")+'" data-preview="integration:'+escapeHtml(i.id)+'" aria-pressed="'+!!(state.context?.type==="integration"&&state.context.id===i.id)+'">'+brandIcon(i.brand)+'<span class="line-name">'+escapeHtml(i.name)+'</span><span class="line-status '+i.status+'">'+statusLabel(i.status)+'</span></button>').join('');
+ const eventRows=o.events.slice(0,3).map(e=>'<button type="button" class="event-row '+(state.context?.type==="event"&&state.context.id===e.id?"is-context-selected":"")+'" data-preview="event:'+escapeHtml(e.id)+'" aria-pressed="'+!!(state.context?.type==="event"&&state.context.id===e.id)+'"><time>'+escapeHtml(e.time)+'</time><span>'+escapeHtml(e.text)+'</span><small class="'+e.state+'">'+(e.state==="success"?T("success"):e.state==="pending"?(state.locale==="ru"?"Ожидает":"Pending"):(state.locale==="ru"?"Передан":"Handed off"))+'</small></button>').join('');
  return '<header class="page-head"><div><h1>'+T("overview")+'</h1><p>'+ (state.locale==="ru"?"Состояние команды · "+activity.range.ru:"Team status · "+activity.range.en)+'</p></div><div class="segmented" role="group" aria-label="Period"><button type="button" data-period="7" aria-pressed="'+(state.period===7)+'">'+T("week")+'</button><button type="button" data-period="30" aria-pressed="'+(state.period===30)+'">'+T("month")+'</button></div></header>'+
  (attention?'<button class="alert-banner" type="button" data-queue="1"><span class="attention-icon">!</span><strong>'+T("attention")+': '+attention+'</strong><span>'+T("openQueue")+' '+icon("arrow",16)+'</span></button>':'')+
  '<section class="surface activity-card"><div class="card-title"><div><h2>'+T("activity")+'</h2><p>'+T("executions")+' · '+escapeHtml(activity.range[state.locale])+'</p></div></div>'+
@@ -72,26 +72,67 @@ function overview(o){
  '<section class="surface events-card"><div class="card-title"><h2>'+T("recent")+'</h2><a href="#/journal">'+T("allJournal")+' '+icon("arrow",14)+'</a></div><div class="events">'+(eventRows||'<p class="empty">'+T("empty")+'</p>')+'</div></section>';
 }
 function previewPanel(o){
- if(!state.context)return null;
+ if(!state.context)return "";
  const {type,id}=state.context;
+ let title="",subtitle="",eyebrow="",badge="",stamp="",description="",facts="",target="",action="",avatar="";
  if(type==="agent"){
- const a=o.agents.find(x=>x.id===id);if(!a)return null;
- return '<div class="detail-content preview-content" aria-live="polite"><p class="eyebrow">'+(state.locale==="ru"?"КОНТЕКСТ АГЕНТА":"AGENT CONTEXT")+'</p><div class="detail-leading"><span class="mini-glyph '+(a.type==="hr"?"lilac":"")+'">'+icon("agents")+'</span><div><strong>'+escapeHtml(a.name)+'</strong><small>'+statusLabel(a.state)+'</small></div></div><small class="detail-label">'+(state.locale==="ru"?"Тип агента":"Agent type")+'</small><b>'+escapeHtml(a.type==="hr"?(state.locale==="ru"?"Рекрутер":"Recruiter"):(state.locale==="ru"?"Менеджер заявок":"Lead manager"))+'</b><p class="detail-desc">'+(state.locale==="ru"?"Выбранный агент. Здесь доступен быстрый контекст; полная карточка откроется на отдельной странице.":"Selected agent. Full agent details open on a dedicated page.")+'</p><a class="btn btn-dark" href="#/agents/'+escapeHtml(a.id)+'">'+T("openAgent")+' '+icon("arrow",15)+'</a></div>';
- }
- if(type==="integration"){
- const i=o.integrations.find(x=>x.id===id);if(!i)return null;
- return '<div class="detail-content preview-content" aria-live="polite"><p class="eyebrow">'+(state.locale==="ru"?"КОНТЕКСТ ПОДКЛЮЧЕНИЯ":"INTEGRATION CONTEXT")+'</p><div class="detail-leading">'+brandIcon(i.brand)+'<div><strong>'+escapeHtml(i.name)+'</strong><small>'+statusLabel(i.status)+'</small></div></div><small class="detail-label">'+T("lastCheck")+'</small><b>'+escapeHtml(i.last)+'</b><p class="detail-desc">'+escapeHtml(i.detail|| (state.locale==="ru"?"Подключение работает, критических ошибок нет.":"Integration is connected; no critical errors."))+'</p><a class="btn btn-dark" href="#/integrations/'+escapeHtml(i.id)+'">'+T("openIntegration")+' '+icon("arrow",15)+'</a></div>';
- }
- if(type==="event"){
- const e=o.events.find(x=>x.id===id);if(!e)return null;
- return '<div class="detail-content preview-content" aria-live="polite"><p class="eyebrow">'+(state.locale==="ru"?"СОБЫТИЕ":"EVENT")+'</p><div class="detail-leading"><span class="mini-glyph">'+icon("journal")+'</span><div><strong>'+escapeHtml(e.text)+'</strong><small>'+escapeHtml(e.time)+'</small></div></div><p class="detail-desc">'+(state.locale==="ru"?"Подробная хронология доступна в журнале действий.":"The activity log contains the detailed event history.")+'</p><a class="btn btn-dark" href="#/journal/'+escapeHtml(e.id)+'">'+T("openJournal")+' '+icon("arrow",15)+'</a></div>';
- }
- return null;
+   const a=o.agents.find(x=>x.id===id);
+   if(!a)return "";
+   title=a.name;
+   eyebrow=state.locale==="ru"?"АГЕНТ":"AGENT";
+   subtitle=state.locale==="ru"?"Контекст выбранного агента":"Selected agent";
+   badge=statusLabel(a.state);
+   stamp=state.locale==="ru"?"Последняя активность":"Last activity";
+   description=state.locale==="ru"?"Проверьте состояние агента и перейдите в его карточку для подробного управления.":"Review the agent status and open the dedicated page to manage it.";
+   facts='<div><dt>'+(state.locale==="ru"?"Тип":"Type")+'</dt><dd>'+escapeHtml(a.type==="hr"?(state.locale==="ru"?"Рекрутер":"Recruiter"):(state.locale==="ru"?"Менеджер заявок":"Lead manager"))+'</dd></div>'+
+         '<div><dt>'+stamp+'</dt><dd>'+escapeHtml(a.last)+'</dd></div>';
+   avatar='<span class="context-avatar agent '+(a.type==="hr"?"lilac":"")+'">'+icon("agents",26)+'</span>';
+   target="#/agents/"+encodeURIComponent(id);
+   action=T("openAgent");
+ }else if(type==="integration"){
+   const i=o.integrations.find(x=>x.id===id);
+   if(!i)return "";
+   title=i.name;
+   eyebrow=state.locale==="ru"?"ИНТЕГРАЦИЯ":"INTEGRATION";
+   subtitle=state.locale==="ru"?"Сведения о подключении":"Connection details";
+   badge=statusLabel(i.status);
+   description=i.detail||(state.locale==="ru"?"Подключение работает, критических ошибок нет.":"Integration is connected with no critical errors.");
+   facts='<div><dt>'+T("lastCheck")+'</dt><dd>'+escapeHtml(i.last)+'</dd></div>';
+   avatar='<span class="context-avatar integration">'+brandIcon(i.brand)+'</span>';
+   target="#/integrations/"+encodeURIComponent(id);
+   action=T("openIntegration");
+ }else if(type==="event"){
+   const e=o.events.find(x=>x.id===id);
+   if(!e)return "";
+   title=e.text;
+   eyebrow=state.locale==="ru"?"СОБЫТИЕ":"EVENT";
+   subtitle=state.locale==="ru"?"Журнал активности":"Activity log";
+   badge=e.state==="success"?T("success"):e.state==="pending"?(state.locale==="ru"?"Ожидает":"Pending"):(state.locale==="ru"?"Передано человеку":"Handed to team");
+   description=state.locale==="ru"?"Это событие сохранено в журнале действий. Полная хронология и связанные объекты доступны на отдельной странице.":"This event is stored in the activity log. View the full timeline and related items on its own page.";
+   facts='<div><dt>'+(state.locale==="ru"?"Время события":"Event time")+'</dt><dd>'+escapeHtml(e.time)+'</dd></div>';
+   avatar='<span class="context-avatar event">'+icon("journal",25)+'</span>';
+   target="#/journal/"+encodeURIComponent(id);
+   action=T("openJournal");
+ }else return "";
+ const back=state.locale==="ru"?"На контроле":"Attention queue";
+ const statusClass=type==="integration"&&o.integrations.find(x=>x.id===id)?.status==="auth"?"warning":"neutral";
+ return '<aside class="right-rail right-rail-context '+(state.panelOpen?'mobile-open':'')+'" id="right-rail" aria-label="'+escapeHtml(eyebrow)+'">'+
+ '<div class="context-top"><button type="button" class="context-back" data-back-control="1">'+icon("arrow",16)+'<span>'+back+'</span></button>'+
+ '<button class="close-mobile" type="button" data-close-panel="1" aria-label="'+(state.locale==="ru"?"Закрыть панель":"Close panel")+'">'+icon("close")+'</button></div>'+
+ '<div class="context-head" aria-live="polite"><span class="eyebrow">'+escapeHtml(eyebrow)+'</span>'+
+ '<div class="context-identity">'+avatar+'<div><h2>'+escapeHtml(title)+'</h2><p>'+escapeHtml(subtitle)+'</p></div></div>'+
+ '<span class="context-status '+statusClass+'"><span aria-hidden="true"></span>'+escapeHtml(badge)+'</span></div>'+
+ '<section class="context-section"><h3>'+(state.locale==="ru"?"Информация":"Information")+'</h3>'+
+ '<dl class="context-facts">'+facts+'</dl></section>'+
+ '<section class="context-section"><h3>'+(state.locale==="ru"?"Подробности":"Details")+'</h3><p>'+escapeHtml(description)+'</p></section>'+
+ '<div class="context-actions"><a class="btn btn-dark" href="'+escapeHtml(target)+'">'+escapeHtml(action)+' '+icon("arrow",15)+'</a>'+
+ '<span>'+(state.locale==="ru"?"Полная информация откроется на отдельной странице":"Full details open on a separate page")+'</span></div></aside>';
 }
 function controlPanel(o){
+ if(state.context){const panel=previewPanel(o);if(panel)return panel;state.context=null;}
  const selected=o.queue.find(x=>x.id===state.selected)||o.queue[0];
  const rowList=o.queue.map(q=>'<button class="queue-item '+(selected&&selected.id===q.id?"selected":"")+'" data-select="'+escapeHtml(q.id)+'" aria-pressed="'+!!(selected&&selected.id===q.id)+'"><span class="queue-icon">'+icon(q.kind==="approval"?"approvals":q.kind==="handoff"?"inbox":"integrations",18)+'</span><span><strong>'+escapeHtml(q.title)+'</strong><small>'+escapeHtml(q.sub)+'</small></span></button>').join('');
- const subHtml=previewPanel(o)||(selected?'<div class="detail-content"><p class="eyebrow">'+T("details")+'</p><div class="detail-leading"><span class="mini-glyph warm">'+icon(selected.kind==="integration"?"integrations":selected.kind==="approval"?"approvals":"inbox")+'</span><div><strong>'+escapeHtml(selected.title)+'</strong><small>'+ (selected.kind==="integration"? (state.locale==="ru"?"Ошибка авторизации":"Authorization issue") : (state.locale==="ru"?"Требуется действие":"Action required"))+'</small></div></div><small class="detail-label">'+T("lastCheck")+'</small><b>'+ (selected.kind==="integration"?"Сегодня, 12:10":selected.sub)+'</b><p class="detail-desc">'+escapeHtml(selected.detail)+'</p><a class="btn btn-dark" href="#/'+escapeHtml(selected.route)+'">'+escapeHtml(selected.action)+' '+icon("arrow",15)+'</a>'+(selected.kind==="integration"?'<button class="btn btn-light" type="button" data-reconnect="1">'+T("reconnect")+'</button>':'')+'</div>':'<div class="detail-content"><p class="empty">'+T("empty")+'</p></div>');
+ const subHtml=selected?'<div class="detail-content"><p class="eyebrow">'+T("details")+'</p><div class="detail-leading"><span class="mini-glyph warm">'+icon(selected.kind==="integration"?"integrations":selected.kind==="approval"?"approvals":"inbox")+'</span><div><strong>'+escapeHtml(selected.title)+'</strong><small>'+ (selected.kind==="integration"? (state.locale==="ru"?"Ошибка авторизации":"Authorization issue") : (state.locale==="ru"?"Требуется действие":"Action required"))+'</small></div></div><small class="detail-label">'+T("lastCheck")+'</small><b>'+ (selected.kind==="integration"?"Сегодня, 12:10":selected.sub)+'</b><p class="detail-desc">'+escapeHtml(selected.detail)+'</p><a class="btn btn-dark" href="#/'+escapeHtml(selected.route)+'">'+escapeHtml(selected.action)+' '+icon("arrow",15)+'</a>'+(selected.kind==="integration"?'<button class="btn btn-light" type="button" data-reconnect="1">'+T("reconnect")+'</button>':'')+'</div>':'<div class="detail-content"><p class="empty">'+T("empty")+'</p></div>';
  return '<aside class="right-rail '+(state.panelOpen?'mobile-open':'')+'" id="right-rail" aria-label="'+T("control")+'"><div class="rail-top"><a class="round-btn" href="#/notifications" aria-label="'+T("notifications")+'">'+icon("notifications",20)+'</a><span class="notif-number">'+o.queue.length+'</span><button class="close-mobile" type="button" data-close-panel="1" aria-label="Close">'+icon("close")+'</button></div><h2>'+T("control")+'</h2><p class="rail-sub">'+o.queue.length+' '+T("actionCount")+'</p>'+
  '<div class="queue-list">'+(rowList||'<p class="empty">'+T("empty")+'</p>')+'</div>'+subHtml+
  '<div class="rail-billing"><p class="eyebrow">'+T("balanceTitle")+'</p><strong>'+escapeHtml(o.plan)+' · '+ (state.locale==="ru"?"до ":"until ")+escapeHtml(o.periodEnd)+'</strong><div class="balance-row"><span>'+T("aiBalance")+'</span><a href="#/finance">'+T("openFinance")+'</a></div><div class="balance-number">'+o.balance.toLocaleString("ru-RU")+' ₽</div></div></aside>';
@@ -125,9 +166,10 @@ function updateSearch(q){
  el.innerHTML=matches.length?matches.map(m=>'<a href="#/'+escapeHtml(m.route)+'"><span>'+escapeHtml(m.name)+'</span><small>'+escapeHtml(m.type)+'</small></a>').join(''):'<p>'+T("noMatches")+'</p>';
 }
 document.addEventListener("click",e=>{
- const el=e.target.closest("[data-preview],[data-period],[data-theme],[data-locale],[data-org],[data-account],[data-search],[data-close-search],[data-menu],[data-mobile-panel],[data-close-panel],[data-queue],[data-reconnect]");
+ const el=e.target.closest("[data-preview],[data-back-control],[data-period],[data-theme],[data-locale],[data-org],[data-account],[data-search],[data-close-search],[data-menu],[data-mobile-panel],[data-close-panel],[data-queue],[data-reconnect]");
  if(!el)return;
- if(el.dataset.preview){const [type,id]=el.dataset.preview.split(":");state.context={type,id};state.panelOpen=matchMedia("(max-width: 1100px)").matches;render();if(!state.panelOpen)document.querySelector(".preview-content")?.scrollIntoView({behavior:"instant",block:"nearest"});}
+ if(el.dataset.preview){const [type,id]=el.dataset.preview.split(":");state.context={type,id};state.panelOpen=matchMedia("(max-width: 1100px)").matches;render();document.querySelector(".right-rail").scrollTop=0;}
+ else if("backControl" in el.dataset){state.context=null;render();document.querySelector(".right-rail").scrollTop=0;}
  else if(el.dataset.period){state.period=Number(el.dataset.period);persisted();render();}
  else if(el.dataset.theme){state.theme=el.dataset.theme;persisted();render();}
  else if(el.dataset.locale){state.locale=el.dataset.locale;persisted();render();}

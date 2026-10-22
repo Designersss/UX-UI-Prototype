@@ -182,3 +182,33 @@ button.line-item:focus-visible,button.event-row:focus-visible{position:relative;
 .chart-month .bar-col .bar{border-radius:3px 3px 1px 1px}
 .chart-month .bar-col small{font-size:9px;transform:translateX(-10%);overflow:visible}
 @media(max-width:760px){.chart-month .bars{gap:2px}.chart-month .bar-col small{font-size:8px}.chart-month .bar-col .bar{border-radius:2px 2px 0 0}}
+
+/* Context mode replaces, rather than nests inside, the default attention/balance rail. */
+.context-top{display:flex;align-items:center;justify-content:space-between;min-height:38px}
+.context-back{display:inline-flex;align-items:center;gap:8px;padding:8px 11px 8px 7px;margin-left:-7px;border:0;border-radius:9px;background:transparent;color:var(--muted);font-size:12px;font-weight:650}
+.context-back:hover{color:var(--ink);background:var(--soft)}
+.context-back svg{transform:rotate(180deg)}
+.context-head{padding:37px 0 28px;border-bottom:1px solid var(--line)}
+.context-identity{display:flex;align-items:center;gap:14px;margin:19px 0 15px;min-width:0}
+.context-identity>div{min-width:0}
+.context-identity h2{font-size:20px;letter-spacing:-.5px;font-weight:730;line-height:1.3;overflow-wrap:anywhere}
+.context-identity p{font-size:12px;line-height:1.4;color:var(--muted);margin-top:8px}
+.context-avatar{display:grid;place-items:center;flex-shrink:0;width:51px;height:51px;border-radius:15px;background:var(--sage);color:var(--sage-ink)}
+.context-avatar.lilac,.context-avatar.event{background:var(--lavender);color:var(--ink)}
+.context-avatar.integration{background:var(--panel)}
+.context-avatar.integration .brand-logo{height:44px;width:44px;background:transparent}
+.context-avatar.integration img{width:42px;height:42px}
+.context-status{display:inline-flex;align-items:center;gap:8px;border-radius:999px;background:var(--sage);color:var(--sage-ink);padding:7px 11px;font-size:11px;font-weight:700}
+.context-status.warning{background:var(--sand);color:var(--warn)}
+.context-status>span{width:7px;height:7px;border-radius:100%;background:currentColor}
+.context-section{padding:25px 0;border-bottom:1px solid var(--line)}
+.context-section h3{font-size:13px;font-weight:720;margin-bottom:18px}
+.context-section p{line-height:1.7;font-size:12.5px;color:var(--text)}
+.context-facts{margin:0;display:grid;gap:17px}
+.context-facts div{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.context-facts dt{color:var(--muted);font-size:11.5px}
+.context-facts dd{margin:0;font-size:12px;font-weight:680;text-align:right;max-width:62%;overflow-wrap:anywhere}
+.context-actions{display:flex;flex-direction:column;gap:12px;padding-top:27px}
+.context-actions>span{text-align:center;color:var(--muted);font-size:11px;line-height:1.5}
+button.line-item.is-context-selected,button.event-row.is-context-selected{background:var(--sage);border-radius:9px;margin-left:-8px;margin-right:-8px;width:calc(100% + 16px);padding-left:8px;padding-right:8px}
+@media(max-width:1100px){.right-rail-context.mobile-open{display:flex}}
