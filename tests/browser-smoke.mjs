@@ -105,6 +105,7 @@ try {
   agentPage.on('pageerror',error=>catalogErrors.push(error.message));
   await agentPage.goto('http://127.0.0.1:4173/#/agents');
   await agentPage.getByRole('heading',{name:'Агенты',exact:true}).waitFor();
+  assert.equal(await agentPage.locator('.agent-page-head p').count(),0,'Redundant header summary must be absent');
   assert.equal(await agentPage.locator('.agent-row').count(),5);
   assert.equal(await agentPage.locator('.agent-tab').count(),5);
   assert.equal(await agentPage.locator('[data-agent-action="page"]').count(),4);
