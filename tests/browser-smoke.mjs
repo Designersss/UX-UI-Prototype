@@ -203,8 +203,8 @@ try {
   assert.equal(await setup.locator('[data-wizard-field="company"]').inputValue(),'Тестовая организация');
   await setup.screenshot({path:'artifacts/ui/create-agent-instructions.png',fullPage:true});
   await setup.locator('.wizard-step[href$="/setup/4"]').click();
-  await setup.locator('[data-wizard-toggle="knowledge"][value="vacancies"]').check();
-  assert.ok(await setup.locator('[data-wizard-toggle="knowledge"][value="vacancies"]').isChecked(),'Checkbox remains mounted and checked');
+  await setup.locator('[data-wizard-toggle="knowledge"][value="vacancies"]').click();
+  assert.ok(await setup.locator('[data-wizard-toggle="knowledge"][value="vacancies"]').isChecked(),'User click must check knowledge without re-render');
   await setup.reload();
   assert.ok(await setup.locator('[data-wizard-toggle="knowledge"][value="vacancies"]').isChecked(),'Knowledge persisted');
   await setup.locator('.wizard-step[href$="/setup/5"]').click();
