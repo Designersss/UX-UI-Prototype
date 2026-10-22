@@ -100,12 +100,13 @@ try {
   await agentPage.goto('http://127.0.0.1:4173/#/agents');
   await agentPage.getByRole('heading',{name:'Агенты',exact:true}).waitFor();
   assert.equal(await agentPage.locator('.agent-row').count(),8);
+  await agentPage.screenshot({path:'artifacts/ui/agents-catalog-desktop.png',fullPage:true});
   assert.equal(await agentPage.locator('[data-agent-filter]').count(),4);
   assert.equal(await agentPage.locator('[data-agent-filter="tag"]').count(),1);
   assert.ok((await agentPage.locator('.agent-context-rail').innerText()).includes('Менеджер заявок'));
   await agentPage.locator('[data-agent-action="select"][data-value="a2"]').click();
   assert.ok((await agentPage.locator('.agent-context-rail').innerText()).includes('HR-рекрутер'));
-  assert.ok(await agentPage.locator('[data-value="a2"]').evaluate(el=>el.classList.contains('selected')));
+  assert.ok(await agentPage.locator('.agent-row[data-value="a2"]').evaluate(el=>el.classList.contains('selected')));
   await agentPage.locator('[data-agent-filter="type"]').selectOption('hr');
   assert.ok((await agentPage.locator('.agent-row').count())<8);
   await agentPage.locator('[data-agent-action="reset"]').click();
