@@ -184,26 +184,21 @@ try {
     assert.ok(await field.evaluate(el=>document.activeElement===el),'Focus lost during typing: '+selector);
     assert.equal(await field.inputValue(),value,'Text did not persist in active input: '+selector);
   };
-  await setup.evaluate(()=>{
-    window.__focusTrace=[];
-    const short=el=>el?.tagName?.toLowerCase()+'#'+(el?.id||'')+'['+(el?.getAttribute?.('data-wizard-field')||'')+']';
-    for(const type of ['pointerdown','mousedown','focus','focusin','mouseup','click','focusout','blur','resize']){
-      window.addEventListener(type,e=>{if(window.__focusTrace.length<80)window.__focusTrace.push({event:type,target:short(e.target),active:short(document.activeElement),connected:document.querySelector('[data-wizard-field="new-name"]')?.isConnected,hash:location.hash});},true);
-    }
-    const observer=new MutationObserver(m=>{if(window.__focusTrace.length<80)window.__focusTrace.push({event:'mutation',size:m.length,focus:short(document.activeElement),input:short(document.querySelector('[data-wizard-field="new-name"]'))});});
-    observer.observe(document.querySelector('#app'),{childList:true,subtree:true});
-  });
-  await setup.locator('[data-wizard-field="new-name"]').click();
-  console.log('FOCUS_TRACE',JSON.stringify(await setup.evaluate(()=>({
-    events:window.__focusTrace,
-    active:document.activeElement?.outerHTML?.slice(0,300),
-    input:document.querySelector('[data-wizard-field="new-name"]')?.outerHTML
-  }))));
-  assert.ok(await setup.locator('[data-wizard-field="new-name"]').evaluate(el=>document.activeElement===el),'Name field focus after click');
   await focusCheck(setup,'[data-wizard-field="new-name"]','Фокус тест');
   await setup.locator('[data-wizard-field="new-name"]').fill('');
   await focusCheck(setup,'[data-wizard-field="new-description"]','Проверка фокуса');
   await setup.locator('[data-wizard-field="new-description"]').fill('');
+  // A normal click must not be captured by the body-level data-theme attribute.
+  await setup.locator('[data-wizard-field="new-name"]').click();
+  assert.equal(await setup.locator('body').getAttribute('data-theme'),'light');
+  assert.ok(await setup.locator('[data-wizard-field="new-name"]').evaluate(el=>document.activeElement===el));
+  // Theme controls still work when used intentionally.
+  await setup.locator('[data-account]').click();
+  await setup.locator('button[data-theme="dark"]').click();
+  assert.equal(await setup.locator('body').getAttribute('data-theme'),'dark');
+  await setup.locator('[data-account]').click();
+  await setup.locator('button[data-theme="light"]').click();
+  assert.equal(await setup.locator('body').getAttribute('data-theme'),'light');
   assert.equal(await setup.locator('.wizard-template').count(),0,'No oversized profession cards in basic form');
   await setup.locator('[data-wizard-field="new-name"]').fill('HR · Прототип');
   await setup.locator('[data-wizard-field="new-description"]').fill('Помогает рекрутерам обрабатывать отклики');

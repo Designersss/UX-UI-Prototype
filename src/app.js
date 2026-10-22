@@ -218,7 +218,7 @@ document.addEventListener("click",e=>{
    }
    return;
  }
- const el=e.target.closest("[data-preview],[data-back-control],[data-period],[data-theme],[data-locale],[data-org],[data-account],[data-search],[data-close-search],[data-menu],[data-mobile-panel],[data-close-panel],[data-queue],[data-reconnect]");
+ const el=e.target.closest("[data-preview],[data-back-control],[data-period],button[data-theme],[data-locale],[data-org],[data-account],[data-search],[data-close-search],[data-menu],[data-mobile-panel],[data-close-panel],[data-queue],[data-reconnect]");
  if(!el)return;
  if(el.dataset.preview){const [type,id]=el.dataset.preview.split(":");state.context={type,id};state.panelOpen=matchMedia("(max-width: 1100px)").matches;render();document.querySelector(".right-rail").scrollTop=0;}
  else if("backControl" in el.dataset){state.context=null;render();document.querySelector(".right-rail").scrollTop=0;}
