@@ -115,9 +115,9 @@ try {
   assert.equal(await agentPage.locator('.agent-row').count(),1);
   assert.ok((await agentPage.locator('.agent-row').innerText()).includes('Новый агент'));
   await agentPage.locator('[data-agent-action="view"][data-value="all"]').click();
-  await agentPage.locator('[data-agent-action="page"][data-value="2"]').click();
+  await agentPage.getByRole('button',{name:'2',exact:true}).click();
   assert.equal(await agentPage.locator('.agent-row').count(),3);
-  await agentPage.locator('[data-agent-action="page"][data-value="1"]').click();
+  await agentPage.getByRole('button',{name:'1',exact:true}).click();
   const catalogFit=await agentPage.evaluate(()=>[".main-scroll",".right-rail",".nav-list"].map(selector=>{
     const el=document.querySelector(selector);return {selector,overflow:el.scrollHeight-el.clientHeight};
   }));
