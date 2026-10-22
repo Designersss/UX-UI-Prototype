@@ -193,7 +193,7 @@ try {
   assert.equal(await setup.locator('body').getAttribute('data-theme'),'light');
   assert.ok(await setup.locator('[data-wizard-field="new-name"]').evaluate(el=>document.activeElement===el));
   // Theme controls still work when used intentionally.
-  await setup.locator('[data-account]').click();
+  await setup.locator('.profile[data-account]').click();
   await setup.locator('button[data-theme="dark"]').click();
   assert.equal(await setup.locator('body').getAttribute('data-theme'),'dark');
   await setup.locator('button[data-theme="light"]').click();
