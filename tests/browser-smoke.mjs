@@ -19,6 +19,12 @@ try {
     assert.ok((await page.locator('.metrics').innerText()).replace(/\s/g,' ').includes('1 248'), '7-day fixture missing');
     const fullWidth=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,viewport:innerWidth}));
     assert.ok(fullWidth.scroll<=fullWidth.viewport+2,'Document horizontally overflows: '+JSON.stringify(fullWidth));
+    if(viewport.width>=1101){
+      const fit=await page.evaluate(()=>[".main-scroll",".right-rail",".nav-list"].map(selector=>{
+        const el=document.querySelector(selector);return {selector,overflow:el.scrollHeight-el.clientHeight};
+      }));
+      assert.ok(fit.every(x=>x.overflow<=3),"Overview scroll at "+viewport.width+"×"+viewport.height+": "+JSON.stringify(fit));
+    }
     await page.screenshot({path:'artifacts/ui/'+viewport.name+'-light.png',fullPage:true});
 
     await page.locator('[data-period="30"]').click();
@@ -99,18 +105,46 @@ try {
   agentPage.on('pageerror',error=>catalogErrors.push(error.message));
   await agentPage.goto('http://127.0.0.1:4173/#/agents');
   await agentPage.getByRole('heading',{name:'Агенты',exact:true}).waitFor();
-  assert.equal(await agentPage.locator('.agent-row').count(),8);
+  assert.equal(await agentPage.locator('.agent-row').count(),5);
+  assert.equal(await agentPage.locator('.agent-tab').count(),5);
+  assert.equal(await agentPage.locator('[data-agent-action="page"]').count(),4);
+  await agentPage.locator('[data-agent-action="view"][data-value="stopped"]').click();
+  assert.equal(await agentPage.locator('.agent-row').count(),1);
+  assert.ok((await agentPage.locator('.agent-row').innerText()).includes('Поддержка сайта'));
+  await agentPage.locator('[data-agent-action="view"][data-value="draft"]').click();
+  assert.equal(await agentPage.locator('.agent-row').count(),1);
+  assert.ok((await agentPage.locator('.agent-row').innerText()).includes('Новый агент'));
+  await agentPage.locator('[data-agent-action="view"][data-value="all"]').click();
+  await agentPage.locator('[data-agent-action="page"][data-value="2"]').click();
+  assert.equal(await agentPage.locator('.agent-row').count(),3);
+  await agentPage.locator('[data-agent-action="page"][data-value="1"]').click();
+  const catalogFit=await agentPage.evaluate(()=>[".main-scroll",".right-rail",".nav-list"].map(selector=>{
+    const el=document.querySelector(selector);return {selector,overflow:el.scrollHeight-el.clientHeight};
+  }));
+  assert.ok(catalogFit.every(x=>x.overflow<=3),"Desktop catalog scroll: "+JSON.stringify(catalogFit));
   await agentPage.screenshot({path:'artifacts/ui/agents-catalog-desktop.png',fullPage:true});
-  assert.equal(await agentPage.locator('[data-agent-filter]').count(),4);
-  assert.equal(await agentPage.locator('[data-agent-filter="tag"]').count(),1);
+  const laptopAgents=await browser.newPage({viewport:{width:1280,height:720}});
+  await laptopAgents.goto('http://127.0.0.1:4173/#/agents');
+  assert.equal(await laptopAgents.locator('.agent-row').count(),4);
+  const laptopFit=await laptopAgents.evaluate(()=>[".main-scroll",".right-rail",".nav-list"].map(selector=>{
+    const el=document.querySelector(selector);return {selector,overflow:el.scrollHeight-el.clientHeight};
+  }));
+  assert.ok(laptopFit.every(x=>x.overflow<=3),"Laptop catalog scroll: "+JSON.stringify(laptopFit));
+  await laptopAgents.screenshot({path:'artifacts/ui/agents-catalog-1280x720.png',fullPage:true});
+  await laptopAgents.close();
+  assert.equal(await agentPage.locator('[data-agent-dropdown]').count(),4);
+  assert.equal(await agentPage.locator('[data-agent-dropdown="tag"]').count(),1);
+  assert.equal((await agentPage.locator('.agent-toolbar-title').innerText()).trim(),'Каталог агентов');
   assert.ok((await agentPage.locator('.agent-context-rail').innerText()).includes('Менеджер заявок'));
   await agentPage.locator('[data-agent-action="select"][data-value="a2"]').click();
   assert.ok((await agentPage.locator('.agent-context-rail').innerText()).includes('HR-рекрутер'));
   assert.ok(await agentPage.locator('.agent-row[data-value="a2"]').evaluate(el=>el.classList.contains('selected')));
-  await agentPage.locator('[data-agent-filter="type"]').selectOption('hr');
-  assert.ok((await agentPage.locator('.agent-row').count())<8);
+  await agentPage.locator('[data-agent-dropdown="type"] summary').click();
+  assert.ok(await agentPage.locator('[data-agent-dropdown="type"]').evaluate(el=>el.open));
+  await agentPage.locator('[data-agent-filter-option="type"][data-value="hr"]').click();
+  assert.ok((await agentPage.locator('.agent-results').innerText()).includes('из 4'));
   await agentPage.locator('[data-agent-action="reset"]').click();
-  assert.equal(await agentPage.locator('.agent-row').count(),8);
+  assert.equal(await agentPage.locator('.agent-row').count(),5);
   await agentPage.locator('[data-agent-action="select"][data-value="a1"]').click();
   await agentPage.locator('[data-agent-action="stop-open"]').click();
   assert.ok(await agentPage.getByRole('alertdialog').isVisible());

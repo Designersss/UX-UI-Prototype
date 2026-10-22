@@ -122,3 +122,7 @@
 @media(max-width:1390px){.agent-filterbar{grid-template-columns:minmax(150px,1.6fr) repeat(4,minmax(70px,1fr));gap:6px}}
 @media(max-width:1100px){.agent-filterbar{grid-template-columns:repeat(4,minmax(75px,1fr))}.agent-search{grid-column:1/-1}.agent-tabs{overflow-x:auto;scrollbar-width:none}.agent-tabs::-webkit-scrollbar{display:none}}
 @media(max-width:760px){.agent-filterbar{grid-template-columns:repeat(2,minmax(0,1fr))}.agent-row{min-height:74px}.agent-dropdown-options{min-width:100%}.agent-page-head{margin-bottom:13px}}
+
+.agent-dropdown:nth-last-child(-n+2) .agent-dropdown-options{left:auto;right:0}
+.agent-dropdown>summary:focus-visible{outline:2px solid #8fb6a1;outline-offset:2px}
+.agent-dropdown[open]{z-index:95}

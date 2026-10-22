@@ -171,6 +171,17 @@ function updateSearch(q){
  el.innerHTML=matches.length?matches.map(m=>'<a href="#/'+escapeHtml(m.route)+'"><span>'+escapeHtml(m.name)+'</span><small>'+escapeHtml(m.type)+'</small></a>').join(''):'<p>'+T("noMatches")+'</p>';
 }
 document.addEventListener("click",e=>{
+ const option=e.target.closest("[data-agent-filter-option]");
+ if(option&&route().section==="agents"&&!route().id){
+   const field=option.dataset.agentFilterOption;
+   if(Agents.setFilter(field,option.dataset.value)){
+     render();
+     document.querySelector('[data-agent-dropdown="'+field+'"] summary')?.focus({preventScroll:true});
+   }
+   return;
+ }
+ const owner=e.target.closest("[data-agent-dropdown]");
+ document.querySelectorAll("[data-agent-dropdown][open]").forEach(d=>{if(d!==owner)d.open=false;});
  const agentAction=e.target.closest("[data-agent-action]");
  if(agentAction&&route().section==="agents"&&!route().id){
    const action=agentAction.dataset.agentAction;
@@ -214,6 +225,7 @@ document.addEventListener("change",e=>{
  if(select&&route().section==="agents"&&!route().id&&Agents.setFilter(select.dataset.agentFilter,select.value))render();
 });
 document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"&&document.querySelector("[data-agent-dropdown][open]")){document.querySelector("[data-agent-dropdown][open]").open=false;e.preventDefault();return;}
  if(e.key==="Escape"&&Agents.hasModal()){e.preventDefault();Agents.dismiss();render();return;}
  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();showSearch();}
  if(e.key==="Escape"&&state.menu){state.menu=false;render();}
