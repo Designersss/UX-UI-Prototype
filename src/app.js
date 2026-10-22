@@ -2,6 +2,7 @@
 "use strict";
 const data=globalThis.AIMockData;
 const Agents=globalThis.AIMockAgents;
+const Creator=globalThis.AIMockCreator;
 const storageKey="aimock-premium-calm-preferences-v1";
 let stored={};
 try{stored=JSON.parse(localStorage.getItem(storageKey)||"{}");}catch(_){}
@@ -39,7 +40,7 @@ check:'<path d="m5 12 4 4L19 6"/>'
 const icon=(name,size=18)=>'<svg aria-hidden="true" viewBox="0 0 24 24" width="'+size+'" height="'+size+'" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+(icons[name]||icons.overview)+'</svg>';
 const org=()=>data.orgs.find(o=>o.id===state.org)||data.orgs[0];
 const persisted=()=>{try{localStorage.setItem(storageKey,JSON.stringify({org:state.org,theme:state.theme,locale:state.locale,period:state.period}));}catch(_){}};
-const route=()=>{const p=(location.hash||"#/overview").slice(2).split("/").filter(Boolean);return {section:p[0]||"overview",id:p[1]||null};};
+const route=()=>{const p=(location.hash||"#/overview").slice(2).split("/").filter(Boolean);return {section:p[0]||"overview",id:p[1]||null,sub:p[2]||null,step:p[3]||null};};
 const nav=[["overview","overview"],["agents","agents"],["inbox","inbox",4],["approvals","approvals",2],["contacts","contacts"],["knowledge","knowledge"],["integrations","integrations"],["analytics","analytics"],["journal","journal"],["notifications","notifications",3],["help","help"],["finance","finance"],["settings","settings"]];
 function sidebar(section,o){
  return '<aside class="sidebar '+(state.menu?"is-open":"")+'" aria-label="Workspace navigation">'+
@@ -152,10 +153,12 @@ function render(){
  const previousMain=root.querySelector(".main-scroll")?.scrollTop||0;
  const previousRail=root.querySelector(".right-rail")?.scrollTop||0;
  const catalog=r.section==="agents"&&!r.id;
- const content=r.section==="overview"?overview(o):catalog?Agents.page(o,state.locale,icon):placeholder(r.section,r.id);
- const panel=catalog?Agents.panel(o,state.locale,icon,state.panelOpen):controlPanel(o);
+ const wizard=r.section==="agents"&&(r.id==="new"||r.sub==="setup"||r.sub==="testing");
+ const catalogOrg=catalog?{...o,agents:[...o.agents,...Creator.catalogRecords(o)]}:o;
+ const content=r.section==="overview"?overview(o):catalog?Agents.page(catalogOrg,state.locale,icon):wizard?Creator.page(o,state.locale,icon,r.id,r.sub,r.step):placeholder(r.section,r.id);
+ const panel=catalog?Agents.panel(catalogOrg,state.locale,icon,state.panelOpen):wizard?Creator.panel(o,state.locale,icon,r.id,state.panelOpen):controlPanel(o);
  root.innerHTML='<div class="shell">'+sidebar(r.section,o)+'<main class="main" id="main"><div class="mobile-toolbar"><button type="button" data-menu="1" aria-label="Menu">'+icon("menu")+'</button><strong>AIMock</strong><button type="button" data-mobile-panel="1" aria-label="'+T("control")+'">'+icon("notifications")+'</button></div><div class="main-scroll">'+content+'</div></main>'+panel+'</div>'+
- (catalog?Agents.modal(o,state.locale):"")+
+ (catalog?Agents.modal(catalogOrg,state.locale):"")+
  '<dialog class="search-dialog" id="search-dialog"><div class="search-modal-head">'+icon("search")+'<input aria-label="'+T("search")+'" placeholder="'+T("searchPlaceholder")+'" autocomplete="off" data-search-input><button data-close-search type="button" aria-label="Close">'+icon("close")+'</button></div><div class="search-results" id="search-results"></div></dialog>';
  root.querySelector(".main-scroll").scrollTop=previousMain;
  root.querySelector(".right-rail").scrollTop=previousRail;
@@ -171,6 +174,13 @@ function updateSearch(q){
  el.innerHTML=matches.length?matches.map(m=>'<a href="#/'+escapeHtml(m.route)+'"><span>'+escapeHtml(m.name)+'</span><small>'+escapeHtml(m.type)+'</small></a>').join(''):'<p>'+T("noMatches")+'</p>';
 }
 document.addEventListener("click",e=>{
+ const wizardButton=e.target.closest("[data-wizard-action]");
+ if(wizardButton&&route().section==="agents"){
+   const result=Creator.handleClick(wizardButton,org());
+   if(result?.navigate)location.hash=result.navigate;
+   else if(result?.rerender)render();
+   return;
+ }
  const option=e.target.closest("[data-agent-filter-option]");
  if(option&&route().section==="agents"&&!route().id){
    const field=option.dataset.agentFilterOption;
@@ -218,6 +228,7 @@ document.addEventListener("click",e=>{
  else if("reconnect" in el.dataset){const btn=el;btn.textContent=state.locale==="ru"?"Откройте Integration Hub для переподключения":"Open Integration Hub to reconnect";btn.disabled=true;}
 });
 document.addEventListener("input",e=>{
+ if(e.target.matches("[data-wizard-field]"))Creator.handleInput(e.target,org());
  if(e.target.matches("[data-search-input]"))updateSearch(e.target.value);
  if(e.target.matches("[data-agents-search]")){
   Agents.setSearch(e.target.value);
@@ -229,6 +240,8 @@ document.addEventListener("input",e=>{
  }
 });
 document.addEventListener("change",e=>{
+ if(e.target.matches("[data-wizard-toggle]")){if(Creator.handleToggle(e.target,org()))render();return;}
+ if(e.target.matches('[data-wizard-field="group"]')){Creator.handleInput(e.target,org());render();return;}
  const select=e.target.closest("[data-agent-filter]");
  if(select&&route().section==="agents"&&!route().id&&Agents.setFilter(select.dataset.agentFilter,select.value))render();
 });
