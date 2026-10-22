@@ -186,6 +186,11 @@ document.addEventListener("click",e=>{
    const result=Creator.handleClick(wizardButton,org());
    if(result?.navigate)location.hash=result.navigate;
    else if(result?.professionList)Creator.refreshProfessionList(org(),state.locale,icon);
+   else if(result?.exampleField){
+     const field=document.querySelector('[data-wizard-field="'+result.exampleField+'"]');
+     if(field){field.value=result.exampleValue;Creator.handleInput(field,org());field.focus({preventScroll:true});}
+     Creator.refreshRail(org(),state.locale,icon);
+   }
    else if(result?.integrationButton){
      wizardButton.classList.toggle("selected",result.selected);
      wizardButton.setAttribute("aria-pressed",String(result.selected));

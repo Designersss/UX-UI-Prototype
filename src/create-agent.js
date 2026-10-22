@@ -77,12 +77,26 @@ function refreshProfessionList(o,loc,icon){
  const d=draft(o,id),mount=document.querySelector(".profession-list-mount");
  if(d&&mount)mount.innerHTML=professionList(d,loc,icon);
 }
+function instructionExamples(type,loc){
+ const hr=type==="hr";
+ return {
+ company:L(loc,hr?"Мы — IT-компания. Нанимаем разработчиков и аналитиков, проводим первичные беседы с кандидатами.":"Мы — студия ремонта квартир. Помогаем клиентам выбрать услугу, рассчитать стоимость и записаться на консультацию.",hr?"We recruit developers and analysts and handle initial conversations with candidates.":"We offer home renovation services and help customers plan a consultation."),
+ task:L(loc,hr?"Уточняй вакансию, опыт и формат работы. Отвечай по утверждённым описаниям вакансий. Передавай HR краткую сводку, не принимай решений об отказе.":"Уточняй площадь, сроки и пожелания. Отвечай по актуальной базе знаний. Предлагай консультацию и передавай заявку менеджеру.",hr?"Ask about the role, experience and work format. Answer from approved job details and hand a summary to HR. Never reject applicants.":"Ask about the area, timeline and needs. Answer using the knowledge base and pass the lead to a manager."),
+ handoff:L(loc,hr?"Передавай HR вопросы без проверенного ответа, жалобы и просьбы поговорить с рекрутером.":"Передавай менеджеру жалобы, просьбы о скидке, вопросы без проверенного ответа и просьбы поговорить с человеком.",hr?"Hand over unverified questions, complaints and requests to speak with a recruiter.":"Hand off complaints, discount requests, unverified questions or requests for a human.")
+ };
+}
 function section2(d,loc){
- return '<div class="wizard-section-intro"><h2>'+L(loc,"Бизнес-контекст и инструкции","Business context & instructions")+'</h2><p>'+L(loc,"Опишите задачи, информацию и границы полномочий.","Describe tasks, context and responsibility boundaries.")+'</p></div>'+
- textArea(L(loc,"Чем занимается компания","About the company"),"company",d.company,L(loc,"Чем занимается ваша организация?","What does your organization do?"),3)+
- textArea(L(loc,"Что должен делать агент","Agent responsibilities"),"task",d.task,L(loc,"Опишите ожидаемые действия и результат","Describe expected actions and outcomes"),5)+
- textArea(L(loc,"Когда передать вопрос человеку","When to escalate to a human"),"handoff",d.handoff,L(loc,"Например, жалоба или неподтверждённая стоимость","For example, complaint or unverified price"),3)+
- '<div class="wizard-advisory">'+L(loc,"Инструкции не дают доступ к новым инструментам и не заменяют разрешения.","Instructions do not grant access to tools or override permissions.")+'</div>';
+ const items=[
+  {key:"company",n:"01",title:L(loc,"Чем занимается компания?","What does your company do?"),help:L(loc,"Какие услуги, товары или вакансии вы предлагаете? Кому помогаете? Это контекст, чтобы агент понимал вашу работу.","What do you offer and whom do you serve? This gives the agent essential business context."),placeholder:L(loc,"Расскажите о компании простыми словами…","Describe the company in plain language…")},
+  {key:"task",n:"02",title:L(loc,"Что должен делать агент?","What should the agent do?"),help:L(loc,"Опишите цепочку действий: какие вопросы задать, где искать ответы, какой результат получить.","Describe a workflow: what to ask, where to look up answers, and the desired result."),placeholder:L(loc,"Например: уточнить запрос, ответить по базе знаний, передать заявку…","For example: clarify a request, answer from knowledge, pass a lead…")},
+  {key:"handoff",n:"03",title:L(loc,"Когда подключать сотрудника?","When should a teammate take over?"),help:L(loc,"В каких ситуациях агент обязан остановить самостоятельные ответы? Команду-получателя выберете на шаге «Разрешения».","When must the agent stop answering on its own? Select the receiving team in Permissions."),placeholder:L(loc,"Например: жалоба, просьба поговорить с человеком, нет точной информации…","For example: complaint, human requested, no verified information…")}
+ ];
+ const examples=instructionExamples(d.type,loc);
+ return '<div class="wizard-section-intro"><h2>'+L(loc,"Настройте поведение агента","Define how the agent should work")+'</h2><p>'+L(loc,"Ответьте на три вопроса своими словами. Под каждым полем есть пояснение и готовый пример, который можно использовать как основу.","Answer three practical questions in your own words. Each has guidance and an example you can adapt.")+'</p></div>'+
+ '<div class="wizard-guided-fields">'+items.map(it=>'<div class="wizard-guided-field"><div class="wizard-guided-heading"><span class="wizard-guided-number">'+it.n+'</span><div><label for="wizard-'+it.key+'">'+it.title+'</label><p id="wizard-help-'+it.key+'">'+it.help+'</p></div></div>'+
+ '<textarea id="wizard-'+it.key+'" aria-describedby="wizard-help-'+it.key+'" rows="2" data-wizard-field="'+it.key+'" placeholder="'+E(it.placeholder)+'">'+E(d[it.key]||"")+'</textarea>'+
+ '<details class="wizard-example"><summary>'+L(loc,"Показать пример заполнения","See an example")+'</summary><p>'+E(examples[it.key])+'</p><button type="button" data-wizard-action="fill-example" data-value="'+it.key+'">'+L(loc,"Использовать пример","Use example")+'</button></details></div>').join("")+'</div>'+
+ '<div class="wizard-advisory">'+L(loc,"Инструкции влияют на ответы агента, но не выдают доступ к внешним сервисам и действиям. Разрешения задаются отдельно.","Instructions guide responses, but never grant access to external services or tools. Permissions are configured separately.")+'</div>';
 }
 const knowledgeFor=(d)=>d.type==="hr"?[{id:"vacancies",title:"Вакансии · 2026",detail:"Набор вакансий · актуально"},{id:"candidate-guide",title:"Политика работы с кандидатами",detail:"Порядок интервью · актуально"},{id:"old-hr",title:"Архив откликов",detail:"Устаревший · только просмотр",disabled:true}]:[{id:"services",title:"Услуги и цены · октябрь 2026",detail:"PDF · актуальная редакция"},{id:"faqs",title:"Частые вопросы клиентов",detail:"24 статьи · актуально"},{id:"old-prices",title:"Устаревшие тарифы",detail:"PDF · неактуально",disabled:true}];
 function section3(d,loc){
@@ -210,6 +224,10 @@ function handleClick(el,o){
   const count=Math.max(1,Math.ceil(total/professionPageSize));
   if(!Number.isInteger(page)||page<1||page>count)return null;
   memory.professionPage=page;return {professionList:true};
+ }
+ if(action==="fill-example"){
+  if(!["company","task","handoff"].includes(el.dataset.value))return null;
+  return {exampleField:el.dataset.value,exampleValue:instructionExamples(d.type,document.documentElement.lang)[el.dataset.value]};
  }
  if(action==="toggle-knowledge"){
   const item=knowledgeFor(d).find(k=>k.id===el.dataset.value&&!k.disabled);
