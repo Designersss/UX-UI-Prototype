@@ -196,7 +196,6 @@ try {
   await setup.locator('[data-account]').click();
   await setup.locator('button[data-theme="dark"]').click();
   assert.equal(await setup.locator('body').getAttribute('data-theme'),'dark');
-  await setup.locator('[data-account]').click();
   await setup.locator('button[data-theme="light"]').click();
   assert.equal(await setup.locator('body').getAttribute('data-theme'),'light');
   assert.equal(await setup.locator('.wizard-template').count(),0,'No oversized profession cards in basic form');
