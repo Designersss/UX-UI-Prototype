@@ -229,9 +229,10 @@ try {
   await setup.locator('[data-wizard-action="fill-example"][data-value="company"]').click();
   assert.ok((await setup.locator('[data-wizard-field="company"]').inputValue()).includes('IT-компания'),'Profession-specific sample populates field');
   assert.ok(await setup.locator('[data-wizard-field="company"]').evaluate(el=>document.activeElement===el),'Sample insertion preserves editable focus');
-  const instructionFit=await setup.locator('.main-scroll').evaluate(el=>({overflow:el.scrollHeight-el.clientHeight}));
-  assert.ok(instructionFit.overflow<=3,'Guided instructions should fit a 1440×900 desktop: '+JSON.stringify(instructionFit));
+  // Collapsed guidance fits the viewport; intentionally expanded examples may scroll naturally.
   await setup.locator('.wizard-example').first().locator('summary').click();
+  const instructionFit=await setup.locator('.main-scroll').evaluate(el=>({overflow:el.scrollHeight-el.clientHeight}));
+  assert.ok(instructionFit.overflow<=3,'Guided instructions should fit a 1440×900 desktop when examples are collapsed: '+JSON.stringify(instructionFit));
   await setup.locator('[data-wizard-field="company"]').fill('');
   await focusCheck(setup,'[data-wizard-field="company"]','Тест');
   await setup.locator('[data-wizard-field="company"]').fill('Тестовая организация');
