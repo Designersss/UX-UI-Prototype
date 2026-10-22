@@ -293,6 +293,21 @@ try {
   assert.ok((await setup.locator('.agent-table').innerText()).includes('HR · Прототип'));
   await setup.goto('http://127.0.0.1:4173/#/agents/'+id+'/setup/1');
   assert.equal(await setup.locator('[data-wizard-field="description"]').inputValue(),'Помогает рекрутерам обрабатывать отклики');
+  // All seven routed wizard screens should use the full central height without
+  // accidental internal scrollbars at a standard laptop viewport.
+  await setup.setViewportSize({width:1280,height:720});
+  for(const step of [1,2,3,4,5,6,7]){
+    await setup.goto('http://127.0.0.1:4173/#/agents/'+id+'/setup/'+step);
+    await setup.locator('.wizard-body').waitFor();
+    const fit=await setup.locator('.main-scroll').evaluate(el=>({
+      overflow:el.scrollHeight-el.clientHeight,
+      nested:el.querySelector('.wizard-body').scrollHeight-el.querySelector('.wizard-body').clientHeight,
+      gap:el.querySelector('.wizard-footer').getBoundingClientRect().top-el.querySelector('.wizard-body').getBoundingClientRect().bottom
+    }));
+    assert.ok(fit.overflow<=3,'Unexpected laptop wizard scroll at step '+step+': '+JSON.stringify(fit));
+    assert.ok(fit.nested<=3,'Unexpected nested panel scroll at step '+step+': '+JSON.stringify(fit));
+    assert.ok(fit.gap>=0&&fit.gap<38,'Wizard card should extend down to the footer at step '+step+': '+JSON.stringify(fit));
+  }
   assert.deepEqual(setupErrors,[]);
 
   const small=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});

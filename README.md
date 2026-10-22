@@ -63,3 +63,10 @@ Third page under review on \`feature/premium-calm-create-agent\`:
 - The 36-entry **demonstration catalog** has search, category filters, and pagination; only two approved role templates can be selected. All other names are non-functional future previews, not production commitments.
 - Knowledge and integration selections use full-row accessible buttons (not nested checkboxes) and persist in the same browser without remounting the clicked control.
 - Other stages shift to 3: instructions, 4: knowledge, 5: integrations, 6: permissions, 7: readiness. Live agent deployment is disabled.
+
+### Wizard UX review: full-height forms and clear routing
+
+- The central `wizard-main` uses the available desktop viewport height; the main viewport scrolls only when content genuinely needs more room. No nested card scrolling.
+- Step 3 is guided by three plain-language questions with profession-specific expandable examples that can be used and edited. The `handoff` text describes **when** the AI should stop answering, not its destination.
+- Step 6 separately configures **who may manage the agent** (`group`) and **which team receives an escalated conversation** (`handoffTarget`). Both use consistent Premium Calm custom dropdowns; the feature is mock-only and performs no live handoff.
+- Knowledge Base and Integration Hub links carry a `from-agent` context route; their placeholders include a visible link back to the originating wizard step. Help links also preserve return context.
