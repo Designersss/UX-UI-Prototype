@@ -244,7 +244,7 @@ document.addEventListener("click",e=>{
  const agentAction=e.target.closest("[data-agent-action]");
  if(agentAction&&route().section==="agents"&&!route().id){
    const action=agentAction.dataset.agentAction;
-   if(Agents.handleClick(agentAction,org())){
+   if(Agents.handleClick(agentAction,{...org(),agents:[...org().agents,...Creator.catalogRecords(org())]})){
      if(action==="select")state.panelOpen=matchMedia("(max-width: 1100px)").matches;
      render();
      if(action==="stop-open")document.querySelector('[data-agent-action="stop-cancel"]')?.focus();
