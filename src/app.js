@@ -178,6 +178,14 @@ document.addEventListener("click",e=>{
  if(wizardButton&&route().section==="agents"){
    const result=Creator.handleClick(wizardButton,org());
    if(result?.navigate)location.hash=result.navigate;
+   else if(result?.professionList)Creator.refreshProfessionList(org(),state.locale,icon);
+   else if(result?.integrationButton){
+     wizardButton.classList.toggle("selected",result.selected);
+     wizardButton.setAttribute("aria-pressed",String(result.selected));
+     const iconSlot=wizardButton.querySelector(".wizard-integration-action");
+     if(iconSlot)iconSlot.innerHTML=result.selected?icon("check",19):"+";
+     Creator.refreshRail(org(),state.locale,icon);
+   }
    else if(result?.rerender)render();
    return;
  }
@@ -228,7 +236,11 @@ document.addEventListener("click",e=>{
  else if("reconnect" in el.dataset){const btn=el;btn.textContent=state.locale==="ru"?"Откройте Integration Hub для переподключения":"Open Integration Hub to reconnect";btn.disabled=true;}
 });
 document.addEventListener("input",e=>{
- if(e.target.matches("[data-wizard-field]"))Creator.handleInput(e.target,org());
+ if(e.target.matches("[data-wizard-field]")){Creator.handleInput(e.target,org());if(e.target.dataset.wizardField==="name"||e.target.dataset.wizardField==="company"||e.target.dataset.wizardField==="task"||e.target.dataset.wizardField==="handoff")Creator.refreshRail(org(),state.locale,icon);}
+ if(e.target.matches("[data-profession-search]")){
+   Creator.setProfessionSearch(e.target.value);
+   Creator.refreshProfessionList(org(),state.locale,icon);
+ }
  if(e.target.matches("[data-search-input]"))updateSearch(e.target.value);
  if(e.target.matches("[data-agents-search]")){
   Agents.setSearch(e.target.value);
@@ -240,8 +252,9 @@ document.addEventListener("input",e=>{
  }
 });
 document.addEventListener("change",e=>{
- if(e.target.matches("[data-wizard-toggle]")){if(Creator.handleToggle(e.target,org()))render();return;}
- if(e.target.matches('[data-wizard-field="group"]')){Creator.handleInput(e.target,org());render();return;}
+ if(e.target.matches("[data-wizard-toggle]")){if(Creator.handleToggle(e.target,org()))Creator.refreshRail(org(),state.locale,icon);return;}
+ if(e.target.matches("[data-profession-category]")){Creator.setProfessionCategory(e.target.value);Creator.refreshProfessionList(org(),state.locale,icon);return;}
+ if(e.target.matches('[data-wizard-field="group"]')){Creator.handleInput(e.target,org());Creator.refreshRail(org(),state.locale,icon);return;}
  const select=e.target.closest("[data-agent-filter]");
  if(select&&route().section==="agents"&&!route().id&&Agents.setFilter(select.dataset.agentFilter,select.value))render();
 });
