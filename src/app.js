@@ -231,5 +231,11 @@ document.addEventListener("keydown",e=>{
  if(e.key==="Escape"&&state.menu){state.menu=false;render();}
 });
 window.addEventListener("hashchange",()=>{state.menu=false;state.account=false;state.panelOpen=false;state.context=null;render();const main=document.querySelector(".main-scroll");if(main)main.scrollTop=0;});
+const viewportCategory=()=>innerWidth<=760?"mobile":innerHeight<800?"compact":innerHeight<980?"standard":"large";
+let lastViewport=viewportCategory();
+window.addEventListener("resize",()=>{
+ const current=viewportCategory();
+ if(current!==lastViewport){lastViewport=current;render();}
+});
 render();
 })();
