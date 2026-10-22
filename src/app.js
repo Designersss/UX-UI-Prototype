@@ -141,8 +141,8 @@ function controlPanel(o){
 }
 function placeholder(section,id,sub,step){
  const n=T(section)||section;
- const fromAgent=id==="from-agent"&&sub&&Creator.draft(org(),sub)&&["knowledge","integrations","help"].includes(section);
- const target=fromAgent?"#/agents/"+encodeURIComponent(sub)+"/"+(section==="knowledge"?"setup/4":section==="integrations"?"setup/5":step==="testing"?"testing":"setup/"+Math.max(1,Math.min(7,Number(step)||2))):"#/overview";
+ const fromAgent=id==="from-agent"&&sub&&(sub==="new"||Creator.draft(org(),sub))&&["knowledge","integrations","help"].includes(section);
+ const target=fromAgent&&sub==="new"?"#/agents/new":fromAgent?"#/agents/"+encodeURIComponent(sub)+"/"+(section==="knowledge"?"setup/4":section==="integrations"?"setup/5":step==="testing"?"testing":"setup/"+Math.max(1,Math.min(7,Number(step)||2))):"#/overview";
  const caption=fromAgent?(state.locale==="ru"?"Вернуться к настройке агента":"Back to agent setup"):T("back");
  return '<header class="page-head"><div>'+(fromAgent?'<a class="wizard-back-link" href="'+target+'">← '+caption+'</a>':'')+
  '<h1>'+escapeHtml(n)+'</h1><p>'+T("mockLabel")+'</p></div></header>'+
