@@ -1,7 +1,7 @@
 (function creatorModule(){
 "use strict";
 const KEY="aimock-wizard-drafts-v1";
-const memory={type:null,name:"",description:"",error:"",simulationInput:"",simulationReply:"",saveError:false",professionSearch:"",professionCategory:"all",professionPage:1};
+const memory={type:null,name:"",description:"",error:"",simulationInput:"",simulationReply:"",saveError:false,professionSearch:"",professionCategory:"all",professionPage:1};
 let drafts={};
 try{drafts=JSON.parse(localStorage.getItem(KEY)||"{}");if(!drafts||typeof drafts!=="object"||Array.isArray(drafts))drafts={};}catch(_){drafts={};}
 const E=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
