@@ -166,3 +166,19 @@ body[data-theme=dark] .nav-item.is-active{background:#33443a}
 @media (max-width:760px){.shell{display:block;min-height:0}.sidebar{position:fixed;top:0;bottom:0;left:0;width:272px;transform:translateX(-102%);transition:transform .2s;box-shadow:12px 0 30px #0001}.sidebar.is-open{transform:translateX(0)}.main{height:100dvh}.mobile-toolbar{justify-content:space-between;position:sticky;top:0;z-index:20;background:var(--side);border-bottom:1px solid var(--line)}.mobile-toolbar strong{display:block;font-size:17px}.mobile-toolbar button:first-child{display:grid}.main-scroll{padding:23px 16px 34px;scrollbar-gutter:auto}.page-head{min-height:83px}.page-head h1{font-size:27px}.page-head p{font-size:11px;margin-top:7px}.segmented{margin-top:0}.segmented button{font-size:10px;padding:7px 9px}.summary-grid{grid-template-columns:1fr}.activity-card{padding:19px 17px}.metrics{margin:19px 0}.metrics>div{padding:0 9px;gap:5px}.metrics small,.metrics span{font-size:9px}.metrics strong{font-size:22px}.chart{height:107px}.compact-card{min-height:0}.alert-banner{padding:10px;gap:8px}.alert-banner strong{font-size:11px}.alert-banner>span:last-child{font-size:0}.alert-banner>span:last-child svg{width:18px}.event-row{grid-template-columns:43px minmax(0,1fr)}.event-row small{display:none}}
 @media(max-width:390px){.metrics strong{font-size:19px}.page-head{align-items:center}.page-head h1{font-size:25px}.page-head p{max-width:180px}.chart .bar-col small{font-size:8px}.card-title h2{font-size:15px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Integration brands are displayed from provider vector assets, never as invented letter glyphs. */
+.brand-logo{flex-shrink:0;width:31px;height:31px;display:grid;place-items:center;border-radius:9px;background:var(--panel)}
+.brand-logo img{display:block;width:27px;height:27px;object-fit:contain}
+.brand-logo.generic{background:var(--soft);color:var(--muted)}
+button.line-item,button.event-row{display:flex;width:100%;border:0;background:transparent;text-align:left;color:var(--ink);padding:0;cursor:pointer}
+button.line-item{min-width:0}
+button.event-row{display:grid}
+button.line-item:focus-visible,button.event-row:focus-visible{position:relative;z-index:1}
+.preview-content .detail-leading{align-items:center}
+.preview-content .brand-logo{width:36px;height:36px}
+.right-rail.attention-highlight .queue-item.selected{outline:2px solid var(--sage-ink);outline-offset:2px}
+.chart-month .bars{gap:3px}
+.chart-month .bar-col .bar{border-radius:3px 3px 1px 1px}
+.chart-month .bar-col small{font-size:9px;transform:translateX(-10%);overflow:visible}
+@media(max-width:760px){.chart-month .bars{gap:2px}.chart-month .bar-col small{font-size:8px}.chart-month .bar-col .bar{border-radius:2px 2px 0 0}}
