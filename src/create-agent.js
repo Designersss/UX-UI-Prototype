@@ -25,7 +25,7 @@ const ready=(d,o)=>{
  {name:"testing",ok:!!d.tested}
  ];
 };
-const steps=(current,loc)=>'<nav class="wizard-steps" aria-label="'+L(loc,"Этапы настройки","Setup steps")+'">'+labels.map((name,index)=>'<a href="'+(current.id?'#/agents/'+encodeURIComponent(current.id)+'/setup/'+(index+1):"#/agents/new")+'" class="wizard-step '+(current.step===index+1?"active":"")+' '+(index+1<current.step?"completed":"")+'" '+(current.step===index+1?'aria-current="step"':'')+'><span>'+ (index+1)+'</span><small>'+E(name[loc==="en"?1:0])+'</small></a>').join("")+'</nav>';
+const steps=(current,loc)=>'<nav class="wizard-steps" aria-label="'+L(loc,"Этапы настройки","Setup steps")+'">'+labels.map((name,index)=>'<a '+(current.id&&current.unselected&&index>1?'aria-disabled="true" tabindex="-1"':'href="'+(current.id?'#/agents/'+encodeURIComponent(current.id)+'/setup/'+(index+1):"#/agents/new")+'"')+' class="wizard-step '+(current.step===index+1?"active":"")+' '+(index+1<current.step?"completed":"")+'" '+(current.step===index+1?'aria-current="step"':'')+'><span>'+ (index+1)+'</span><small>'+E(name[loc==="en"?1:0])+'</small></a>').join("")+'</nav>';
 function shellHeading(o,d,step,loc){
  const subtitle=d?E(d.name)+' · '+L(loc,"Локальный черновик","Local draft")+' · '+L(loc,"Шаг","Step")+' '+step+' / 7':L(loc,"Шаг 1 из 7 · Название и назначение агента","Step 1 of 7 · Name and purpose");
  return '<div class="wizard-heading"><div><a class="wizard-back-link" href="#/agents">‹ '+L(loc,"Каталог агентов","Agent catalog")+'</a><h1>'+L(loc,"Создать агента","Create agent")+'</h1><p>'+subtitle+'</p></div><span class="wizard-local-pill">'+L(loc,"МОК · без бэкенда","MOCK · no backend")+'</span></div>';
@@ -121,14 +121,14 @@ function section5(d,loc){
 }
 function section6(d,o,loc,icon){
  const items=ready(d,o);
- const titles=[L(loc,"Профессия и имя","Profession and name"),L(loc,"Инструкции","Instructions"),L(loc,"База знаний","Knowledge base"),L(loc,"Подключения","Integrations"),L(loc,"Разрешения","Permissions"),L(loc,"Тестирование","Testing")];
+ const titles=[L(loc,"Название","Name"),L(loc,"Профессия","Profession"),L(loc,"Инструкции","Instructions"),L(loc,"База знаний","Knowledge base"),L(loc,"Подключения","Integrations"),L(loc,"Разрешения","Permissions"),L(loc,"Тестирование","Testing")];
  return '<div class="wizard-section-intro"><h2>'+L(loc,"Проверка готовности","Readiness review")+'</h2><p>'+L(loc,"Проверьте обязательные шаги перед запуском. В этой версии реальный запуск отключён.","Check required steps before deployment. Live activation is disabled in this prototype.")+'</p></div>'+
  '<div class="wizard-readiness-list">'+items.map((item,i)=>'<div class="wizard-ready-row"><span class="wizard-ready-icon '+(item.ok?"ok":"todo")+'">'+icon(item.ok?"check":"alert",16)+'</span><span><strong>'+titles[i]+'</strong><small>'+L(loc,item.ok?"Готово":"Требует внимания",item.ok?"Ready":"Needs attention")+'</small></span></div>').join("")+'</div>'+
  '<div class="wizard-advisory">'+L(loc,"Это интерактивный прототип без бэкенда: даже при полной готовности AI-агент не запускается и не выполняет внешние действия.","This interactive prototype has no backend. Even a fully configured agent cannot go live or perform external actions.")+'</div>';
 }
 function testing(d,o,loc,icon){
  const tested=d.tested;
- return '<header class="wizard-heading"><div><a class="wizard-back-link" href="#/agents/'+E(d.id)+'/setup/6">‹ '+L(loc,"Назад к готовности","Back to readiness")+'</a><h1>'+L(loc,"Тестирование агента","Test agent")+'</h1><p>'+E(d.name)+' · '+L(loc,"Только безопасная локальная симуляция","Safe local simulation only")+'</p></div><span class="wizard-local-pill">MOCK</span></header>'+
+ return '<header class="wizard-heading"><div><a class="wizard-back-link" href="#/agents/'+E(d.id)+'/setup/7">‹ '+L(loc,"Назад к готовности","Back to readiness")+'</a><h1>'+L(loc,"Тестирование агента","Test agent")+'</h1><p>'+E(d.name)+' · '+L(loc,"Только безопасная локальная симуляция","Safe local simulation only")+'</p></div><span class="wizard-local-pill">MOCK</span></header>'+
  '<section class="wizard-body wizard-test-body"><div class="wizard-section-intro"><h2>'+L(loc,"Проверка ответа","Response preview")+'</h2><p>'+L(loc,"Сценарий имитирует переписку без вызова модели, Telegram, CRM или внешних API.","This scripted simulation does not call a model, Telegram, CRM or any external APIs.")+'</p></div>'+
  '<div class="wizard-chat"><div class="wizard-chat-bubble incoming">'+L(loc,"Здравствуйте! Хочу оставить заявку на ваш сервис.","Hello! I’d like to inquire about your service.")+'</div>'+
  (memory.simulationInput?'<div class="wizard-chat-bubble outgoing">'+E(memory.simulationInput)+'</div>':'')+
@@ -147,7 +147,7 @@ function setupPage(o,loc,icon,id,step){
  const content=s===1?basics:s===2?professionStep(d,loc,icon):s===3?section2(d,loc):s===4?section3(d,loc):s===5?section4(d,o,loc,icon):s===6?section5(d,loc):section6(d,o,loc,icon);
  const next='#/agents/'+E(d.id)+'/setup/'+(s+1);
  const blocked=s===2&&!["sales","hr"].includes(d.type);
- return shellHeading(o,d,s,loc)+steps({step:s,id:d.id},loc)+'<section class="wizard-body '+(s===2?"wizard-profession-stage":"")+'">'+content+'</section>'+
+ return shellHeading(o,d,s,loc)+steps({step:s,id:d.id,unselected:!d.type},loc)+'<section class="wizard-body '+(s===2?"wizard-profession-stage":"")+'">'+content+'</section>'+
  '<div class="wizard-footer"><a class="wizard-btn wizard-secondary" href="'+(s===1?"#/agents":"#/agents/"+E(d.id)+"/setup/"+(s-1))+'">← '+L(loc,"Назад","Back")+'</a>'+
  (s===7?'<a class="wizard-btn wizard-secondary" href="#/agents/'+E(d.id)+'/testing">'+L(loc,"Открыть тестирование","Open testing")+'</a><button class="wizard-btn wizard-primary" disabled title="'+L(loc,"Реальный запуск отключён","Live activation disabled")+'">'+L(loc,"Запустить · недоступно","Launch · unavailable")+'</button>':
  '<a class="wizard-btn wizard-primary '+(blocked?"wizard-disabled":"")+'" '+(blocked?'aria-disabled="true" tabindex="-1"':'href="'+next+'"')+'>'+L(loc,"Далее","Next")+' →</a>')+'</div>';
