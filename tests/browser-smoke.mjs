@@ -208,6 +208,7 @@ try {
   await setup.reload();
   assert.equal(await setup.locator('[data-wizard-action="toggle-knowledge"][data-value="vacancies"]').getAttribute('aria-pressed'),'true','Knowledge persisted after reload');
   await setup.locator('.wizard-step[href$="/setup/5"]').click();
+  await setup.getByRole('heading',{name:'Подключения',exact:true}).waitFor();
   assert.equal(await setup.locator('.wizard-integration-item').count(),3);
   assert.equal(await setup.locator('.wizard-integration-logo img').count(),3,'Original provider logos');
   await setup.locator('[data-wizard-action="toggle-connection"][data-value="max"]').click();
@@ -219,6 +220,7 @@ try {
   assert.ok((await setup.locator('.wizard-permissions').innerText()).includes('Автоматически отклонять кандидата'));
   await setup.locator('[data-wizard-field="group"]').selectOption('HR');
   await setup.locator('.wizard-step[href$="/setup/7"]').click();
+  await setup.getByRole('heading',{name:'Проверка готовности',exact:true}).waitFor();
   assert.equal(await setup.locator('.wizard-ready-row').count(),7);
   assert.equal(await setup.locator('.wizard-footer button[disabled]').count(),1);
   await setup.screenshot({path:'artifacts/ui/create-agent-readiness.png',fullPage:true});
