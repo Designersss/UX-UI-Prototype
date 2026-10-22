@@ -3,6 +3,7 @@
 const data=globalThis.AIMockData;
 const Agents=globalThis.AIMockAgents;
 const Creator=globalThis.AIMockCreator;
+const Editor=globalThis.AIMockApprovedEditor;
 const storageKey="aimock-premium-calm-preferences-v1";
 let stored={};
 try{stored=JSON.parse(localStorage.getItem(storageKey)||"{}");}catch(_){}
@@ -142,7 +143,7 @@ function controlPanel(o){
 function placeholder(section,id,sub,step){
  const n=T(section)||section;
  const fromAgent=id==="from-agent"&&sub&&(sub==="new"||Creator.draft(org(),sub))&&["knowledge","integrations","help"].includes(section);
- const target=fromAgent&&sub==="new"?"#/agents/new":fromAgent?"#/agents/"+encodeURIComponent(sub)+"/"+(section==="knowledge"?"setup/4":section==="integrations"?"setup/5":step==="testing"?"testing":"setup/"+Math.max(1,Math.min(7,Number(step)||2))):"#/overview";
+ const target=fromAgent&&sub==="new"?"#/agents/new":fromAgent&&Creator.draft(org(),sub)?"#/agents/"+encodeURIComponent(sub)+"/edit/tools":fromAgent?"#/agents/"+encodeURIComponent(sub)+"/"+(section==="knowledge"?"setup/4":section==="integrations"?"setup/5":step==="testing"?"testing":"setup/"+Math.max(1,Math.min(7,Number(step)||2))):"#/overview";
  const caption=fromAgent?(state.locale==="ru"?"Вернуться к настройке агента":"Back to agent setup"):T("back");
  return '<header class="page-head"><div>'+(fromAgent?'<a class="wizard-back-link" href="'+target+'">← '+caption+'</a>':'')+
  '<h1>'+escapeHtml(n)+'</h1><p>'+T("mockLabel")+'</p></div></header>'+
@@ -160,14 +161,16 @@ function render(){
  const previousMain=root.querySelector(".main-scroll")?.scrollTop||0;
  const previousRail=root.querySelector(".right-rail")?.scrollTop||0;
  const catalog=r.section==="agents"&&!r.id;
- const wizard=r.section==="agents"&&(r.id==="new"||r.sub==="setup"||r.sub==="testing");
+ const editor=r.section==="agents"&&(r.id==="new"||r.sub==="edit"||(r.id&&r.sub!=="testing"&&!!Creator.draft(o,r.id)));
+ const wizard=r.section==="agents"&&!editor&&(r.sub==="setup"||r.sub==="testing");
  const catalogOrg=catalog?{...o,agents:[...o.agents,...Creator.catalogRecords(o)]}:o;
- const content=r.section==="overview"?overview(o):catalog?Agents.page(catalogOrg,state.locale,icon):wizard?Creator.page(o,state.locale,icon,r.id,r.sub,r.step):placeholder(r.section,r.id,r.sub,r.step);
- const panel=catalog?Agents.panel(catalogOrg,state.locale,icon,state.panelOpen):wizard?Creator.panel(o,state.locale,icon,r.id,state.panelOpen):controlPanel(o);
- root.innerHTML='<div class="shell">'+sidebar(r.section,o)+'<main class="main" id="main"><div class="mobile-toolbar"><button type="button" data-menu="1" aria-label="Menu">'+icon("menu")+'</button><strong>AIMock</strong><button type="button" data-mobile-panel="1" aria-label="'+T("control")+'">'+icon("notifications")+'</button></div><div class="main-scroll'+(wizard?" wizard-main":"")+'">'+content+'</div></main>'+panel+'</div>'+
+ const content=r.section==="overview"?overview(o):catalog?Agents.page(catalogOrg,state.locale,icon):editor?Editor.page(o,state.locale,icon,r.id):wizard?Creator.page(o,state.locale,icon,r.id,r.sub,r.step):placeholder(r.section,r.id,r.sub,r.step);
+ const panel=catalog?Agents.panel(catalogOrg,state.locale,icon,state.panelOpen):editor?Editor.panel(o,state.locale,icon,r.id,state.panelOpen):wizard?Creator.panel(o,state.locale,icon,r.id,state.panelOpen):controlPanel(o);
+ root.innerHTML='<div class="shell">'+sidebar(r.section,o)+'<main class="main" id="main"><div class="mobile-toolbar"><button type="button" data-menu="1" aria-label="Menu">'+icon("menu")+'</button><strong>AIMock</strong><button type="button" data-mobile-panel="1" aria-label="'+T("control")+'">'+icon("notifications")+'</button></div><div class="main-scroll'+(editor?" ae-main":wizard?" wizard-main":"")+'">'+content+'</div></main>'+panel+'</div>'+
  (catalog?Agents.modal(catalogOrg,state.locale):"")+
  '<dialog class="search-dialog" id="search-dialog"><div class="search-modal-head">'+icon("search")+'<input aria-label="'+T("search")+'" placeholder="'+T("searchPlaceholder")+'" autocomplete="off" data-search-input><button data-close-search type="button" aria-label="Close">'+icon("close")+'</button></div><div class="search-results" id="search-results"></div></dialog>';
  root.querySelector(".main-scroll").scrollTop=previousMain;
+ if(editor&&r.step==="tools")root.querySelector("#ae-block-4")?.scrollIntoView({block:"start"});
  root.querySelector(".right-rail").scrollTop=previousRail;
  root.querySelectorAll('.queue-item').forEach(b=>{b.addEventListener('click',()=>{state.context=null;state.selected=b.dataset.select;render();});});
 }
@@ -181,6 +184,8 @@ function updateSearch(q){
  el.innerHTML=matches.length?matches.map(m=>'<a href="#/'+escapeHtml(m.route)+'"><span>'+escapeHtml(m.name)+'</span><small>'+escapeHtml(m.type)+'</small></a>').join(''):'<p>'+T("noMatches")+'</p>';
 }
 document.addEventListener("click",e=>{
+ const editorButton=e.target.closest("[data-editor-action]");
+ if(editorButton&&route().section==="agents"){Editor.click(editorButton,org(),state.locale,icon);return;}
  const wizardButton=e.target.closest("[data-wizard-action]");
  if(wizardButton&&route().section==="agents"){
    const result=Creator.handleClick(wizardButton,org());
@@ -264,6 +269,8 @@ document.addEventListener("click",e=>{
  else if("reconnect" in el.dataset){const btn=el;btn.textContent=state.locale==="ru"?"Откройте Integration Hub для переподключения":"Open Integration Hub to reconnect";btn.disabled=true;}
 });
 document.addEventListener("input",e=>{
+ if(e.target.matches('[data-editor-input]:not(select)')){Editor.input(e.target,org(),state.locale,icon);return;}
+ if(e.target.matches('[data-editor-search]')){Editor.search(e.target.value,org(),state.locale,icon);return;}
  if(e.target.matches("[data-wizard-field]")){
    // Keep the active text control mounted throughout typing. Only persist the value here.
    Creator.handleInput(e.target,org());
@@ -283,6 +290,7 @@ document.addEventListener("input",e=>{
  }
 });
 document.addEventListener("change",e=>{
+ if(e.target.matches('select[data-editor-input]')){Editor.input(e.target,org(),state.locale,icon);return;}
  if(e.target.matches("[data-wizard-field]")&&e.target.dataset.wizardField!=="group"){
    // Update readiness after the user commits a field, never in its input event.
    Creator.refreshRail(org(),state.locale,icon);
