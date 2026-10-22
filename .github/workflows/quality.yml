@@ -1,4 +1,4 @@
-name: Quality · Clean Overview
+name: Quality · Premium Calm
 on:
   push:
     branches: [main, 'rebuild/**']
@@ -21,3 +21,25 @@ jobs:
           test ! -e src/overview.js
           test ! -e src/styles/theme.css
           test ! -e docs/UX_DECISIONS.md
+  browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Install Chromium tests
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Start preview
+        run: |
+          nohup python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/aimock-http.log 2>&1 &
+          sleep 2
+      - name: Browser smoke / screenshots
+        run: node tests/browser-smoke.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: premium-calm-overview-screenshots
+          path: artifacts/ui
+          if-no-files-found: ignore
