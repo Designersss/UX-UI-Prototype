@@ -200,3 +200,10 @@
  .profession-grid,.wizard-integration-grid{grid-template-columns:1fr}
  .profession-pages{flex-wrap:wrap}
 }
+
+.wizard-knowledge-item{width:100%;background:var(--panel);border:0;border-bottom:1px solid var(--line);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.wizard-knowledge-item:last-child{border-bottom:0}
+.wizard-knowledge-item:hover:not(:disabled),.wizard-knowledge-item.selected{background:var(--sage)}
+.wizard-knowledge-item:disabled{cursor:not-allowed}
+.wizard-knowledge-item .wizard-integration-action{font-size:19px}
+.wizard-knowledge-item.disabled .wizard-integration-action{font-size:10px}

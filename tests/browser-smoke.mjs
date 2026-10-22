@@ -203,22 +203,10 @@ try {
   assert.equal(await setup.locator('[data-wizard-field="company"]').inputValue(),'Тестовая организация');
   await setup.screenshot({path:'artifacts/ui/create-agent-instructions.png',fullPage:true});
   await setup.locator('.wizard-step[href$="/setup/4"]').click();
-  await setup.evaluate(()=>{
-    window.__knowledgeDebug=[];
-    document.addEventListener("click",e=>{if(e.target.matches('[data-wizard-toggle="knowledge"]'))window.__knowledgeDebug.push("click:"+e.target.checked)},true);
-    document.addEventListener("change",e=>{if(e.target.matches('[data-wizard-toggle="knowledge"]'))window.__knowledgeDebug.push("change:"+e.target.checked)},true);
-    window.addEventListener("hashchange",()=>window.__knowledgeDebug.push("hashchange:"+location.hash));
-  });
-  await setup.locator('[data-wizard-toggle="knowledge"][value="vacancies"]').click();
-  console.log("KNOWLEDGE DEBUG",JSON.stringify(await setup.evaluate(()=>({
-    events:window.__knowledgeDebug,
-    checked:document.querySelector('[data-wizard-toggle="knowledge"][value="vacancies"]')?.checked,
-    knowledge:JSON.parse(localStorage.getItem("aimock-wizard-drafts-v1")||"{}"),
-    route:location.hash
-  }))));
-  assert.ok(await setup.locator('[data-wizard-toggle="knowledge"][value="vacancies"]').isChecked(),'User click must check knowledge without re-render');
+  await setup.locator('[data-wizard-action="toggle-knowledge"][data-value="vacancies"]').click();
+  assert.equal(await setup.locator('[data-wizard-action="toggle-knowledge"][data-value="vacancies"]').getAttribute('aria-pressed'),'true','Whole-row knowledge selection must persist');
   await setup.reload();
-  assert.ok(await setup.locator('[data-wizard-toggle="knowledge"][value="vacancies"]').isChecked(),'Knowledge persisted');
+  assert.equal(await setup.locator('[data-wizard-action="toggle-knowledge"][data-value="vacancies"]').getAttribute('aria-pressed'),'true','Knowledge persisted after reload');
   await setup.locator('.wizard-step[href$="/setup/5"]').click();
   assert.equal(await setup.locator('.wizard-integration-item').count(),3);
   assert.equal(await setup.locator('.wizard-integration-logo img').count(),3,'Original provider logos');

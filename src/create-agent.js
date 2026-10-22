@@ -86,9 +86,14 @@ function section2(d,loc){
 }
 const knowledgeFor=(d)=>d.type==="hr"?[{id:"vacancies",title:"Вакансии · 2026",detail:"Набор вакансий · актуально"},{id:"candidate-guide",title:"Политика работы с кандидатами",detail:"Порядок интервью · актуально"},{id:"old-hr",title:"Архив откликов",detail:"Устаревший · только просмотр",disabled:true}]:[{id:"services",title:"Услуги и цены · октябрь 2026",detail:"PDF · актуальная редакция"},{id:"faqs",title:"Частые вопросы клиентов",detail:"24 статьи · актуально"},{id:"old-prices",title:"Устаревшие тарифы",detail:"PDF · неактуально",disabled:true}];
 function section3(d,loc){
- return '<div class="wizard-section-intro"><h2>'+L(loc,"Документы и база знаний","Knowledge & documents")+'</h2><p>'+L(loc,"Выберите существующие материалы. Создание и загрузка новых файлов будут реализованы в разделе «База знаний».","Choose existing materials. Uploading new files will be implemented in Knowledge Base.")+'</p></div>'+
- '<div class="wizard-choice-list">'+knowledgeFor(d).map(k=>'<label class="wizard-check-row '+(k.disabled?"disabled":"")+'"><span class="wizard-check-icon">▤</span><span class="wizard-check-main"><strong>'+E(k.title)+'</strong><small>'+E(k.detail)+'</small></span><input type="checkbox" data-wizard-toggle="knowledge" value="'+k.id+'" '+(d.knowledge.includes(k.id)?"checked":"")+' '+(k.disabled?"disabled":"")+'></label>').join("")+'</div>'+
- '<a class="wizard-inline-link" href="#/knowledge">'+L(loc,"Открыть базу знаний","Open knowledge base")+' ↗</a>';
+ return '<div class="wizard-section-intro"><h2>'+L(loc,"Документы и база знаний","Knowledge & documents")+'</h2><p>'+L(loc,"Выберите материалы целиком по строке. Загрузка новых документов будет в разделе «База знаний».","Select materials by clicking their rows. Uploading new documents belongs to the Knowledge Base page.")+'</p></div>'+
+ '<div class="wizard-choice-list">'+knowledgeFor(d).map(k=>{
+ const selected=d.knowledge.includes(k.id);
+ return '<button type="button" class="wizard-check-row wizard-knowledge-item '+(selected?"selected":"")+' '+(k.disabled?"disabled":"")+'" data-wizard-action="toggle-knowledge" data-value="'+E(k.id)+'" '+(k.disabled?'disabled aria-disabled="true"':'aria-pressed="'+selected+'"')+'>'+
+ '<span class="wizard-check-icon">▤</span><span class="wizard-check-main"><strong>'+E(k.title)+'</strong><small>'+E(k.detail)+'</small></span>'+
+ '<span class="wizard-integration-action">'+(selected?"✓":k.disabled?L(loc,"Неактуально","Outdated"):"+")+'</span></button>';
+ }).join("")+'</div>'+
+ '<a class="wizard-inline-link" href="#/knowledge">'+L(loc,"Открыть базу знаний","Open Knowledge Base")+' ↗</a>';
 }
 function section4(d,o,loc,icon){
  const brand={telegram:"telegram.svg",max:"max.svg",bitrix:"bitrix24.svg",bitrix24:"bitrix24.svg",vk:"vk.svg",whatsapp:"whatsapp.svg",viber:"viber.svg",googlecalendar:"googlecalendar.svg"};
@@ -205,6 +210,14 @@ function handleClick(el,o){
   const count=Math.max(1,Math.ceil(total/professionPageSize));
   if(!Number.isInteger(page)||page<1||page>count)return null;
   memory.professionPage=page;return {professionList:true};
+ }
+ if(action==="toggle-knowledge"){
+  const item=knowledgeFor(d).find(k=>k.id===el.dataset.value&&!k.disabled);
+  if(!item)return null;
+  const entries=new Set(d.knowledge);
+  if(entries.has(item.id))entries.delete(item.id);else entries.add(item.id);
+  d.knowledge=Array.from(entries);d.tested=false;save();
+  return {integrationButton:true,selected:d.knowledge.includes(item.id)};
  }
  if(action==="toggle-connection"){
    const connection=o.integrations.find(i=>i.id===el.dataset.value&&i.status==="connected");
