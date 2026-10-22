@@ -45,3 +45,16 @@ test('30-day chart uses one value per actual day and includes the last 7 days',(
     assert.ok(typeof month.range.ru==='string'&&month.range.ru.includes('2026'));
   }
 });
+
+test('catalog mock agents expose independent type, group and tag fields',()=>{
+ const first=orgs[0];
+ assert.equal(first.agents.length,8);
+ assert.equal(first.agents.filter(x=>x.state==='active').length,6);
+ assert.equal(first.agents.filter(x=>x.state==='stopped').length,1);
+ assert.equal(first.agents.filter(x=>x.state==='draft').length,1);
+ for(const a of first.agents){
+  assert.ok(['hr','sales'].includes(a.type));
+  assert.ok(typeof a.group==='string'&&a.group.length>0);
+  assert.ok(Array.isArray(a.tags));
+ }
+});
