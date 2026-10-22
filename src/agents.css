@@ -126,3 +126,6 @@
 .agent-dropdown:nth-last-child(-n+2) .agent-dropdown-options{left:auto;right:0}
 .agent-dropdown>summary:focus-visible{outline:2px solid #8fb6a1;outline-offset:2px}
 .agent-dropdown[open]{z-index:95}
+
+.agent-tab-count{display:inline-grid;place-items:center;min-width:19px;height:18px;margin-left:6px;padding:0 5px;font-size:10px;font-weight:750;border-radius:50px;background:var(--soft);color:var(--muted)}
+.agent-tab.active .agent-tab-count{background:var(--sage);color:var(--sage-ink)}

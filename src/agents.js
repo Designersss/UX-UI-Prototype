@@ -39,7 +39,15 @@ function filtered(o){
  });
  return rows;
 }
-function pick(o){const agents=data(o);let id=memory.selectedByOrg[o.id];if(!agents.some(a=>a.id===id)){id=agents[0]?.id||null;memory.selectedByOrg[o.id]=id;}return agents.find(a=>a.id===id)||null;}
+function pick(o){
+ const rows=filtered(o),limit=pageSize();
+ const page=Math.min(Math.max(1,memory.page),Math.max(1,Math.ceil(rows.length/limit)));
+ const visible=rows.slice((page-1)*limit,page*limit);
+ if(!visible.length)return null;
+ let id=memory.selectedByOrg[o.id];
+ if(!visible.some(a=>a.id===id)){id=visible[0].id;memory.selectedByOrg[o.id]=id;}
+ return visible.find(a=>a.id===id)||null;
+}
 const select=(o,id)=>{if(data(o).some(a=>a.id===id))memory.selectedByOrg[o.id]=id;};
 function badge(s,locale){return '<span class="agent-status agent-state-'+h(s)+'"><i aria-hidden="true"></i>'+stateTitle(s,locale)+'</span>';}
 function buttonCount(title,count){return '<span class="agent-count">'+h(count)+' '+title+'</span>';}
@@ -54,11 +62,11 @@ function page(o,locale,icon){
  const tags=[...new Set(all.flatMap(a=>a.tags))].sort((a,b)=>a.localeCompare(b,"ru"));
  const statusList=[...new Set(["active","stopped","financial_paused","draft","needs_setup","archived",...all.map(a=>a.state)])];
 
- const navView=(key,ru,en)=>'<button type="button" data-agent-action="view" data-value="'+key+'" class="agent-tab '+(memory.view===key?"active":"")+'" aria-pressed="'+(memory.view===key)+'">'+L(locale,ru,en)+'</button>';
+ const navView=(key,ru,en,count)=>'<button type="button" data-agent-action="view" data-value="'+key+'" class="agent-tab '+(memory.view===key?"active":"")+'" aria-pressed="'+(memory.view===key)+'">'+L(locale,ru,en)+(count==null?"":'<span class="agent-tab-count">'+count+'</span>')+'</button>';
  const tableHeader=(key,ru,en)=>'<button class="agent-th" data-agent-action="sort" data-value="'+key+'" type="button">'+L(locale,ru,en)+(memory.sort===key?(memory.direction==="asc"?" ↑":" ↓"):"")+'</button>';
  const head='<header class="agent-page-head"><div><h1>'+L(locale,"Агенты","Agents")+'</h1><p>'+all.length+' '+L(locale,"агентов","agents")+' · '+active+' '+L(locale,"активны","active")+' · '+stopped+' '+L(locale,"остановлен","stopped")+' · '+draft+' '+L(locale,"черновик","draft")+'</p></div><a class="agent-create" href="#/agents/new"><span aria-hidden="true">＋</span>'+L(locale,"Создать агента","Create agent")+'</a></header>';
  const toolbar='<div class="agent-toolbar"><div class="agent-toolbar-title"><h2>'+L(locale,"Каталог агентов","Agent catalog")+'</h2></div>'+
- '<div class="agent-tabs" role="group" aria-label="'+L(locale,"Представление","View")+'">'+navView("all","Все","All")+navView("active","Активные","Active")+navView("stopped","Остановленные","Stopped")+navView("draft","Черновики","Drafts")+navView("attention","Требуют внимания","Need attention")+'</div>'+
+ '<div class="agent-tabs" role="group" aria-label="'+L(locale,"Представление","View")+'">'+navView("all","Все","All",all.length)+navView("active","Активные","Active",active)+navView("stopped","Остановленные","Stopped",stopped)+navView("draft","Черновики","Drafts",draft)+navView("attention","Требуют внимания","Need attention",all.filter(isAttention).length)+'</div>'+
  '<div class="agent-filterbar"><label class="agent-search">'+icon("search",17)+'<input type="search" data-agents-search autocomplete="off" value="'+h(memory.search)+'" placeholder="'+L(locale,"Поиск агента по имени","Search agents by name")+'" aria-label="'+L(locale,"Поиск агента по имени","Search agents by name")+'"></label>'+
  dropdown("type",L(locale,"Тип","Type"),[["all",L(locale,"Любой","Any")],["sales",L(locale,"Менеджер заявок","Lead manager")],["hr",L(locale,"HR-рекрутер","HR recruiter")]],icon)+
  dropdown("status",L(locale,"Состояние","Status"),[["all",L(locale,"Любое","Any")],...statusList.map(s=>[s,stateTitle(s,locale)])],icon)+
