@@ -1,0 +1,23 @@
+name: Quality · Clean Overview
+on:
+  push:
+    branches: [main, 'rebuild/**']
+  pull_request:
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Syntax check
+        run: |
+          node --check src/data.js
+          node --check src/app.js
+      - name: Mock contract tests
+        run: node --test tests/*.test.mjs
+      - name: Reject legacy sources
+        run: |
+          test ! -e src/overview.js
+          test ! -e src/styles/theme.css
+          test ! -e docs/UX_DECISIONS.md
