@@ -39,23 +39,37 @@ function click(el,o,loc,icon){
    if(Number.isInteger(page)&&page>=1&&page<=total){ui.page=page;renderRoles(o,loc,icon);}return true;
  }
  if(action==="role"){
-   const p=C.professions.find(x=>x.id===value&&x.available);if(!p)return true;
-   const selectedGroup=p.category==="hr"?"HR":"Продажи";
-   const updates={type:p.id,...(d.type!==p.id?{knowledge:[]}:{}),...(!d.group?{group:selectedGroup}:{}),...(!d.handoffTarget?{handoffTarget:selectedGroup}:{})};
-   const res=persist(o,updates);
-   if(res.saved){
-     const now=res.draft;
-     document.querySelectorAll(".ae-role").forEach(b=>{
-       const selected=b.dataset.value===p.id;b.classList.toggle("selected",selected);b.setAttribute("aria-pressed",String(selected));
-       const marker=b.querySelector(".ae-role-status");if(marker&&!b.disabled)marker.innerHTML=selected?icon("check",14):"";
+   const profession=C.professions.find(p=>p.id===value&&p.available);
+   if(!profession)return true;
+   const oldPreset=E.preset(d,loc),nextPreset=globalThis.AIMockProfessionPresets.get(profession.id,loc);
+   const selectedGroup=profession.category==="hr"?"HR":"Продажи";
+   const currentRules=d.quickRules||[];
+   const hadRole=Boolean(d.type);
+   const sameDefaults=oldPreset&&currentRules.length===oldPreset.rules.length&&currentRules.every(rule=>oldPreset.rules.includes(rule));
+   const patch={
+     type:profession.id,
+     ...(!d.group?{group:selectedGroup}:{}),
+     ...(!d.handoffTarget?{handoffTarget:selectedGroup}:{})
+   };
+   if(nextPreset&&(!d.task||d.task===oldPreset?.task))patch.task=nextPreset.task;
+   if(nextPreset&&(!hadRole||!currentRules.length||sameDefaults))patch.quickRules=[...nextPreset.rules];
+   if(nextPreset&&(!hadRole||!d.communicationStyle||d.communicationStyle===oldPreset?.tone))patch.communicationStyle=nextPreset.tone;
+   if(d.type!==profession.id)patch.knowledge=[];
+   const result=persist(o,patch);
+   if(result.saved){
+     const updated=result.draft;
+     renderRoles(o,loc,icon);
+     document.querySelectorAll('[data-editor-dropdown="group"]').forEach(dd=>{
+       const group=dd.querySelector("summary span");
+       if(group)group.textContent=updated.group||L(loc,"Не выбрано","Not selected");
      });
-     if(now.group)document.querySelectorAll('[data-editor-input="group"]').forEach(b=>b.value=now.group);
-     const knowledgeBlock=document.getElementById("ae-block-4");
-     if(knowledgeBlock)knowledgeBlock.outerHTML=E.toolsSection(now,o,loc,icon);
-     if(now.handoffTarget)document.querySelectorAll('[data-editor-input="handoffTarget"]').forEach(b=>b.value=now.handoffTarget);
-     const label=document.querySelector("#ae-block-2 .ae-section-header>small");if(label)label.textContent=L(loc,"Выбрано: ","Selected: ")+E.roleName(now,loc);
+     const instructions=document.getElementById("ae-block-3");
+     if(instructions)instructions.outerHTML=E.instructionsSection(updated,loc,icon);
+     const knowledge=document.getElementById("ae-block-4");
+     if(knowledge)knowledge.outerHTML=E.toolsSection(updated,o,loc,icon);
      E.refresh(o,loc,icon);
-   }return true;
+   }
+   return true;
  }
  if(action==="rule"){
    const rules=new Set(d.quickRules||[]);if(rules.has(value))rules.delete(value);else rules.add(value);
