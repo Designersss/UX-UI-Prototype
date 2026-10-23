@@ -258,7 +258,11 @@ document.addEventListener("click",e=>{
  if(agentAction&&route().section==="agents"&&!route().id){
    const action=agentAction.dataset.agentAction;
    if(Agents.handleClick(agentAction,{...org(),agents:[...org().agents,...Creator.catalogRecords(org())]})){
-     if(action==="select")state.panelOpen=matchMedia("(max-width: 1100px)").matches;
+     if(action==="select"){
+       const selectedId=agentAction.dataset.value;
+       const item=[...org().agents,...Creator.catalogRecords(org())].find(a=>a.id===selectedId);
+       if(item){location.hash="#/agents/"+encodeURIComponent(selectedId)+(item.state==="draft"?"/edit":"");return;}
+     }
      render();
      if(action==="stop-open")document.querySelector('[data-agent-action="stop-cancel"]')?.focus();
    }
