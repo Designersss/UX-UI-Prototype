@@ -191,7 +191,8 @@ try {
   assert.match(editor.url(),/#\/agents\/draft-[a-z0-9-]+\/edit$/,'Typing creates local draft and stable edit route');
   const draftId=editor.url().split('#/agents/')[1].split('/')[0];
   await editor.locator('[data-editor-input="description"]').fill('Отвечает кандидатам и передаёт заявки HR');
-  await editor.locator('[data-editor-input="group"]').first().selectOption('HR');
+  await editor.locator('#ae-block-1 .ae-dropdown summary').click();
+  await editor.locator('#ae-block-1 [data-field="group"][data-value="HR"]').click();
   assert.ok((await editor.locator('.ae-preview').innerText()).includes('Новый HR агент'));
   await editor.locator('[data-editor-action="role"][data-value="hr"]').click();
   assert.equal(await editor.locator('[data-editor-action="role"][data-value="hr"]').getAttribute('aria-pressed'),'true');
