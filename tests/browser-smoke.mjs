@@ -251,6 +251,8 @@ try {
   assert.equal(await editor.locator('[data-editor-input="name"]').inputValue(),'Новый HR агент');
   await editor.locator('.ae-advanced summary').click();
   assert.equal(await editor.locator('[data-editor-advanced="identity"]').inputValue(),'HR: проверяй только информацию о вакансиях.','Edited advanced prompt survives reload');
+  await editor.locator('[data-editor-action="reset-advanced"]').click();
+  assert.ok((await editor.locator('[data-editor-advanced="identity"]').inputValue()).includes('подбора персонала'),'Restore defaults restores the profession preset');
 
   assert.equal(await editor.locator('[data-editor-action="knowledge"][data-value="vacancies"]').getAttribute('aria-pressed'),'true');
   assert.equal(await editor.locator('[data-editor-action="connection"][data-value="max"]').getAttribute('aria-pressed'),'true');
