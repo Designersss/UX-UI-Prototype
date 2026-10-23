@@ -193,6 +193,8 @@ function updateSearch(q){
  el.innerHTML=matches.length?matches.map(m=>'<a href="#/'+escapeHtml(m.route)+'"><span>'+escapeHtml(m.name)+'</span><small>'+escapeHtml(m.type)+'</small></a>').join(''):'<p>'+T("noMatches")+'</p>';
 }
 document.addEventListener("click",e=>{
+ const pickerButton=e.target.closest("[data-pick-action]");
+ if(pickerButton&&route().sub==="pick"){Picker.click(pickerButton,org(),state.locale);return;}
  const detailButton=e.target.closest("[data-detail-action]");
  if(detailButton&&route().section==="agents"){if(Detail.click(detailButton,org(),route().id))render();return;}
  const editorButton=e.target.closest("[data-editor-action]");
@@ -280,6 +282,7 @@ document.addEventListener("click",e=>{
  else if("reconnect" in el.dataset){const btn=el;btn.textContent=state.locale==="ru"?"Откройте Integration Hub для переподключения":"Open Integration Hub to reconnect";btn.disabled=true;}
 });
 document.addEventListener("input",e=>{
+ if(e.target.matches('[data-pick-search],[data-pick-only]')){Picker.input(e.target,org(),state.locale);return;}
  if(e.target.matches('[data-editor-input]:not(select)')){Editor.input(e.target,org(),state.locale,icon);return;}
  if(e.target.matches('[data-editor-search]')){Editor.search(e.target.value,org(),state.locale,icon);return;}
  if(e.target.matches("[data-wizard-field]")){
