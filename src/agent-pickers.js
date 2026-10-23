@@ -3,7 +3,7 @@ const C=globalThis.AIMockCreator,E=globalThis.AIMockApprovedEditor;
 const state={q:"",only:false,page:1};
 const text=(l,ru,en)=>l==="en"?en:ru;
 function list(o,d,kind,l){
- return kind==="integrations"?o.integrations.map(i=>({id:i.id,name:i.name,ok:i.status==="connected"})):(d.type==="hr"?[["vacancies","Вакансии"],["candidate-guide","Правила найма"]]:[["services","Услуги и цены"],["faqs","Частые вопросы"]]).map(i=>({id:i[0],name:i[1],ok:true}));
+ return kind==="integrations"?o.integrations.filter(i=>E.agentIntegrationIds(d.type).includes(i.id)||E.agentIntegrationIds(d.type).includes(i.brand)).map(i=>({id:i.id,name:i.name,ok:i.status==="connected"})):(d.type==="hr"?[["vacancies","Вакансии"],["candidate-guide","Правила найма"]]:[["services","Услуги и цены"],["faqs","Частые вопросы"]]).map(i=>({id:i[0],name:i[1],ok:true}));
 }
 function cards(o,l,id,kind){
  const d=E.model(o,id),field=kind==="knowledge"?"knowledge":"connections",chosen=d[field]||[];
