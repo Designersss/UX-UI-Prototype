@@ -135,24 +135,43 @@ function panel(o,l,icon,id,open){
  const checks=C.creationChecks(d),done=checks.filter(c=>c.ok).length,ready=Math.round(done/checks.length*100);
  return '<aside class="right-rail ad-rail '+(open?"mobile-open":"")+'" id="right-rail"><div class="ad-rail-header"><h2>'+L(l,"Готовность к запуску","Launch readiness")+'</h2><button class="close-mobile" data-close-panel aria-label="Close">'+icon("close")+'</button></div><div class="ad-rail-progress"><strong>'+ready+'%</strong><span>'+done+' / '+checks.length+'</span><div><i style="width:'+ready+'%"></i></div></div><p>'+L(l,"Статус конфигурации","Configuration status")+'</p><div class="ad-rail-checks">'+checks.map(c=>'<div><span>'+(c.ok?"✓":"○")+'</span>'+H(({name:L(l,"Название","Name"),type:L(l,"Тип агента","Agent type"),task:L(l,"Инструкции","Instructions"),group:L(l,"Группа доступа","Access group"),knowledge:L(l,"База знаний","Knowledge"),connections:L(l,"Интеграции","Integrations"),handoff:L(l,"Передача человеку","Escalation")})[c.key]||c.key)+'</div>').join("")+'</div><p class="ad-rail-note">'+L(l,"Запуск доступен при активной подписке, положительном AI-балансе и выполнении обязательных условий. Здесь используются демонстрационные данные.","Activation requires a paid plan, positive AI balance and required validation. Demo values shown.")+'</p></aside>';
 }
+
 function click(el,o,id){
  const action=el.dataset.detailAction;
- if(action==="cover-upload"){document.querySelector("[data-detail-cover-file]")?.click();return false}
- if(!C.draft(o,id)&&["enable","stop","confirm-stop"].includes(action))return false;
- if(action==="cover-position"){
-  const value=el.dataset.value;
-  if(!["top","center","bottom"].includes(value))return false;
-  return saveCover(o,id,{...coverFor(o,id),position:value});
+ if(action==="open-edit"){v.edit=id;v.editMessage="";return true}
+ if(action==="close-edit"){v.edit=null;v.editMessage="";return true}
+ if(action==="cover-upload"||action==="avatar-upload"){
+  if(!editableAgent(o,id))return false;
+  document.querySelector(action==="cover-upload"?"[data-detail-cover-file]":"[data-detail-avatar-file]")?.click();
+  return false;
  }
- if(action==="cover-reset")return saveCover(o,id,null);
- if(action==="confirm-stop"){v.confirm=id;return true;}
- if(action==="cancel-stop"){v.confirm=null;return true;}
+ if(action==="cover-position"){
+  if(!editableAgent(o,id)||!["top","center","bottom"].includes(el.dataset.value))return false;
+  return saveCover(o,id,{...coverFor(o,id),position:el.dataset.value});
+ }
+ if(action==="cover-reset"||action==="avatar-reset"){
+  if(!editableAgent(o,id))return false;
+  const cover={...coverFor(o,id)};
+  if(action==="cover-reset")delete cover.image;else delete cover.avatar;
+  return saveCover(o,id,cover);
+ }
+ if(action==="toggle-tag"){
+  if(!editableAgent(o,id))return false;
+  const tag=el.dataset.value,values=globalThis.AIMockApprovedEditor.tagList(o);
+  const d=C.draft(o,id),tags=new Set(d.tags||[]);
+  if(tags.has(tag))tags.delete(tag);else if(values.includes(tag)&&tags.size<12)tags.add(tag);
+  const result=C.upsertEditorDraft(o,{tags:[...tags]},id);
+  v.editMessage=result.saved?"":"save";return true;
+ }
+ if(!C.draft(o,id)&&["enable","stop","confirm-stop"].includes(action))return false;
+ if(action==="confirm-stop"){v.confirm=id;return true}
+ if(action==="cancel-stop"){v.confirm=null;return true}
  if(action==="enable"||action==="stop"){
   if(!C.setAgentEnabled(o,id,action==="enable"))return false;
   v.confirm=null;return true;
  }
- if(action==="test"){v.message=document.querySelector("[data-detail-test]")?.value.trim()||"";if(v.message)v.reply="Спасибо! Уточните, пожалуйста, детали запроса, чтобы я мог помочь.";return true;}
+ if(action==="test"){v.message=document.querySelector("[data-detail-test]")?.value.trim()||"";if(v.message)v.reply="Спасибо! Уточните, пожалуйста, детали запроса, чтобы я мог помочь.";return true}
  return false;
 }
-globalThis.AIMockAgentDetail={page,panel,click,coverFile};
+globalThis.AIMockAgentDetail={page,panel,click,coverFile,avatarFile,updateMeta,editableAgent};
 })();
