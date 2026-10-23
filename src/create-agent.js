@@ -10,8 +10,8 @@ const professions=Object.freeze([{"id":"sales","ru":"Менеджер заяво
 const labels=[["Основное","Basics"],["Профессия","Profession"],["Инструкции","Instructions"],["Знания","Knowledge"],["Интеграции","Integrations"],["Разрешения","Permissions"],["Готовность","Readiness"]];
 const label=(i,loc)=>labels[i-1]?.[loc==="en"?1:0]||"";
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(drafts));memory.saveError=false;return true;}catch(_){memory.saveError=true;return false;}};
-const draftsFor=o=>Object.values(drafts).filter(d=>d.orgId===o.id&&d.status==="draft");
-const catalogRecords=o=>draftsFor(o).map(d=>({id:d.id,name:d.name,type:d.type,state:"draft",last:L("ru","Локальный черновик","Local draft"),group:d.group||(d.type==="hr"?"HR":d.type==="sales"?"Продажи":"Без группы"),tags:[],taskCount:0,issues:0}));
+const draftsFor=o=>Object.values(drafts).filter(d=>d.orgId===o.id&&["draft","created","active","stopped"].includes(d.status));
+const catalogRecords=o=>draftsFor(o).map(d=>({id:d.id,name:d.name||"Без названия",type:d.type,state:d.status==="created"?"stopped":d.status,last:d.status==="draft"?"Черновик":"—",group:d.group||(d.type==="hr"?"HR":d.type==="sales"?"Продажи":"Без группы"),tags:[],taskCount:0,issues:0}));
 const draft=(o,id)=>{const d=drafts[id];return d&&d.orgId===o.id?d:null;};
 const ready=(d,o)=>{
  const connected=(d.connections||[]).filter(id=>o.integrations.some(i=>i.id===id&&i.status==="connected"));
@@ -292,6 +292,35 @@ function handleToggle(el,o){
  save();
  return true;
 }
+function creationChecks(d){
+ const label=key=>String(d?.[key]||"").trim();
+ return [
+  {key:"name",ok:!!label("name"),required:true},
+  {key:"type",ok:["sales","hr"].includes(d?.type),required:true},
+  {key:"task",ok:!!label("task"),required:true},
+  {key:"group",ok:!!label("group"),required:false},
+  {key:"knowledge",ok:(d?.knowledge||[]).length>0,required:false},
+  {key:"connections",ok:(d?.connections||[]).length>0,required:false},
+  {key:"handoff",ok:!!label("handoff"),required:false}
+ ];
+}
+function finalizeAgent(o,id){
+ const d=draft(o,id);
+ if(!d||d.status!=="draft")return {ok:false,reason:"not_found"};
+ const missing=creationChecks(d).filter(x=>x.required&&!x.ok).map(x=>x.key);
+ if(missing.length)return {ok:false,missing,reason:"incomplete"};
+ d.status="created";d.tested=false;d.enabled=false;d.createdAt=d.createdAt||Date.now();d.completedAt=Date.now();
+ if(!save()){d.status="draft";delete d.completedAt;return {ok:false,reason:"storage_unavailable"};}
+ return {ok:true,id:d.id};
+}
+function setAgentEnabled(o,id,enabled){
+ const d=draft(o,id);
+ if(!d||d.status==="draft")return false;
+ const previous=d.status;
+ d.status=enabled?"active":"stopped";d.enabled=Boolean(enabled);
+ if(!save()){d.status=previous;d.enabled=previous==="active";return false;}
+ return true;
+}
 function upsertEditorDraft(o,changes,id){
  const existing=id?draft(o,id):null;
  if(id&&!existing)return {error:"not_found"};
@@ -311,5 +340,5 @@ function upsertEditorDraft(o,changes,id){
  if(!saved&&fresh)delete drafts[key];
  return {id:key,draft:saved?agent:null,saved,error:saved?null:"storage_unavailable"};
 }
-globalThis.AIMockCreator={page,panel,handleClick,handleInput,handleToggle,catalogRecords,draft,ready,refreshRail,refreshProfessionList,setProfessionSearch,setProfessionCategory,upsertEditorDraft,professions};
+globalThis.AIMockCreator={page,panel,handleClick,handleInput,handleToggle,catalogRecords,draft,ready,refreshRail,refreshProfessionList,setProfessionSearch,setProfessionCategory,upsertEditorDraft,professions,creationChecks,finalizeAgent,setAgentEnabled};
 })();
