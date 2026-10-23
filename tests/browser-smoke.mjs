@@ -244,7 +244,7 @@ try {
   await editor.locator('.ae-advanced-back').click();
 
   assert.equal(await editor.locator('[data-editor-action="expand"]').count(),0,'No expandable catalog control');
-  assert.ok(await editor.getByRole('navigation',{name:'Страницы профессий'}).isVisible());
+  assert.ok(await editor.getByRole('navigation',{name:'Страницы агентов'}).isVisible());
   await editor.locator('[data-editor-action="page"][data-value="2"]').last().click();
   assert.equal(await editor.locator('.ae-role').count(),9);
   await editor.locator('[data-editor-search]').fill('HR-рекрутер');
@@ -283,14 +283,20 @@ try {
   await editor.locator('[data-editor-action="create"]').click();
   assert.match(editor.url(),new RegExp('#/agents/'+draftId+'$'),'Created agent must open detail route');
   await editor.getByRole('heading',{name:'Новый HR агент',exact:true}).waitFor();
-  await editor.getByRole('button',{name:'Включить',exact:true}).click();
-  await editor.getByRole('button',{name:'Выключить',exact:true}).click();
+  assert.equal(await editor.getByRole('link',{name:'Редактировать'}).count(),0,'No redundant Edit link');
+  await editor.getByRole('link',{name:'Настройки',exact:true}).click();
+  await editor.locator('[data-editor-input="description"]').fill('Настройки прямо в карточке');
+  await editor.getByRole('button',{name:'Запустить',exact:true}).click();
+  await editor.locator('.ad-status.enabled').waitFor();
+  await editor.getByRole('link',{name:'Настройки',exact:true}).click();
+  assert.equal(await editor.locator('[data-editor-input]').count(),0,'Active agent is read-only');
+  await editor.getByRole('button',{name:'Остановить',exact:true}).click();
   await editor.getByRole('alertdialog').waitFor();
   await editor.getByRole('button',{name:'Отмена'}).click();
-  await editor.getByRole('link',{name:'Редактировать'}).click();
-  assert.match(editor.url(),/\/edit$/);
-  await editor.locator('[data-editor-action="done"]').click();
-  assert.match(editor.url(),new RegExp('#/agents/'+draftId+'$'));
+  await editor.getByRole('button',{name:'Остановить',exact:true}).click();
+  await editor.getByRole('alertdialog').getByRole('button',{name:'Остановить'}).click();
+  await editor.getByRole('link',{name:'Настройки',exact:true}).click();
+  assert.ok(await editor.locator('[data-editor-input="description"]').isVisible(),'Stopped agent is editable');
   assert.deepEqual(editorErrors,[],'New editor has no JavaScript runtime errors');
   const mobile=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
   const mobileErrors=[];
