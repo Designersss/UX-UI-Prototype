@@ -22,7 +22,7 @@ function click(el,o,l){
  const item=list(o,d,kind,l).find(i=>i.id===el.dataset.value&&i.ok);if(!item)return;
  const chosen=new Set(d[field]||[]);if(chosen.has(item.id))chosen.delete(item.id);else chosen.add(item.id);
  const result=C.upsertEditorDraft(o,{[field]:[...chosen]},id==="new"?null:id);
- if(result.saved){if(id==="new")history.replaceState(null,"","#/agents/"+result.id+"/pick/"+kind);refresh(o,l);}
+ if(result.saved){if(id==="new"){history.replaceState(null,"","#/agents/"+result.id+"/pick/"+kind);document.querySelector(".ap-done")?.setAttribute("href","#/agents/"+result.id+"/edit/tools");document.querySelector(".ap-head a")?.setAttribute("href","#/agents/"+result.id+"/edit/tools");}refresh(o,l);}
 }
 function input(el,o,l){if(el.matches("[data-pick-search]")){state.q=el.value;state.page=1;refresh(o,l);return;}if(el.matches("[data-pick-only]")){state.only=el.checked;state.page=1;refresh(o,l);}}
 globalThis.AIMockPicker={page,click,input};
