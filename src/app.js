@@ -282,6 +282,12 @@ document.addEventListener("click",e=>{
  else if("reconnect" in el.dataset){const btn=el;btn.textContent=state.locale==="ru"?"Откройте Integration Hub для переподключения":"Open Integration Hub to reconnect";btn.disabled=true;}
 });
 document.addEventListener("input",e=>{
+ if(e.target.matches("[data-tag-search]")){
+   const query=e.target.value.trim().toLocaleLowerCase();
+   e.target.closest(".ae-tag-options")?.querySelectorAll("[data-editor-action='toggle-tag']").forEach(b=>{b.hidden=!b.dataset.value.toLocaleLowerCase().includes(query)});
+   return;
+ }
+
  if(e.target.matches('[data-editor-advanced]')){Editor.advancedInput(e.target,org(),state.locale,icon);return;}
  if(e.target.matches('[data-pick-search],[data-pick-only]')){Picker.input(e.target,org(),state.locale);return;}
  if(e.target.matches('[data-editor-input]:not(select)')){Editor.input(e.target,org(),state.locale,icon);return;}
