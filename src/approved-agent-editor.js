@@ -46,14 +46,32 @@ function professions(d,loc,icon){
  '<div class="ae-role-controls"><div class="ae-filters">'+tabs.map(t=>'<button type="button" data-editor-action="category" data-value="'+t[0]+'" aria-pressed="'+(ui.category===t[0])+'">'+L(loc,t[1],t[2])+'</button>').join("")+'</div><label class="ae-search">'+icon("search",15)+'<input data-editor-search type="search" value="'+X(ui.q)+'" placeholder="'+L(loc,"Поиск профессии…","Search professions…")+'" aria-label="'+L(loc,"Поиск профессии","Search profession")+'"></label></div><div data-editor-roles>'+roleList(d,loc,icon)+'</div>');
 }
 function instructions(d,loc,icon){
- const options=[["friendly","Дружелюбный и профессиональный","Friendly and professional"],["formal","Формальный и точный","Formal and precise"],["calm","Спокойный и заботливый","Calm and supportive"]];
- return block(3,L(loc,"Поведение и инструкции","Behavior and instructions"),L(loc,"Как агент должен общаться и выполнять задачи.","How your agent should communicate and work."),
- '<div class="ae-two ae-instructions"><div class="ae-field"><strong>'+L(loc,"Стиль общения","Communication style")+'</strong>'+styledDropdown("communicationStyle",d.communicationStyle||"friendly",loc,options)+'</div>'+
- input("task",L(loc,"Инструкции для агента","Agent instructions"),d.task,L(loc,"Какие вопросы задавать и что делать?","What should the agent ask and do?"),3)+'</div>'+
- '<div class="ae-quick"><strong>'+L(loc,"Быстрые правила","Quick rules")+'</strong><div>'+suggestions.map(x=>'<button data-editor-action="rule" data-value="'+x[0]+'" aria-pressed="'+((d.quickRules||[]).includes(x[0]))+'">'+L(loc,x[1],x[2])+'</button>').join("")+'</div></div>'+
- '<div class="ae-two ae-instructions-extra">'+input("company",L(loc,"Чем занимается компания?","What does your company do?"),d.company,L(loc,"Продукты, услуги, ваши клиенты…","Products, services and customers…"),2)+
- input("handoff",L(loc,"Когда подключать сотрудника?","When to involve a person?"),d.handoff,L(loc,"Жалоба, вопрос без ответа, просьба о сотруднике…","Complaints, unknown answers or requests for a person…"),2)+'</div>'+
- '<details class="ae-details"><summary>'+L(loc,"Посмотреть примеры заполнения","See completed examples")+'</summary><div class="ae-example-grid"><div><strong>'+L(loc,"О компании","About the company")+'</strong><p>'+L(loc,"Помогаем клиентам выбрать подходящую услугу.","We help clients choose services.")+'</p><button data-editor-action="example" data-field="company">'+L(loc,"Использовать пример","Use example")+'</button></div><div><strong>'+L(loc,"Передача сотруднику","Human handoff")+'</strong><p>'+L(loc,"Передавай сложные вопросы сотруднику.","Hand complex questions to a teammate.")+'</p><button data-editor-action="example" data-field="handoff">'+L(loc,"Использовать пример","Use example")+'</button></div></div></details>');
+ const p=preset(d,loc);
+ const toneOptions=[["friendly","Дружелюбный и профессиональный","Friendly and professional"],["formal","Формальный и точный","Formal and precise"],["calm","Спокойный и заботливый","Calm and supportive"]];
+ const exampleRows=p?[
+   ["company",L(loc,"О компании","About the business"),p.examples.company],
+   ["task",L(loc,"Задачи и инструкции","Tasks & instructions"),p.examples.task],
+   ["handoff",L(loc,"Передача человеку","Human handoff"),p.examples.handoff]
+ ]:[];
+ const advancedFields=[
+  ["identity",L(loc,"Роль и цель агента","Role & mission")],
+  ["workflow",L(loc,"Порядок работы","Workflow")],
+  ["restrictions",L(loc,"Ограничения и достоверность","Safety & accuracy")],
+  ["escalation",L(loc,"Передача сотруднику","Human escalation")]
+ ];
+ const overrides=d.advancedRoleOverrides?.[d.type]||{};
+ const advanced=p?'<details class="ae-advanced"><summary><span><strong>'+L(loc,"Расширенные настройки","Advanced settings")+'</strong><small>'+L(loc,"Профессиональный промпт уже настроен. При необходимости измените отдельные части.","A profession-specific prompt is preconfigured. Edit individual sections only if needed.")+'</small></span><span aria-hidden="true">⌄</span></summary><div class="ae-advanced-body"><div class="ae-advanced-caption">'+L(loc,"Предустановлено для профессии: ","Preset for: ")+X(p.headline)+'</div>'+
+ advancedFields.map(([field,label])=>'<label class="ae-field"><strong>'+label+'</strong><textarea data-editor-advanced="'+field+'" rows="4" maxlength="5000">'+X(Object.hasOwn(overrides,field)?overrides[field]:p.advanced[field])+'</textarea></label>').join("")+
+ '<div class="ae-advanced-footer"><p>'+L(loc,"Правки сохраняются для выбранной профессии. Исходные правила можно восстановить.","Changes are stored for this profession. Restore the recommended settings at any time.")+'</p><button type="button" data-editor-action="reset-advanced">'+L(loc,"Восстановить настройки профессии","Restore profession defaults")+'</button></div></div></details>':"";
+ return block(3,L(loc,"Поведение и инструкции","Behavior and instructions"),p?p.summary:L(loc,"Выберите профессию, чтобы получить подходящие инструкции и правила.","Select a profession to see tailored instructions and guidelines."),
+ (p?'<div class="ae-profession-context"><span class="ae-profession-context-icon">'+icon(d.type==="hr"?"agents":"inbox",18)+'</span><div><strong>'+X(p.headline)+'</strong><p>'+X(p.summary)+'</p></div><span class="ae-profession-tag">'+L(loc,"Настроено под профессию","Role preset")+'</span></div>':"")+
+ '<div class="ae-two ae-instructions"><div class="ae-field"><strong>'+L(loc,"Стиль общения","Communication style")+'</strong>'+styledDropdown("communicationStyle",d.communicationStyle||p?.tone||"friendly",loc,toneOptions)+'</div>'+
+ input("task",p?.taskLabel||L(loc,"Инструкции для агента","Agent instructions"),d.task||"",p?.taskHint||L(loc,"Какие вопросы задавать и что делать?","What should the agent ask and do?"),3)+'</div>'+
+ '<div class="ae-quick"><strong>'+L(loc,"Быстрые правила","Quick rules")+'</strong><p>'+L(loc,"Выберите готовые действия — без написания промпта вручную.","Select ready-made behaviors without writing a prompt.")+'</p><div>'+suggestions.map(x=>'<button type="button" data-editor-action="rule" data-value="'+x[0]+'" aria-pressed="'+((d.quickRules||[]).includes(x[0]))+'">'+L(loc,x[1],x[2])+'</button>').join("")+'</div></div>'+
+ '<div class="ae-two ae-instructions-extra">'+input("company",p?.companyLabel||L(loc,"Чем занимается компания?","Business context"),d.company,p?.companyHint||L(loc,"Продукты, услуги, ваши клиенты…","Products, services and customers…"),2)+
+ input("handoff",p?.handoffLabel||L(loc,"Когда подключать сотрудника?","When to involve a person?"),d.handoff,p?.handoffHint||L(loc,"Когда нужно передать вопрос человеку?","When is a human needed?"),2)+'</div>'+
+ (exampleRows.length?'<details class="ae-details"><summary>'+L(loc,"Посмотреть примеры заполнения","See completed examples")+'</summary><div class="ae-example-grid">'+exampleRows.map(([field,label,value])=>'<div><strong>'+label+'</strong><p>'+X(value)+'</p><button type="button" data-editor-action="example" data-field="'+field+'">'+L(loc,"Использовать пример","Use example")+'</button></div>').join("")+'</div></details>':
+ '<p class="ae-examples-placeholder">'+L(loc,"Примеры для заполнения появятся после выбора профессии.","Profession-specific examples will appear after choosing a role.")+'</p>')+advanced);
 }
 function tools(d,o,loc,icon){
  const docs=[{id:d.type==="hr"?"vacancies":"services",name:L(loc,d.type==="hr"?"Вакансии":"Услуги и цены",d.type==="hr"?"Vacancies":"Services and pricing")},{id:d.type==="hr"?"candidate-guide":"faqs",name:L(loc,d.type==="hr"?"Правила найма":"Частые вопросы",d.type==="hr"?"Hiring guidelines":"FAQ")}];
