@@ -133,7 +133,7 @@ function click(el,o,loc,icon){
    document.querySelector(field)?.scrollIntoView({block:"center",behavior:"smooth"});
    return true;
  }
- if(action==="open-examples"){document.querySelector("[data-editor-modal-backdrop]")?.remove();document.body.insertAdjacentHTML("beforeend",E.examplesModal(d,loc));document.querySelector(".ae-modal")?.focus();return true;}
+ if(action==="open-examples"){document.querySelector("[data-editor-modal-backdrop]")?.remove();document.querySelector(".shell").insertAdjacentHTML("beforeend",E.examplesModal(d,loc));document.querySelector(".ae-modal")?.focus();return true;}
  if(action==="close-examples"){document.querySelector("[data-editor-modal-backdrop]")?.remove();return true;}
  if(action==="example"){
    const field=el.dataset.field,p=E.preset(d,loc);
