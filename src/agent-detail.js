@@ -193,6 +193,61 @@ function panel(o,l,icon,id,open){
  return '<aside class="right-rail ad-rail '+(open?"mobile-open":"")+'" id="right-rail"><div class="ad-rail-header"><h2>'+L(l,"Готовность к запуску","Launch readiness")+'</h2><button class="close-mobile" data-close-panel aria-label="Close">'+icon("close")+'</button></div><div class="ad-rail-progress"><strong>'+ready+'%</strong><span>'+done+' / '+checks.length+'</span><div><i style="width:'+ready+'%"></i></div></div><p>'+L(l,"Статус конфигурации","Configuration status")+'</p><div class="ad-rail-checks">'+checks.map(c=>'<div><span>'+(c.ok?"✓":"○")+'</span>'+H(({name:L(l,"Название","Name"),type:L(l,"Тип агента","Agent type"),task:L(l,"Инструкции","Instructions"),group:L(l,"Группа доступа","Access group"),knowledge:L(l,"База знаний","Knowledge"),connections:L(l,"Интеграции","Integrations"),handoff:L(l,"Передача человеку","Escalation")})[c.key]||c.key)+'</div>').join("")+'</div><p class="ad-rail-note">'+L(l,"Запуск доступен при активной подписке, положительном AI-балансе и выполнении обязательных условий. Здесь используются демонстрационные данные.","Activation requires a paid plan, positive AI balance and required validation. Demo values shown.")+'</p></aside>';
 }
 
+
+function settingInput(el,o,id,l){
+ if(!editableAgent(o,id))return false;
+ const key=el.dataset.detailSetting;
+ if(!key)return false;
+ const d=C.draft(o,id);
+ let updates={};
+ if(key.startsWith("advanced:")){
+  const field=key.slice(9);
+  if(!d.type||!["identity","workflow","restrictions","escalation"].includes(field))return false;
+  const overrides={...(d.advancedRoleOverrides||{})};
+  overrides[d.type]={...(overrides[d.type]||{}),[field]:el.value};
+  updates={advancedRoleOverrides:overrides};
+ }else if(["task","company","handoff","communicationStyle"].includes(key)){
+  updates={[key]:el.value};
+ }else return false;
+ const result=C.upsertEditorDraft(o,updates,id);
+ settingsState.saveError=!result.saved;
+ const status=document.querySelector("[data-detail-settings-save]");
+ if(status){
+   const span=status.querySelector("span");
+   if(span)span.textContent=L(l,result.saved?"✓ Сохранено":"Не удалось сохранить",result.saved?"✓ Saved":"Save failed");
+   status.dataset.error=String(!result.saved);
+ }
+ return result.saved;
+}
+function settingClick(el,o,id){
+ const action=el.dataset.detailSettingAction;
+ if(action==="section"){
+  if(!settingsMenus.some(x=>x[0]===el.dataset.value))return false;
+  settingsState.sectionById[id]=el.dataset.value;
+  settingsState.examples=null;return true;
+ }
+ if(action==="examples"){settingsState.examples=id;return true}
+ if(action==="close-examples"){settingsState.examples=null;return true}
+ if(!editableAgent(o,id))return false;
+ if(action==="toggle-rule"){
+  const name=el.dataset.value;
+  if(!settingRules.some(x=>x[0]===name))return false;
+  const d=C.draft(o,id),rules=new Set(d.quickRules||[]);
+  if(rules.has(name))rules.delete(name);else rules.add(name);
+  const result=C.upsertEditorDraft(o,{quickRules:[...rules]},id);
+  settingsState.saveError=!result.saved;return true;
+ }
+ if(action==="reset-advanced"){
+  const d=C.draft(o,id);
+  if(!d?.type)return false;
+  const overrides={...(d.advancedRoleOverrides||{})};
+  delete overrides[d.type];
+  const result=C.upsertEditorDraft(o,{advancedRoleOverrides:overrides},id);
+  settingsState.saveError=!result.saved;return true;
+ }
+ return false;
+}
+
 function click(el,o,id){
  const action=el.dataset.detailAction;
  if(action==="open-edit"){v.edit=id;v.editMessage="";return true}
@@ -230,6 +285,6 @@ function click(el,o,id){
  if(action==="test"){v.message=document.querySelector("[data-detail-test]")?.value.trim()||"";if(v.message)v.reply="Спасибо! Уточните, пожалуйста, детали запроса, чтобы я мог помочь.";return true}
  return false;
 }
-function closePopup(){v.edit=null;v.editMessage="";v.confirm=null}
-globalThis.AIMockAgentDetail={page,panel,click,coverFile,avatarFile,updateMeta,editableAgent,closePopup};
+function closePopup(){v.edit=null;v.editMessage="";v.confirm=null;settingsState.examples=null}
+globalThis.AIMockAgentDetail={page,panel,click,coverFile,avatarFile,updateMeta,editableAgent,closePopup,settingInput,settingClick};
 })();
