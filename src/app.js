@@ -183,6 +183,7 @@ function render(){
  '<dialog class="search-dialog" id="search-dialog"><div class="search-modal-head">'+icon("search")+'<input aria-label="'+T("search")+'" placeholder="'+T("searchPlaceholder")+'" autocomplete="off" data-search-input><button data-close-search type="button" aria-label="Close">'+icon("close")+'</button></div><div class="search-results" id="search-results"></div></dialog>';
  root.querySelector(".main-scroll").scrollTop=previousMain;
  if(editor&&r.step==="tools")root.querySelector("#ae-block-4")?.scrollIntoView({block:"start"});
+ if(root.querySelector(".ad-edit-dialog"))root.querySelector(".ad-edit-dialog").focus({preventScroll:true});
  const railAfterRender=root.querySelector(".right-rail");
  if(railAfterRender)railAfterRender.scrollTop=previousRail;
  root.querySelectorAll('.queue-item').forEach(b=>{b.addEventListener('click',()=>{state.context=null;state.selected=b.dataset.select;render();});});
@@ -360,7 +361,7 @@ document.addEventListener("keydown",e=>{
  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();showSearch();}
  if(e.key==="Escape"&&state.menu){state.menu=false;render();}
 });
-window.addEventListener("hashchange",()=>{state.menu=false;state.account=false;state.panelOpen=false;state.context=null;render();const main=document.querySelector(".main-scroll");if(main)main.scrollTop=0;});
+window.addEventListener("hashchange",()=>{Detail.closePopup();state.menu=false;state.account=false;state.panelOpen=false;state.context=null;render();const main=document.querySelector(".main-scroll");if(main)main.scrollTop=0;});
 const viewportCategory=()=>innerWidth<=760?"mobile":innerHeight<800?"compact":innerHeight<980?"standard":"large";
 let lastViewport=viewportCategory();
 window.addEventListener("resize",()=>{
