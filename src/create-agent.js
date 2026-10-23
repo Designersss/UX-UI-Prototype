@@ -327,12 +327,13 @@ function upsertEditorDraft(o,changes,id){
  const fresh=!existing;
  const key=fresh?"draft-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8):id;
  const agent=existing||{id:key,orgId:o.id,status:"draft",type:null,name:"",description:"",company:"",task:"",handoff:"",knowledge:[],connections:[],group:"",handoffTarget:"",tested:false,createdAt:Date.now()};
- const allowed=["name","description","company","task","handoff","type","group","handoffTarget","knowledge","connections","communicationStyle","instructions","quickRules","avatar"];
+ const allowed=["name","description","company","task","handoff","type","group","handoffTarget","knowledge","connections","communicationStyle","instructions","quickRules","avatar","tags"];
  const valid=Object.fromEntries(Object.entries(changes||{}).filter(([k,v])=>allowed.includes(k)&&(typeof v==="string"||Array.isArray(v))));
  if("name" in valid)valid.name=valid.name.slice(0,80);
  if("description" in valid)valid.description=valid.description.slice(0,500);
  if("type" in valid&&!professions.some(p=>p.id===valid.type&&p.available))delete valid.type;
  if("knowledge" in valid)valid.knowledge=valid.knowledge.filter(x=>typeof x==="string");
+ if("tags" in valid)valid.tags=[...new Set(valid.tags.filter(x=>typeof x==="string").map(x=>x.trim().slice(0,30)).filter(Boolean))].slice(0,12);
  if("connections" in valid)valid.connections=valid.connections.filter(x=>o.integrations.some(i=>i.id===x&&i.status==="connected"));
  // Preserve optional professional overrides independently for each role.
  if(Object.prototype.hasOwnProperty.call(changes||{},"rolePreferences")){
