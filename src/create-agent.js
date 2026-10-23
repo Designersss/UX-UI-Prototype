@@ -323,6 +323,7 @@ function setAgentEnabled(o,id,enabled){
 }
 function upsertEditorDraft(o,changes,id){
  const existing=id?draft(o,id):null;
+ if(existing&&["active","financial_paused","paused","archived"].includes(existing.status))return {saved:false,error:"configuration_locked"};
  if(id&&!existing)return {error:"not_found"};
  const fresh=!existing;
  const key=fresh?"draft-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8):id;
