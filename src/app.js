@@ -169,7 +169,7 @@ function render(){
  const previousRail=root.querySelector(".right-rail")?.scrollTop||0;
  const catalog=r.section==="agents"&&!r.id;
  const saved=r.section==="agents"&&r.id?Creator.draft(o,r.id):null;
- const detail=!!saved&&saved.status!=="draft"&&!["guide","pick","advanced"].includes(r.sub);
+ const detail=(!!saved&&saved.status!=="draft"||!saved&&o.agents.some(a=>a.id===r.id&&a.state!=="draft"))&&!["guide","pick","advanced"].includes(r.sub);
  const editor=r.section==="agents"&&(r.id==="new"||["guide","pick","advanced"].includes(r.sub)||(saved&&saved.status==="draft"&&r.sub!=="testing"));
  const wizard=r.section==="agents"&&!editor&&!detail&&(r.sub==="setup"||r.sub==="testing");
  const catalogOrg=catalog?{...o,agents:[...o.agents,...Creator.catalogRecords(o)]}:o;
