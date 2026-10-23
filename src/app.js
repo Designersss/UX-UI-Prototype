@@ -169,8 +169,8 @@ function render(){
  const previousRail=root.querySelector(".right-rail")?.scrollTop||0;
  const catalog=r.section==="agents"&&!r.id;
  const saved=r.section==="agents"&&r.id?Creator.draft(o,r.id):null;
- const detail=!!saved&&saved.status!=="draft"&&!["edit","guide","pick"].includes(r.sub);
- const editor=r.section==="agents"&&(r.id==="new"||["edit","guide","pick"].includes(r.sub)||(saved&&saved.status==="draft"&&r.sub!=="testing"));
+ const detail=!!saved&&saved.status!=="draft"&&!["edit","guide","pick","advanced"].includes(r.sub);
+ const editor=r.section==="agents"&&(r.id==="new"||["edit","guide","pick","advanced"].includes(r.sub)||(saved&&saved.status==="draft"&&r.sub!=="testing"));
  const wizard=r.section==="agents"&&!editor&&!detail&&(r.sub==="setup"||r.sub==="testing");
  const catalogOrg=catalog?{...o,agents:[...o.agents,...Creator.catalogRecords(o)]}:o;
  const content=r.section==="overview"?overview(o):catalog?Agents.page(catalogOrg,state.locale,icon):editor?(r.sub==="guide"?Guide.page(o,state.locale,icon,r.id):r.sub==="pick"?Picker.page(o,state.locale,icon,r.id,r.step):Editor.page(o,state.locale,icon,r.id,r.sub,r.step)):detail?Detail.page(o,state.locale,icon,r.id,r.sub):wizard?Creator.page(o,state.locale,icon,r.id,r.sub,r.step):placeholder(r.section,r.id,r.sub,r.step);
