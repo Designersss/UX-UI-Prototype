@@ -22,7 +22,7 @@ function basic(d,loc,icon){
  '<div class="ae-basic"><div class="ae-avatar">'+icon("agents",31)+'</div><div class="ae-basic-fields"><div class="ae-two">'+input("name",L(loc,"Название агента","Agent name"),d.name,L(loc,"Например, Менеджер заявок","E.g. Lead manager"))+
  '<label class="ae-field"><strong>'+L(loc,"Группа","Team")+'</strong>'+groupSelect("group",d.group||"",loc)+'</label></div>'+
  input("description",L(loc,"Описание","Description"),d.description,L(loc,"Кратко опишите основную задачу агента","Describe the agent's purpose"),2)+
- '<p class="ae-note">'+L(loc,"Название и описание будут видны в каталоге. Данные хранятся локально.","The name and description appear in the catalog. Saved locally.")+'</p></div></div>',L(loc,"Основное","Basics"));
+ '</div></div>');
 }
 const roleButton=(p,d,loc,icon)=>'<button class="ae-role '+(d.type===p.id?"selected":"")+'" type="button" data-editor-action="role" data-value="'+X(p.id)+'" aria-pressed="'+(d.type===p.id)+'" '+(!p.available?"disabled":"")+'> <span class="ae-role-icon">'+icon(p.category==="hr"?"agents":p.category==="sales"?"inbox":"knowledge",18)+'</span><span class="ae-role-content"><strong>'+X(p[loc==="en"?"en":"ru"])+'</strong><small>'+X(p[loc==="en"?"detailEn":"detailRu"])+'</small></span><span class="ae-role-status">'+(d.type===p.id?icon("check",14):p.available?"":L(loc,"Скоро","Soon"))+'</span></button>';
 function matching(){
@@ -49,7 +49,7 @@ function instructions(d,loc,icon){
  input("task",L(loc,"Инструкции для агента","Agent instructions"),d.task,L(loc,"Какие вопросы задавать и что делать?","What should the agent ask and do?"),3)+'</div>'+
  '<div class="ae-quick"><strong>'+L(loc,"Быстрые правила","Quick rules")+'</strong><div>'+suggestions.map(x=>'<button data-editor-action="rule" data-value="'+x[0]+'" aria-pressed="'+((d.quickRules||[]).includes(x[0]))+'">'+L(loc,x[1],x[2])+'</button>').join("")+'</div></div>'+
  '<details class="ae-details"><summary>'+L(loc,"Нужна помощь? Откройте примеры заполнения","Need help? Open guided examples")+'</summary><div>'+input("company",L(loc,"Чем занимается компания?","What does your company do?"),d.company,L(loc,"Продукты, услуги, ваши клиенты…","Products, services and customers…"),2)+
- input("handoff",L(loc,"Когда подключать сотрудника?","When to involve a person?"),d.handoff,L(loc,"Жалоба, вопрос без ответа, просьба о сотруднике…","Complaints, unknown answers or requests for a person…"),2)+'</div></details>',L(loc,"Готовый шаблон","Template"));
+ input("handoff",L(loc,"Когда подключать сотрудника?","When to involve a person?"),d.handoff,L(loc,"Жалоба, вопрос без ответа, просьба о сотруднике…","Complaints, unknown answers or requests for a person…"),2)+'</div></details>');
 }
 function tools(d,o,loc,icon){
  const docs=[{id:d.type==="hr"?"vacancies":"services",name:L(loc,d.type==="hr"?"Вакансии":"Услуги и цены",d.type==="hr"?"Vacancies":"Services and pricing")},{id:d.type==="hr"?"candidate-guide":"faqs",name:L(loc,d.type==="hr"?"Правила найма":"Частые вопросы",d.type==="hr"?"Hiring guidelines":"FAQ")}];
@@ -64,18 +64,18 @@ function tools(d,o,loc,icon){
 function access(d,loc,icon){
  return block(5,L(loc,"Доступ и передача диалогов","Access and human handoff"),L(loc,"Кто управляет агентом и кому он передаёт сложные случаи.","Choose who manages the agent and receives complex cases."),
  '<div class="ae-two">'+["group","handoffTarget"].map((key,i)=>'<label class="ae-field"><strong>'+L(loc,i?"Кому передавать диалоги?":"Кто управляет агентом?",i?"Who receives escalated conversations?":"Who manages the agent?")+'</strong>'+groupSelect(key,d[key]||"",loc)+'</label>').join("")+'</div>'+
- '<p class="ae-note">'+icon("info",14)+L(loc,"В прототипе реальные права и передача разговоров отключены.","Real permissions and handoffs are disabled in the prototype.")+'</p>');
+ '');
 }
 function readiness(d,o,loc,icon){
  const checks=C.ready({...d,company:d.company||d.description},o);
  const titles=[L(loc,"Название","Name"),L(loc,"Профессия","Profession"),L(loc,"Инструкции","Instructions"),L(loc,"Знания","Knowledge"),L(loc,"Интеграции","Integrations"),L(loc,"Доступ","Access"),L(loc,"Тест","Test")];
  return block(6,L(loc,"Проверка готовности","Readiness check"),L(loc,"Проверьте необходимые настройки перед запуском.","Check required settings before launch."),
- '<div class="ae-checks">'+checks.map((x,i)=>'<span class="'+(x.ok?"ok":"")+'">'+icon(x.ok?"check":"clock",14)+titles[i]+'</span>').join("")+'</div><p class="ae-note">'+L(loc,"Это демонстрационный редактор: публикация AI-агента пока недоступна.","This is a mock editor; live publishing is not available.")+'</p>');
+ '<div class="ae-checks">'+checks.map((x,i)=>'<span class="'+(x.ok?"ok":"")+'">'+icon(x.ok?"check":"clock",14)+titles[i]+'</span>').join("")+'</div>');
 }
 function page(o,loc,icon,key){
  const d=model(o,key);
- return '<header class="ae-head"><div><div class="ae-breadcrumb">'+L(loc,"РАБОЧЕЕ ПРОСТРАНСТВО / ","WORKSPACE / ")+X(o.name)+L(loc," / АГЕНТЫ"," / AGENTS")+'</div><h1>'+L(loc,"Создание агента","Create agent")+'</h1><p>'+L(loc,"Настройте агента под задачи вашей команды. Все изменения сохраняются автоматически.","Set up an agent for your team. Changes save automatically.")+'</p></div><div class="ae-head-actions"><span data-editor-save>'+L(loc,ui.fail?"Ошибка сохранения":get(o,key)?"Сохранено локально":"Автосохранение",ui.fail?"Save failed":get(o,key)?"Saved locally":"Autosave")+'</span><a href="#/agents" aria-label="'+L(loc,"Закрыть","Close")+'">'+icon("close",17)+'</a></div></header>'+
- '<section class="ae-hero"><div class="ae-hero-text"><span class="ae-spark">'+icon("sparkles",22)+'</span><div><h2>'+L(loc,"Создайте AI-сотрудника для вашей команды","Build an AI teammate for your team")+'</h2><p>'+L(loc,"Выберите профессию, настройте поведение и подключите нужные инструменты.","Choose a profession, configure behavior and connect useful tools.")+'</p></div></div><div class="ae-hero-art" aria-hidden="true"><span>'+icon("agents",26)+'</span><i>'+icon("message",17)+'</i><i>'+icon("integrations",17)+'</i><i>'+icon("knowledge",17)+'</i></div></section>'+
+ return '<header class="ae-head"><div><h1>'+L(loc,"Создание агента","Create agent")+'</h1><p>'+L(loc,"Настройте агента под задачи вашей команды. Все изменения сохраняются автоматически.","Set up an agent for your team. Changes save automatically.")+'</p></div><div class="ae-head-actions"><a href="#/agents" aria-label="'+L(loc,"Закрыть","Close")+'">'+icon("close",17)+'</a></div></header>'+
+ '<section class="ae-hero"><div class="ae-hero-text"><span class="ae-spark">'+icon("sparkles",22)+'</span><div><h2>'+L(loc,"Создайте AI-сотрудника для вашей команды","Build an AI teammate for your team")+'</h2><p>'+L(loc,"Выберите профессию, настройте поведение и подключите нужные инструменты.","Choose a profession, configure behavior and connect useful tools.")+'</p><a class="ae-hero-guide" href="#/agents/'+encodeURIComponent(key)+'/guide">'+L(loc,"Пошаговая инструкция по настройке","Step-by-step setup guide")+' →</a></div></div><div class="ae-hero-art" aria-hidden="true"><span>'+icon("agents",26)+'</span><i>'+icon("message",17)+'</i><i>'+icon("integrations",17)+'</i><i>'+icon("knowledge",17)+'</i></div></section>'+
  '<div class="ae-sections">'+basic(d,loc,icon)+professions(d,loc,icon)+instructions(d,loc,icon)+tools(d,o,loc,icon)+access(d,loc,icon)+readiness(d,o,loc,icon)+'</div>'+
  '<footer class="ae-footer"><span>'+icon("check",14)+' '+L(loc,"Автоматическое сохранение черновика","Draft autosaves")+'</span><div><a href="#/agents">'+L(loc,"Отмена","Cancel")+'</a><button data-editor-action="test" class="ae-test">'+L(loc,"Протестировать","Test agent")+'</button><button class="ae-publish" disabled title="'+L(loc,"Запуск недоступен","Launch unavailable")+'">'+L(loc,"Опубликовать агента","Publish agent")+'</button></div></footer>';
 }
