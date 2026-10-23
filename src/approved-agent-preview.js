@@ -20,7 +20,7 @@ function panel(o,loc,icon,key,open){
  '<div class="ae-preview-divider"></div><div class="ae-preview-tool-head"><h4>'+L(loc,"Подключённые инструменты","Selected tools")+'</h4><small>'+connected.length+'</small></div>'+
  '<div class="ae-preview-tools">'+(connected.length?connected.map(i=>'<div>'+ (logo(i.brand)?'<img src="./src/assets/logos/'+logo(i.brand)+'" width="19" height="19" alt="">':icon("integrations",17))+'<span>'+X(i.name)+'</span><b>●</b></div>').join(""):'<p>'+L(loc,"Пока ничего не выбрано","No connections selected")+'</p>')+'</div>'+
  '<div class="ae-preview-progress"><div><strong>'+L(loc,"Готовность к запуску","Readiness")+'</strong><span>'+progress+'%</span></div><div class="ae-preview-progress-track"><i style="width:'+progress+'%"></i></div><p>'+L(loc,"Заполните параметры, проверьте знания и протестируйте сценарий.","Fill in the settings, review knowledge and run a test.")+'</p></div>'+
- '<div class="ae-preview-note">'+icon("info",17)+L(loc,"Все данные предварительные. Реальный запуск отключён.","Mock preview only. Live activation is disabled.")+'</div></aside>';
+ '<div class="ae-preview-note">'+icon("info",17)+L(loc,"После создания тестируйте и управляйте агентом из его карточки.","After creation, test and manage the agent from its page.")+'</div></aside>';
 }
 function refresh(o,loc,icon){
  const old=document.querySelector(".ae-preview");if(!old)return;
