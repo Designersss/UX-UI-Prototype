@@ -13,6 +13,8 @@ function persist(o,update){
    document.querySelectorAll('a[href*="/new/"]').forEach(link=>{
      link.setAttribute("href",link.getAttribute("href").replace("/new/","/"+encodeURIComponent(result.id)+"/"));
    });
+   const guide=document.querySelector('a.ae-hero-guide[href="#/help/from-agent/new"]');
+   if(guide)guide.setAttribute("href","#/help/from-agent/"+encodeURIComponent(result.id));
    ui.blank={name:"",description:"",group:"",type:null,task:"",company:"",handoff:"",handoffTarget:"",knowledge:[],connections:[],quickRules:[],communicationStyle:"friendly",tags:[]};
  }
  return result;
