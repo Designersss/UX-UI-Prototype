@@ -13,7 +13,7 @@ function persist(o,update){
    document.querySelectorAll('a[href^="#/agents/new/"]').forEach(link=>{
      link.setAttribute("href",link.getAttribute("href").replace("#/agents/new/","#/agents/"+encodeURIComponent(result.id)+"/"));
    });
-   ui.blank={name:"",description:"",group:"",type:null,task:"",company:"",handoff:"",handoffTarget:"",knowledge:[],connections:[],quickRules:[],communicationStyle:"friendly"};
+   ui.blank={name:"",description:"",group:"",type:null,task:"",company:"",handoff:"",handoffTarget:"",knowledge:[],connections:[],quickRules:[],communicationStyle:"friendly",tags:[]};
  }
  return result;
 }
@@ -31,9 +31,9 @@ function withRolePreference(d,changes){
 }
 function input(el,o,loc,icon){
  const key=el.dataset.editorInput;
- if(!["name","description","company","task","handoff","group","handoffTarget","communicationStyle"].includes(key))return false;
+ if(!["name","description","company","task","handoff","group","handoffTarget","communicationStyle","tags"].includes(key))return false;
  const draft=E.model(o,E.id());
- const result=persist(o,withRolePreference(draft,{[key]:el.value}));
+ const result=persist(o,withRolePreference(draft,{[key]:key==="tags"?el.value.split(",").map(v=>v.trim().replace(/\\s+/g," ")).filter(Boolean).slice(0,12):el.value}));
  if(result.saved){
    if(key==="group")document.querySelectorAll('[data-editor-input="group"]').forEach(s=>{if(s!==el)s.value=el.value;});
    E.refresh(o,loc,icon);
