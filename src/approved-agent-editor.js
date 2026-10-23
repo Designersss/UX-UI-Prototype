@@ -58,9 +58,9 @@ function tools(d,o,loc,icon){
  const items=(rows,key)=>rows.map(i=>'<button type="button" class="ae-option '+((d[key]||[]).includes(i.id)?"selected":"")+'" data-editor-action="'+(key==="knowledge"?"knowledge":"connection")+'" data-value="'+X(i.id)+'" aria-pressed="'+((d[key]||[]).includes(i.id))+'"><span>'+((key==="connections"&&logos[i.brand])?'<img src="./src/assets/logos/'+logos[i.brand]+'" alt="" width="20" height="20">':"")+X(i.name)+'</span><small>'+((d[key]||[]).includes(i.id)?L(loc,"Выбрано","Selected"):"+")+'</small></button>').join("");
  return block(4,L(loc,"Знания и интеграции","Knowledge and integrations"),L(loc,"Добавьте материалы и сервисы, с которыми работает агент.","Attach reference materials and connected services."),
  '<div class="ae-tools-grid"><div class="ae-tool"><h3>'+icon("knowledge",17)+L(loc,"База знаний","Knowledge base")+'</h3><p>'+L(loc,"Материалы для ответов","Reference materials")+'</p>'+items(docs,"knowledge")+
- '<a href="#/knowledge/from-agent/'+encodeURIComponent(id())+'">'+L(loc,"Открыть базу знаний","Open knowledge base")+' ↗</a></div>'+
+ '<a href="#/agents/'+encodeURIComponent(id())+'/pick/knowledge">'+L(loc,"Выбрать материалы из каталога","Choose knowledge from catalog")+' →</a></div>'+
  '<div class="ae-tool"><h3>'+icon("integrations",17)+L(loc,"Интеграции","Integrations")+'</h3><p>'+L(loc,"Подключения организации","Organization connections")+'</p>'+(conn.length?items(conn,"connections"):'<p class="ae-empty">'+L(loc,"Пока нет подключений","No connections yet")+'</p>')+
- '<a href="#/integrations/from-agent/'+encodeURIComponent(id())+'">'+L(loc,"Открыть Integration Hub","Open Integration Hub")+' ↗</a></div></div>',L(loc,"Выбираются отдельно","Choose individually"));
+ '<a href="#/agents/'+encodeURIComponent(id())+'/pick/integrations">'+L(loc,"Выбрать подключения из каталога","Choose connected services")+' →</a></div></div>',L(loc,"Выбираются отдельно","Choose individually"));
 }
 function access(d,loc,icon){
  return block(5,L(loc,"Доступ и передача диалогов","Access and human handoff"),L(loc,"Кто управляет агентом и кому он передаёт сложные случаи.","Choose who manages the agent and receives complex cases."),
