@@ -8,6 +8,11 @@ function persist(o,update){
  ui.fail=!result.saved;
  if(result.saved&&key==="new"){
    history.replaceState(null,"","#/agents/"+encodeURIComponent(result.id)+"/edit");
+   // Links were rendered before the first keystroke, when no draft ID existed.
+   // Retarget guide and picker links without rebuilding the form or dropping focus.
+   document.querySelectorAll('a[href^="#/agents/new/"]').forEach(link=>{
+     link.setAttribute("href",link.getAttribute("href").replace("#/agents/new/","#/agents/"+encodeURIComponent(result.id)+"/"));
+   });
    ui.blank={name:"",description:"",group:"",type:null,task:"",company:"",handoff:"",handoffTarget:"",knowledge:[],connections:[],quickRules:[],communicationStyle:"friendly"};
  }
  return result;
