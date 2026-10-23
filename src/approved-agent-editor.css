@@ -313,3 +313,10 @@ body[data-theme=dark] .ae-hero{border-color:var(--line);background:linear-gradie
  #ae-block-3 .ae-quick{padding:12px}
  #ae-block-3 .ae-configuration-links{grid-template-columns:1fr}
 }
+
+/* Agent-type dependent setup steps */
+.ae-block-locked{background:var(--soft);border-style:dashed;opacity:.72}
+.ae-block-locked .ae-section-header{margin-bottom:11px}
+.ae-block-locked .ae-number{background:var(--line);color:var(--muted)}
+.ae-locked-content{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:15px;background:var(--panel);font-size:11px;font-weight:650;color:var(--muted)}
+.ae-locked-content span{font-size:16px}
