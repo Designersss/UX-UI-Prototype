@@ -8,7 +8,7 @@ const h=(s)=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const L=(locale,ru,en)=>locale==="en"?en:ru;
 const data=(o)=>o.agents.map(a=>({...a,state:statusOverrides[o.id+"/"+a.id]||a.state,group:a.group||(a.type==="hr"?"HR":"Продажи"),tags:a.tags||[],taskCount:a.taskCount||0,issues:a.issues||0}));
 const stateTitle=(s,locale)=>{
- const names={active:L(locale,"Активен","Active"),stopped:L(locale,"Остановлен вручную","Manually stopped"),financial_paused:L(locale,"Пауза · нет AI-средств","Paused · insufficient funds"),paused:L(locale,"Пауза","Paused"),draft:L(locale,"Черновик","Draft"),needs_setup:L(locale,"Требует настройки","Setup required"),archived:L(locale,"Архивирован","Archived")};
+ const names={created:L(locale,"Готов к включению","Ready to enable"),active:L(locale,"Активен","Active"),stopped:L(locale,"Остановлен вручную","Manually stopped"),financial_paused:L(locale,"Пауза · нет AI-средств","Paused · insufficient funds"),paused:L(locale,"Пауза","Paused"),draft:L(locale,"Черновик","Draft"),needs_setup:L(locale,"Требует настройки","Setup required"),archived:L(locale,"Архивирован","Archived")};
  return names[s]||s;
 };
 const isAttention=(a)=>["needs_setup","financial_paused","paused"].includes(a.state)||a.issues>0;
