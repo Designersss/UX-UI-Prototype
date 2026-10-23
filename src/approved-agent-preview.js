@@ -10,7 +10,7 @@ function panel(o,loc,icon,key,open){
  const connected=o.integrations.filter(i=>(d.connections||[]).includes(i.id));
  const checks=C.creationChecks(d);
  const labels=[
-  L(loc,"Название агента","Agent name"),L(loc,"Профессия","Profession"),
+  L(loc,"Название агента","Agent name"),L(loc,"Тип агента","Agent type"),
   L(loc,"Инструкции","Instructions"),L(loc,"Группа доступа","Access group"),
   L(loc,"База знаний","Knowledge base"),L(loc,"Подключения","Integrations"),
   L(loc,"Передача человеку","Human handoff")
