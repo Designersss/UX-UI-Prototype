@@ -334,6 +334,21 @@ function upsertEditorDraft(o,changes,id){
  if("type" in valid&&!professions.some(p=>p.id===valid.type&&p.available))delete valid.type;
  if("knowledge" in valid)valid.knowledge=valid.knowledge.filter(x=>typeof x==="string");
  if("connections" in valid)valid.connections=valid.connections.filter(x=>o.integrations.some(i=>i.id===x&&i.status==="connected"));
+ // Preserve optional professional overrides independently for each role.
+ if(Object.prototype.hasOwnProperty.call(changes||{},"advancedRoleOverrides")){
+   const raw=changes.advancedRoleOverrides;
+   if(raw&&typeof raw==="object"&&!Array.isArray(raw)){
+     const result={};
+     for(const [role,fields] of Object.entries(raw)){
+       if(!professions.some(p=>p.id===role&&p.available)||!fields||typeof fields!=="object"||Array.isArray(fields))continue;
+       result[role]={};
+       for(const k of ["identity","workflow","restrictions","escalation"]){
+         if(typeof fields[k]==="string")result[role][k]=fields[k].slice(0,5000);
+       }
+     }
+     valid.advancedRoleOverrides=result;
+   }
+ }
  Object.assign(agent,valid,{tested:false});
  if(fresh)drafts[key]=agent;
  const saved=save();
