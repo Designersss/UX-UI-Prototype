@@ -54,20 +54,31 @@ function click(el,o,loc,icon){
  if(action==="role"){
    const profession=C.professions.find(p=>p.id===value&&p.available);
    if(!profession)return true;
-   const oldPreset=E.preset(d,loc),nextPreset=globalThis.AIMockProfessionPresets.get(profession.id,loc);
+   if(d.type===profession.id)return true;
+   const nextPreset=globalThis.AIMockProfessionPresets.get(profession.id,loc);
    const selectedGroup=profession.category==="hr"?"HR":"Продажи";
-   const currentRules=d.quickRules||[];
-   const hadRole=Boolean(d.type);
-   const sameDefaults=oldPreset&&currentRules.length===oldPreset.rules.length&&currentRules.every(rule=>oldPreset.rules.includes(rule));
+   const oldDefault=d.type==="hr"?"HR":d.type==="sales"?"Продажи":"";
+   const previous={...(d.rolePreferences||{})};
+   if(d.type){
+     previous[d.type]={
+       ...(previous[d.type]||{}),
+       task:d.task||"",handoff:d.handoff||"",
+       quickRules:[...(d.quickRules||[])],
+       communicationStyle:d.communicationStyle||"friendly"
+     };
+   }
+   const saved=previous[profession.id]||{};
    const patch={
      type:profession.id,
-     ...(!d.group?{group:selectedGroup}:{}),
-     ...(!d.handoffTarget?{handoffTarget:selectedGroup}:{})
+     rolePreferences:previous,
+     group:!d.group||d.group===oldDefault?selectedGroup:d.group,
+     handoffTarget:!d.handoffTarget||d.handoffTarget===oldDefault?selectedGroup:d.handoffTarget,
+     task:typeof saved.task==="string"?saved.task:(d.type?nextPreset.task:(d.task||nextPreset.task)),
+     handoff:typeof saved.handoff==="string"?saved.handoff:(d.type?nextPreset.examples.handoff:(d.handoff||nextPreset.examples.handoff)),
+     quickRules:Array.isArray(saved.quickRules)?[...saved.quickRules]:[...nextPreset.rules],
+     communicationStyle:saved.communicationStyle||nextPreset.tone,
+     knowledge:[]
    };
-   if(nextPreset&&(!d.task||d.task===oldPreset?.task))patch.task=nextPreset.task;
-   if(nextPreset&&(!hadRole||!currentRules.length||sameDefaults))patch.quickRules=[...nextPreset.rules];
-   if(nextPreset&&(!hadRole||!d.communicationStyle||d.communicationStyle===oldPreset?.tone))patch.communicationStyle=nextPreset.tone;
-   if(d.type!==profession.id)patch.knowledge=[];
    const result=persist(o,patch);
    if(result.saved){
      const updated=result.draft;
