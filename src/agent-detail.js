@@ -4,6 +4,36 @@ const C=globalThis.AIMockCreator;
 const v={confirm:null,message:"",reply:""};
 const H=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const L=(l,a,b)=>l==="en"?b:a;
+const coverKey="aimock-agent-covers-v1";
+let covers={};
+try{covers=JSON.parse(localStorage.getItem(coverKey)||"{}")||{}}catch(_){}
+const coverId=(o,id)=>o.id+"/"+id;
+const coverFor=(o,id)=>covers[coverId(o,id)]||null;
+function saveCover(o,id,cover){
+ const key=coverId(o,id),before=covers[key];
+ if(cover)covers[key]=cover;else delete covers[key];
+ try{localStorage.setItem(coverKey,JSON.stringify(covers));v.coverMessage="";return true}
+ catch(_){if(before)covers[key]=before;else delete covers[key];v.coverMessage="save";return false}
+}
+async function coverFile(file,o,id){
+ if(!file)return false;
+ if(!["image/jpeg","image/png","image/webp","image/avif"].includes(file.type)||file.size>12*1024*1024){v.coverMessage="type";return false}
+ const url=URL.createObjectURL(file);
+ try{
+  const img=new Image();
+  await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});
+  const scale=Math.min(1,1600/img.naturalWidth,1100/img.naturalHeight);
+  const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+  const ctx=canvas.getContext("2d");if(!ctx)throw Error("canvas");
+  ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  let encoded=canvas.toDataURL("image/jpeg",.82);
+  if(encoded.length>750000)encoded=canvas.toDataURL("image/jpeg",.64);
+  if(encoded.length>1200000){v.coverMessage="size";return false}
+  return saveCover(o,id,{image:encoded,position:coverFor(o,id)?.position||"center"});
+ }catch(_){v.coverMessage="type";return false}
+ finally{URL.revokeObjectURL(url)}
+}
+
 function page(o,l,icon,id,sub){
  const live=C.draft(o,id),sample=o.agents.find(a=>a.id===id),d=live||(sample?{...sample,status:sample.state,description:sample.description||"",connections:[],knowledge:[],quickRules:[],handoff:"",task:""}:null);
  if(!d||d.status==="draft")return '<div class="ad-missing"><h1>'+L(l,"Агент не найден","Agent not found")+'</h1><a href="#/agents">'+L(l,"Вернуться в каталог","Back to catalog")+'</a></div>';
@@ -16,7 +46,10 @@ function page(o,l,icon,id,sub){
  const base="#/agents/"+encodeURIComponent(id);
  const nav='<nav class="ad-tabs" aria-label="'+L(l,"Разделы агента","Agent sections")+'">'+tabs.map(([slug,ru,en])=>'<a href="'+base+(slug==="overview"?"":"/"+slug)+'" '+(key===slug?'aria-current="page"':'')+'>'+L(l,ru,en)+'</a>').join("")+'</nav>';
  const action=demo?'':active?'<button class="ad-danger" type="button" data-detail-action="confirm-stop">'+L(l,"Остановить","Stop")+'</button>':d.status==="financial_paused"?'<button class="ad-danger" type="button" data-detail-action="confirm-stop">'+L(l,"Остановить","Stop")+'</button>':'<button class="ad-primary" type="button" data-detail-action="enable">'+L(l,"Запустить","Start")+'</button>';
- const head='<div class="ad-visual-hero"><a class="ad-back" href="#/agents">← '+L(l,"Все агенты","All agents")+'</a><div class="ad-hero-line"><span class="ad-hero-avatar">'+icon("agents",26)+'</span><div class="ad-hero-copy"><div class="ad-hero-title"><h1>'+H(d.name)+'</h1><span class="ad-status '+(active?"enabled":"")+'">'+status+'</span></div><p>'+H(d.description||role)+'</p><div class="ad-hero-tags"><span>'+role+'</span>'+(d.tags||[]).map(t=>'<span>'+H(t)+'</span>').join("")+'</div></div><div class="ad-actions">'+action+'</div></div></div>'+nav;
+ const cover=coverFor(o,id),coverPosition=["top","center","bottom"].includes(cover?.position)?cover.position:"center";
+ const coverControls='<div class="ad-cover-controls"><label class="ad-cover-upload" for="ad-cover-file">'+icon("image",15)+L(l,"Изменить обложку","Change cover")+'</label><input class="ad-cover-file" type="file" id="ad-cover-file" data-detail-cover-file accept="image/jpeg,image/png,image/webp,image/avif" aria-label="'+L(l,"Загрузить обложку агента","Upload agent cover")+'"><details class="ad-cover-menu"><summary aria-label="'+L(l,"Настройки обложки","Cover settings")+'">'+icon("more-horizontal",17)+'</summary><div><strong>'+L(l,"Положение изображения","Image position")+'</strong>'+[["top","Сверху","Top"],["center","По центру","Center"],["bottom","Снизу","Bottom"]].map(([value,ru,en])=>'<button type="button" data-detail-action="cover-position" data-value="'+value+'" aria-pressed="'+(value===coverPosition)+'">'+L(l,ru,en)+(value===coverPosition?" ✓":"")+'</button>').join("")+'<button type="button" data-detail-action="cover-reset" '+(cover?.image?"":"disabled")+'>'+L(l,"Убрать изображение","Remove image")+'</button></div></details></div>';
+ const coverError=v.coverMessage?'<div class="ad-cover-error" role="alert">'+L(l,v.coverMessage==="save"?"Не удалось сохранить обложку. Возможно, закончилось место в браузере.":v.coverMessage==="size"?"Изображение слишком большое после обработки.":"Используйте JPG, PNG, WebP или AVIF размером до 12 МБ.",v.coverMessage==="save"?"Could not save cover. Browser storage may be full.":v.coverMessage==="size"?"Image is too large after processing.":"Choose JPG, PNG, WebP or AVIF, up to 12 MB.")+'</div>':"";
+ const head='<header class="ad-visual-hero" data-cover-position="'+coverPosition+'">'+(cover?.image?'<img class="ad-cover-image" src="'+H(cover.image)+'" alt="" aria-hidden="true">':'<div class="ad-default-cover" aria-hidden="true"></div>')+'<div class="ad-hero-shade" aria-hidden="true"></div><div class="ad-hero-top"><a class="ad-back" href="#/agents">← '+L(l,"Все агенты","All agents")+'</a>'+coverControls+'</div><div class="ad-hero-line"><span class="ad-hero-avatar">'+icon("agents",26)+'</span><div class="ad-hero-copy"><div class="ad-hero-title"><h1>'+H(d.name)+'</h1><span class="ad-status '+(active?"enabled":"")+'">'+status+'</span></div><p>'+H(d.description||role)+'</p><div class="ad-hero-tags"><span>'+role+'</span>'+(d.tags||[]).map(t=>'<span>'+H(t)+'</span>').join("")+'</div></div><div class="ad-actions">'+action+'</div></div>'+coverError+'</header>'+nav;
  const total=(d.connections||[]).length,know=(d.knowledge||[]).length;
  const stats='<div class="ad-kpis">'+[[L(l,"Обращения","Inquiries"),"—"],[L(l,"Обработано","Handled"),"—"],[L(l,"Передано сотруднику","Handed off"),"—"],[L(l,"Успешность","Success rate"),"—"]].map(([name,n])=>'<div class="ad-kpi"><strong>'+n+'</strong><span>'+name+'</span></div>').join("")+'</div>';
  const readiness=C.creationChecks(d),passed=readiness.filter(x=>x.ok).length;
@@ -43,6 +76,12 @@ function panel(o,l,icon,id,open){
 function click(el,o,id){
  const action=el.dataset.detailAction;
  if(!C.draft(o,id)&&["enable","stop","confirm-stop"].includes(action))return false;
+ if(action==="cover-position"){
+  const value=el.dataset.value;
+  if(!["top","center","bottom"].includes(value))return false;
+  return saveCover(o,id,{...coverFor(o,id),position:value});
+ }
+ if(action==="cover-reset")return saveCover(o,id,null);
  if(action==="confirm-stop"){v.confirm=id;return true;}
  if(action==="cancel-stop"){v.confirm=null;return true;}
  if(action==="enable"||action==="stop"){
@@ -52,5 +91,5 @@ function click(el,o,id){
  if(action==="test"){v.message=document.querySelector("[data-detail-test]")?.value.trim()||"";if(v.message)v.reply="Спасибо! Уточните, пожалуйста, детали запроса, чтобы я мог помочь.";return true;}
  return false;
 }
-globalThis.AIMockAgentDetail={page,panel,click};
+globalThis.AIMockAgentDetail={page,panel,click,coverFile};
 })();
