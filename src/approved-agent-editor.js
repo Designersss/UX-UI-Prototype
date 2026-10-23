@@ -30,18 +30,18 @@ function matching(){
  return C.professions.filter(p=>(ui.category==="all"||ui.category===p.category)&&(!ui.q||[p.ru,p.en,p.detailRu,p.detailEn].join(" ").toLowerCase().includes(ui.q.toLowerCase())));
 }
 function roleList(d,loc,icon){
- const all=matching(),expand=ui.expanded||ui.q||ui.category!=="all";
- const count=Math.max(1,Math.ceil(all.length/9));ui.page=Math.min(Math.max(1,ui.page),count);
- const current=expand?all.slice((ui.page-1)*9,ui.page*9):featured.map(k=>C.professions.find(p=>p.id===k)).filter(Boolean);
+ const all=matching(),count=Math.max(1,Math.ceil(all.length/9));
+ ui.page=Math.min(Math.max(1,ui.page),count);
+ const current=all.slice((ui.page-1)*9,ui.page*9);
  return '<div class="ae-role-grid">'+(current.length?current.map(p=>roleButton(p,d,loc,icon)).join(""):'<p class="ae-empty">'+L(loc,"Ничего не найдено","No matching professions")+'</p>')+'</div>'+
- (expand?'<nav class="ae-pages" aria-label="'+L(loc,"Страницы профессий","Profession pages")+'"><span>'+L(loc,"Найдено: ","Found: ")+all.length+'</span><div><button data-editor-action="page" data-value="'+(ui.page-1)+'" '+(ui.page===1?"disabled":"")+'>‹</button>'+
- Array.from({length:count},(_,i)=>'<button data-editor-action="page" data-value="'+(i+1)+'" '+(ui.page===i+1?'aria-current="page"':'')+'>'+(i+1)+'</button>').join("")+
- '<button data-editor-action="page" data-value="'+(ui.page+1)+'" '+(ui.page===count?"disabled":"")+'>›</button></div></nav><button data-editor-action="collapse" class="ae-more">'+L(loc,"Свернуть каталог","Collapse catalog")+'</button>':
- '<button class="ae-more" data-editor-action="expand">'+L(loc,"Показать ещё 30 профессий","Show 30 more professions")+' '+icon("chevron",13)+'</button>');
+ '<nav class="ae-pages" aria-label="'+L(loc,"Страницы профессий","Profession pages")+'"><span>'+L(loc,"Показано ","Showing ")+(all.length?(ui.page-1)*9+1:0)+'–'+Math.min(ui.page*9,all.length)+' '+L(loc,"из ","of ")+all.length+'</span><div>'+
+ '<button type="button" data-editor-action="page" data-value="'+(ui.page-1)+'" '+(ui.page===1?"disabled":"")+' aria-label="'+L(loc,"Предыдущая страница","Previous page")+'">‹</button>'+
+ Array.from({length:count},(_,i)=>'<button type="button" data-editor-action="page" data-value="'+(i+1)+'" '+(ui.page===i+1?'aria-current="page"':'')+'>'+(i+1)+'</button>').join("")+
+ '<button type="button" data-editor-action="page" data-value="'+(ui.page+1)+'" '+(ui.page===count?"disabled":"")+' aria-label="'+L(loc,"Следующая страница","Next page")+'">›</button></div></nav>';
 }
 function professions(d,loc,icon){
  return block(2,L(loc,"Выберите профессию","Choose a profession"),L(loc,"Готовые настройки для разных задач.","Ready-made starting points for different tasks."),
- '<div class="ae-role-controls"><div class="ae-filters">'+tabs.map(t=>'<button type="button" data-editor-action="category" data-value="'+t[0]+'" aria-pressed="'+(ui.category===t[0])+'">'+L(loc,t[1],t[2])+'</button>').join("")+'</div><label class="ae-search">'+icon("search",15)+'<input data-editor-search type="search" value="'+X(ui.q)+'" placeholder="'+L(loc,"Поиск профессии…","Search professions…")+'" aria-label="'+L(loc,"Поиск профессии","Search profession")+'"></label></div><div data-editor-roles>'+roleList(d,loc,icon)+'</div>',d.type?L(loc,"Выбрано: ","Selected: ")+X(roleName(d,loc)):"");
+ '<div class="ae-role-controls"><div class="ae-filters">'+tabs.map(t=>'<button type="button" data-editor-action="category" data-value="'+t[0]+'" aria-pressed="'+(ui.category===t[0])+'">'+L(loc,t[1],t[2])+'</button>').join("")+'</div><label class="ae-search">'+icon("search",15)+'<input data-editor-search type="search" value="'+X(ui.q)+'" placeholder="'+L(loc,"Поиск профессии…","Search professions…")+'" aria-label="'+L(loc,"Поиск профессии","Search profession")+'"></label></div><div data-editor-roles>'+roleList(d,loc,icon)+'</div>');
 }
 function instructions(d,loc,icon){
  const options=[["friendly","Дружелюбный и профессиональный","Friendly and professional"],["formal","Формальный и точный","Formal and precise"],["calm","Спокойный и заботливый","Calm and supportive"]];
