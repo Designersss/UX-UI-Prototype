@@ -78,9 +78,9 @@ function click(el,o,loc,icon){
      rolePreferences:previous,
      group:!d.group||d.group===oldDefault?selectedGroup:d.group,
      handoffTarget:!d.handoffTarget||d.handoffTarget===oldDefault?selectedGroup:d.handoffTarget,
-     task:typeof saved.task==="string"?saved.task:(d.type?nextPreset.task:(d.task||nextPreset.task)),
-     handoff:typeof saved.handoff==="string"?saved.handoff:(d.type?nextPreset.examples.handoff:(d.handoff||nextPreset.examples.handoff)),
-     quickRules:Array.isArray(saved.quickRules)?[...saved.quickRules]:[...nextPreset.rules],
+     task:typeof saved.task==="string"?saved.task:"",
+     handoff:typeof saved.handoff==="string"?saved.handoff:"",
+     quickRules:Array.isArray(saved.quickRules)?[...saved.quickRules]:[],
      communicationStyle:saved.communicationStyle||nextPreset.tone,
      knowledge:[]
    };
@@ -133,6 +133,8 @@ function click(el,o,loc,icon){
    document.querySelector(field)?.scrollIntoView({block:"center",behavior:"smooth"});
    return true;
  }
+ if(action==="open-examples"){document.querySelector("[data-editor-modal-backdrop]")?.remove();document.body.insertAdjacentHTML("beforeend",E.examplesModal(d,loc));document.querySelector(".ae-modal")?.focus();return true;}
+ if(action==="close-examples"){document.querySelector("[data-editor-modal-backdrop]")?.remove();return true;}
  if(action==="example"){
    const field=el.dataset.field,p=E.preset(d,loc);
    if(!["company","task","handoff"].includes(field)||!p?.examples[field])return true;
