@@ -5,6 +5,8 @@ const Agents=globalThis.AIMockAgents;
 const Creator=globalThis.AIMockCreator;
 const Editor=globalThis.AIMockApprovedEditor;
 const Detail=globalThis.AIMockAgentDetail;
+const Guide=globalThis.AIMockAgentGuide;
+const Picker=globalThis.AIMockPicker;
 const storageKey="aimock-premium-calm-preferences-v1";
 let stored={};
 try{stored=JSON.parse(localStorage.getItem(storageKey)||"{}");}catch(_){}
@@ -167,8 +169,8 @@ function render(){
  const previousRail=root.querySelector(".right-rail")?.scrollTop||0;
  const catalog=r.section==="agents"&&!r.id;
  const saved=r.section==="agents"&&r.id?Creator.draft(o,r.id):null;
- const detail=!!saved&&saved.status!=="draft"&&r.sub!=="edit";
- const editor=r.section==="agents"&&(r.id==="new"||r.sub==="edit"||(saved&&saved.status==="draft"&&r.sub!=="testing"));
+ const detail=!!saved&&saved.status!=="draft"&&!["edit","guide","pick"].includes(r.sub);
+ const editor=r.section==="agents"&&(r.id==="new"||["edit","guide","pick"].includes(r.sub)||(saved&&saved.status==="draft"&&r.sub!=="testing"));
  const wizard=r.section==="agents"&&!editor&&!detail&&(r.sub==="setup"||r.sub==="testing");
  const catalogOrg=catalog?{...o,agents:[...o.agents,...Creator.catalogRecords(o)]}:o;
  const content=r.section==="overview"?overview(o):catalog?Agents.page(catalogOrg,state.locale,icon):editor?Editor.page(o,state.locale,icon,r.id,r.sub,r.step):detail?Detail.page(o,state.locale,icon,r.id,r.sub):wizard?Creator.page(o,state.locale,icon,r.id,r.sub,r.step):placeholder(r.section,r.id,r.sub,r.step);
