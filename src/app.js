@@ -4,6 +4,7 @@ const data=globalThis.AIMockData;
 const Agents=globalThis.AIMockAgents;
 const Creator=globalThis.AIMockCreator;
 const Editor=globalThis.AIMockApprovedEditor;
+const Detail=globalThis.AIMockAgentDetail;
 const storageKey="aimock-premium-calm-preferences-v1";
 let stored={};
 try{stored=JSON.parse(localStorage.getItem(storageKey)||"{}");}catch(_){}
@@ -165,11 +166,13 @@ function render(){
  const previousMain=root.querySelector(".main-scroll")?.scrollTop||0;
  const previousRail=root.querySelector(".right-rail")?.scrollTop||0;
  const catalog=r.section==="agents"&&!r.id;
- const editor=r.section==="agents"&&(r.id==="new"||r.sub==="edit"||(r.id&&r.sub!=="testing"&&!!Creator.draft(o,r.id)));
- const wizard=r.section==="agents"&&!editor&&(r.sub==="setup"||r.sub==="testing");
+ const saved=r.section==="agents"&&r.id?Creator.draft(o,r.id):null;
+ const detail=!!saved&&saved.status!=="draft"&&r.sub!=="edit";
+ const editor=r.section==="agents"&&(r.id==="new"||r.sub==="edit"||(saved&&saved.status==="draft"&&r.sub!=="testing"));
+ const wizard=r.section==="agents"&&!editor&&!detail&&(r.sub==="setup"||r.sub==="testing");
  const catalogOrg=catalog?{...o,agents:[...o.agents,...Creator.catalogRecords(o)]}:o;
- const content=r.section==="overview"?overview(o):catalog?Agents.page(catalogOrg,state.locale,icon):editor?Editor.page(o,state.locale,icon,r.id):wizard?Creator.page(o,state.locale,icon,r.id,r.sub,r.step):placeholder(r.section,r.id,r.sub,r.step);
- const panel=catalog?Agents.panel(catalogOrg,state.locale,icon,state.panelOpen):editor?Editor.panel(o,state.locale,icon,r.id,state.panelOpen):wizard?Creator.panel(o,state.locale,icon,r.id,state.panelOpen):controlPanel(o);
+ const content=r.section==="overview"?overview(o):catalog?Agents.page(catalogOrg,state.locale,icon):editor?Editor.page(o,state.locale,icon,r.id,r.sub,r.step):detail?Detail.page(o,state.locale,icon,r.id,r.sub):wizard?Creator.page(o,state.locale,icon,r.id,r.sub,r.step):placeholder(r.section,r.id,r.sub,r.step);
+ const panel=catalog?Agents.panel(catalogOrg,state.locale,icon,state.panelOpen):editor?Editor.panel(o,state.locale,icon,r.id,state.panelOpen):detail?Detail.panel(o,state.locale,icon,r.id,state.panelOpen):wizard?Creator.panel(o,state.locale,icon,r.id,state.panelOpen):controlPanel(o);
  root.innerHTML='<div class="shell">'+sidebar(r.section,o)+'<main class="main" id="main"><div class="mobile-toolbar"><button type="button" data-menu="1" aria-label="Menu">'+icon("menu")+'</button><strong>AIMock</strong><button type="button" data-mobile-panel="1" aria-label="'+T("control")+'">'+icon("notifications")+'</button></div><div class="main-scroll'+(editor?" ae-main":wizard?" wizard-main":"")+'">'+content+'</div></main>'+panel+'</div>'+
  (catalog?Agents.modal(catalogOrg,state.locale):"")+
  '<dialog class="search-dialog" id="search-dialog"><div class="search-modal-head">'+icon("search")+'<input aria-label="'+T("search")+'" placeholder="'+T("searchPlaceholder")+'" autocomplete="off" data-search-input><button data-close-search type="button" aria-label="Close">'+icon("close")+'</button></div><div class="search-results" id="search-results"></div></dialog>';
