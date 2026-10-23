@@ -70,8 +70,8 @@ function access(d,loc,icon){
 }
 function readiness(d,o,loc,icon){
  const checks=C.ready({...d,company:d.company||d.description},o);
- const titles=[L(loc,"Название","Name"),L(loc,"Профессия","Profession"),L(loc,"Инструкции","Instructions"),L(loc,"Знания","Knowledge"),L(loc,"Интеграции","Integrations"),L(loc,"Доступ","Access"),L(loc,"Тест","Test")];
- return block(6,L(loc,"Проверка готовности","Readiness check"),L(loc,"Проверьте необходимые настройки перед запуском.","Check required settings before launch."),
+ const titles=[L(loc,"Название","Name"),L(loc,"Профессия","Profession"),L(loc,"Инструкции","Instructions"),L(loc,"Группа","Group"),L(loc,"Знания","Knowledge"),L(loc,"Интеграции","Integrations"),L(loc,"Тест","Test")];
+ return block(6,L(loc,"Проверка готовности","Readiness check"),L(loc,"Проверьте настройки перед созданием агента.","Review settings before creating the agent."),
  '<div class="ae-checks">'+checks.map((x,i)=>'<span class="'+(x.ok?"ok":"")+'">'+icon(x.ok?"check":"clock",14)+titles[i]+'</span>').join("")+'</div>');
 }
 function page(o,loc,icon,key){
