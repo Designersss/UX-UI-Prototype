@@ -191,6 +191,8 @@ function updateSearch(q){
  el.innerHTML=matches.length?matches.map(m=>'<a href="#/'+escapeHtml(m.route)+'"><span>'+escapeHtml(m.name)+'</span><small>'+escapeHtml(m.type)+'</small></a>').join(''):'<p>'+T("noMatches")+'</p>';
 }
 document.addEventListener("click",e=>{
+ const detailButton=e.target.closest("[data-detail-action]");
+ if(detailButton&&route().section==="agents"){if(Detail.click(detailButton,org(),route().id))render();return;}
  const editorButton=e.target.closest("[data-editor-action]");
  if(editorButton&&route().section==="agents"){Editor.click(editorButton,org(),state.locale,icon);return;}
  const wizardButton=e.target.closest("[data-wizard-action]");
