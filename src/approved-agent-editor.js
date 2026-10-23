@@ -1,6 +1,8 @@
 (function(){
 "use strict";
 const C=globalThis.AIMockCreator;
+const Presets=globalThis.AIMockProfessionPresets;
+const preset=(d,loc)=>Presets.get(d?.type,loc);
 const ui={expanded:false,category:"all",q:"",page:1,fail:false,blank:{name:"",description:"",group:"",type:null,task:"",company:"",handoff:"",handoffTarget:"",knowledge:[],connections:[],quickRules:[],communicationStyle:"friendly"}};
 const X=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const L=(loc,ru,en)=>loc==="en"?en:ru;
@@ -10,7 +12,7 @@ const model=(o,key)=>get(o,key)||ui.blank;
 const roleName=(d,loc)=>C.professions.find(p=>p.id===d.type)?.[loc==="en"?"en":"ru"]||L(loc,"Профессия не выбрана","Profession not selected");
 const groupNames=[["Продажи","Продажи","Sales"],["HR","HR","HR"],["Поддержка","Поддержка","Support"]];
 const tabs=[["all","Все","All"],["sales","Продажи","Sales"],["hr","HR","HR"],["support","Поддержка","Support"],["marketing","Маркетинг","Marketing"],["operations","Операции","Operations"],["data","Аналитика","Analytics"],["finance","Финансы","Finance"]];
-const featured=["sales","hr","support","sales-b2b","data-analyst","content-editor"];
+
 const suggestions=[["clarify","Уточняй запрос","Ask clarifying questions"],["verify","Не придумывай факты","Never invent facts"],["handoff","Передавай сложное человеку","Hand off complex cases"],["knowledge","Отвечай по базе знаний","Answer using knowledge"],["summary","Подводи итог диалога","Summarize chats"],["privacy","Не раскрывай личные данные","Protect private data"],["confirm","Подтверждай важные действия","Confirm important actions"],["concise","Отвечай кратко","Keep answers brief"],["polite","Общайся вежливо","Stay polite"],["questions","Уточняй недостающие данные","Ask for missing details"],["uncertain","Сообщай, когда ответа нет","Admit uncertainty"],["followup","Проверяй результат обращения","Check the outcome"]];
 const logos={telegram:"telegram.svg",max:"max.svg",bitrix:"bitrix24.svg",slack:"slack.svg"};
 const input=(key,label,value,placeholder,rows)=>'<label class="ae-field"><strong>'+label+'</strong>'+(rows?'<textarea data-editor-input="'+key+'" rows="'+rows+'" placeholder="'+X(placeholder)+'">'+X(value)+'</textarea>':'<input data-editor-input="'+key+'" value="'+X(value)+'" maxlength="80" placeholder="'+X(placeholder)+'">')+'</label>';
@@ -82,5 +84,5 @@ function page(o,loc,icon,key){
  '<div class="ae-sections">'+basic(d,loc,icon)+professions(d,loc,icon)+instructions(d,loc,icon)+tools(d,o,loc,icon)+access(d,loc,icon)+readiness(d,o,loc,icon)+'</div>'+
  '<div class="ae-form-error" data-editor-error role="alert" hidden></div><footer class="ae-footer"><span>'+icon("check",14)+' '+L(loc,"Автоматическое сохранение черновика","Draft autosaves")+'</span><div><a href="#/agents">'+L(loc,"Отмена","Cancel")+'</a><button data-editor-action="'+(editing?"done":"create")+'" class="ae-publish">'+(editing?L(loc,"Готово","Done"):L(loc,"Создать агента","Create agent"))+'</button></div></footer>';
 }
-globalThis.AIMockApprovedEditor={ui,L,X,id,get,model,page,roleList,matching,logo:logos,roleName,toolsSection:tools};
+globalThis.AIMockApprovedEditor={ui,L,X,id,get,model,page,roleList,matching,logo:logos,roleName,toolsSection:tools,instructionsSection:instructions,preset};
 })();
