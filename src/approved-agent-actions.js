@@ -91,6 +91,8 @@ function click(el,o,loc,icon){
      if(instructions)instructions.outerHTML=E.instructionsSection(updated,loc,icon);
      const knowledge=document.getElementById("ae-block-4");
      if(knowledge)knowledge.outerHTML=E.toolsSection(updated,o,loc,icon);
+     const access=document.getElementById("ae-block-5");
+     if(access)access.outerHTML=E.accessSection(updated,loc,icon);
      E.refresh(o,loc,icon);
    }
    return true;
