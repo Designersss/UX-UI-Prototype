@@ -73,6 +73,34 @@ function click(el,o,loc,icon){
      E.refresh(o,loc,icon);
    }return true;
  }
+ if(action==="create"){
+   const saved=key==="new"?persist(o,{}):{saved:!!C.draft(o,key),id:key};
+   if(!saved.saved)return true;
+   const result=C.finalizeAgent(o,saved.id);
+   if(result.ok){location.hash="#/agents/"+result.id;return true;}
+   const missing=result.missing||[];
+   const locs={name:"название",type:"профессию",task:"инструкции"};
+   const msg=loc==="ru"?"Заполните: "+missing.map(k=>locs[k]||k).join(", "):"Complete: "+missing.join(", ");
+   const alert=document.querySelector("[data-editor-error]");
+   if(alert){alert.textContent=msg;alert.hidden=false;}
+   const field=missing.includes("name")?'[data-editor-input="name"]':missing.includes("type")?"#ae-block-2":'[data-editor-input="task"]';
+   document.querySelector(field)?.scrollIntoView({block:"center",behavior:"smooth"});
+   return true;
+ }
+ if(action==="select-value"){
+   const field=el.dataset.field;
+   if(!["group","handoffTarget","communicationStyle"].includes(field))return true;
+   const changed=persist(o,{[field]:value});
+   if(changed.saved){
+      document.querySelectorAll('[data-editor-dropdown="'+field+'"]').forEach(d=>{
+        d.querySelector("summary span").textContent=el.textContent.trim();
+        d.querySelectorAll("[data-editor-action='select-value']").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.value===value)));
+        d.open=false;
+      });
+      E.refresh(o,loc,icon);
+   }
+   return true;
+ }
  if(action==="test"){
    const res=key!=="new"?{saved:!!C.draft(o,key),id:key}:persist(o,{});
    if(res.saved)location.hash="#/agents/"+res.id+"/testing";
