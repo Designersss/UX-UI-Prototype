@@ -21,7 +21,7 @@ const groupSelect=(key,value,loc)=>styledDropdown(key,value,loc,groupNames);
 function basic(d,loc,icon){
  return block(1,L(loc,"Базовая информация","Basic information"),L(loc,"Укажите основную информацию об агенте.","Enter the key details for your agent."),
  '<div class="ae-basic"><div class="ae-avatar">'+icon("agents",31)+'</div><div class="ae-basic-fields"><div class="ae-two">'+input("name",L(loc,"Название агента","Agent name"),d.name,L(loc,"Например, Менеджер заявок","E.g. Lead manager"))+
- '<label class="ae-field"><strong>'+L(loc,"Группа","Team")+'</strong>'+groupSelect("group",d.group||"",loc)+'</label></div>'+
+ '<div class="ae-field"><strong>'+L(loc,"Группа","Team")+'</strong>'+groupSelect("group",d.group||"",loc)+'</div></div>'+
  input("description",L(loc,"Описание","Description"),d.description,L(loc,"Кратко опишите основную задачу агента","Describe the agent's purpose"),2)+
  '</div></div>');
 }
