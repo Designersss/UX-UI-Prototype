@@ -7,7 +7,7 @@ function panel(o,loc,icon,key,open){
  const d=model(o,key);
  const title=d.name?.trim()||L(loc,"Ваш агент","Your agent"),desc=d.description||L(loc,"Здесь появится описание, когда вы его добавите.","The description appears here when added.");
  const connected=o.integrations.filter(i=>(d.connections||[]).includes(i.id));
- const checks=C.ready({...d,company:d.company||d.description},o);
+ const checks=C.creationChecks(d);
  const progress=Math.round(checks.filter(c=>c.ok).length/checks.length*100);
  return '<aside class="right-rail ae-preview '+(open?"mobile-open":"")+'" id="right-rail" aria-label="'+L(loc,"Предпросмотр агента","Agent preview")+'">'+
  '<div class="ae-preview-top"><h2>'+L(loc,"Предпросмотр агента","Agent preview")+'</h2><button type="button" class="close-mobile" data-close-panel aria-label="'+L(loc,"Закрыть","Close")+'">'+icon("close",17)+'</button></div>'+
