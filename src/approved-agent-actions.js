@@ -10,8 +10,8 @@ function persist(o,update){
    history.replaceState(null,"","#/agents/"+encodeURIComponent(result.id)+"/edit");
    // Links were rendered before the first keystroke, when no draft ID existed.
    // Retarget guide and picker links without rebuilding the form or dropping focus.
-   document.querySelectorAll('a[href^="#/agents/new/"]').forEach(link=>{
-     link.setAttribute("href",link.getAttribute("href").replace("#/agents/new/","#/agents/"+encodeURIComponent(result.id)+"/"));
+   document.querySelectorAll('a[href*="/new/"]').forEach(link=>{
+     link.setAttribute("href",link.getAttribute("href").replace("/new/","/"+encodeURIComponent(result.id)+"/"));
    });
    ui.blank={name:"",description:"",group:"",type:null,task:"",company:"",handoff:"",handoffTarget:"",knowledge:[],connections:[],quickRules:[],communicationStyle:"friendly",tags:[]};
  }
