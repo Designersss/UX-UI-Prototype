@@ -199,6 +199,7 @@ try {
   assert.ok(await editor.locator('.ae-hero-guide').isVisible(),'Instruction CTA is visible');
   const guideStyle=await editor.locator('.ae-hero-guide').evaluate(el=>getComputedStyle(el).backgroundColor);
   assert.notEqual(guideStyle,'rgba(0, 0, 0, 0)','Instruction CTA has button-like fill');
+  assert.ok((await editor.locator('.ae-hero-guide').getAttribute('href')).includes(draftId),'Guide keeps newly created draft ID');
   await editor.locator('.ae-hero-guide').click();
   await editor.getByRole('heading',{name:'Как создать агента'}).waitFor();
   await editor.locator('.ag-head>a').click();
