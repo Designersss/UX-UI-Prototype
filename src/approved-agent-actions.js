@@ -73,6 +73,7 @@ function click(el,o,loc,icon){
      E.refresh(o,loc,icon);
    }return true;
  }
+ if(action==="done"){location.hash="#/agents/"+key;return true;}
  if(action==="create"){
    const saved=key==="new"?persist(o,{}):{saved:!!C.draft(o,key),id:key};
    if(!saved.saved)return true;
@@ -86,6 +87,12 @@ function click(el,o,loc,icon){
    const field=missing.includes("name")?'[data-editor-input="name"]':missing.includes("type")?"#ae-block-2":'[data-editor-input="task"]';
    document.querySelector(field)?.scrollIntoView({block:"center",behavior:"smooth"});
    return true;
+ }
+ if(action==="example"){
+  const field=el.dataset.field;
+  const data=field==="company"?"Мы консультируем клиентов по услугам, ценам и срокам.":"Передавай разговор человеку при жалобах и вопросах без подтверждённого ответа.";
+  const input=document.querySelector('[data-editor-input="'+field+'"]');
+  if(input){input.value=data;persist(o,{[field]:data});input.focus({preventScroll:true});E.refresh(o,loc,icon);}return true;
  }
  if(action==="select-value"){
    const field=el.dataset.field;
