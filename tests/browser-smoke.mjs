@@ -213,6 +213,18 @@ try {
   assert.equal(await editor.locator('[data-editor-advanced]').count(),4,'Four editable role-specific advanced prompts');
   assert.ok((await editor.locator('[data-editor-advanced="identity"]').inputValue()).includes('подбора персонала'));
   await editor.locator('[data-editor-advanced="identity"]').fill('HR: проверяй только информацию о вакансиях.');
+  await editor.locator('[data-editor-input="task"]').fill('Индивидуальная инструкция HR');
+  await editor.locator('[data-editor-action="role"][data-value="sales"]').click();
+  assert.ok((await editor.locator('[data-editor-input="task"]').inputValue()).includes('клиента'),'Sales gets its own default task');
+  await editor.locator('.ae-details summary').click();
+  assert.ok((await editor.locator('.ae-example-grid').innerText()).includes('ремонт'),'Sales gets distinct examples');
+  await editor.locator('.ae-advanced summary').click();
+  assert.ok((await editor.locator('[data-editor-advanced="identity"]').inputValue()).includes('менеджер первичной'),'Sales advanced prompt differs from HR');
+  await editor.locator('[data-editor-action="role"][data-value="hr"]').click();
+  assert.equal(await editor.locator('[data-editor-input="task"]').inputValue(),'Индивидуальная инструкция HR','Custom HR instructions restored across role changes');
+  await editor.locator('.ae-advanced summary').click();
+  assert.equal(await editor.locator('[data-editor-advanced="identity"]').inputValue(),'HR: проверяй только информацию о вакансиях.','Custom HR advanced prompt restored after role switch');
+
 
   assert.equal(await editor.locator('[data-editor-action="expand"]').count(),0,'No expandable catalog control');
   assert.ok(await editor.getByRole('navigation',{name:'Страницы профессий'}).isVisible());
