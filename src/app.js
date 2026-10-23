@@ -193,6 +193,13 @@ function updateSearch(q){
  const matches=[...o.agents.map(a=>({name:a.name,route:"agents/"+a.id,type:T("agents")})),...o.integrations.map(i=>({name:i.name,route:"integrations/"+i.id,type:T("integrations")}))].filter(i=>i.name.toLocaleLowerCase().includes(query)).slice(0,12);
  el.innerHTML=matches.length?matches.map(m=>'<a href="#/'+escapeHtml(m.route)+'"><span>'+escapeHtml(m.name)+'</span><small>'+escapeHtml(m.type)+'</small></a>').join(''):'<p>'+T("noMatches")+'</p>';
 }
+document.addEventListener("change",async e=>{
+ if(!e.target.matches("[data-detail-cover-file]"))return;
+ const file=e.target.files?.[0];e.target.value="";
+ if(!file||route().section!=="agents"||!route().id)return;
+ await Detail.coverFile(file,org(),route().id);
+ render();
+});
 document.addEventListener("click",e=>{
  const pickerButton=e.target.closest("[data-pick-action]");
  if(pickerButton&&route().sub==="pick"){Picker.click(pickerButton,org(),state.locale);return;}
