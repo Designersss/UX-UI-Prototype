@@ -132,3 +132,15 @@
 .ad-rail-note{font-size:10.5px!important;line-height:1.65;color:var(--muted);font-weight:500!important}
 @media(max-width:1200px){.ad-overview-grid{grid-template-columns:1fr}.ad-hero-line{flex-wrap:wrap}.ad-visual-hero .ad-actions{margin-left:76px}}
 @media(max-width:760px){.ad-visual-hero{padding:16px}.ad-hero-line{align-items:flex-start}.ad-hero-title h1{font-size:20px}.ad-hero-avatar{width:45px;height:45px}.ad-visual-hero .ad-actions{margin-left:0;width:100%}.ad-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.ad-tabs{gap:0}.ad-tabs a{padding:11px 9px}}
+
+/* Full-width agent details, no contextual right rail. */
+.ad-main-full{min-width:0;width:100%;flex:1}
+.ad-main-full .ad-full-scroll{width:100%;padding:22px 28px 40px;overflow-y:auto}
+.ad-main-full .ad-visual-hero{max-width:none}
+.ad-main-full .ad-overview-grid{grid-template-columns:minmax(0,1.65fr) minmax(290px,1fr)}
+.ad-readiness-inline{margin-top:14px}
+.ad-readiness-inline .ad-card-head strong{font-size:12px;color:var(--sage-ink)}
+.ad-readiness-items{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.ad-readiness-items span{border:1px solid var(--line);border-radius:99px;padding:8px 11px;font-size:11px;color:var(--muted);background:var(--soft)}
+.ad-readiness-items span.complete{background:var(--sage);color:var(--sage-ink);border-color:#cce0d2}
+@media(max-width:760px){.ad-main-full .ad-full-scroll{padding:14px 13px 35px}.ad-main-full .ad-overview-grid{grid-template-columns:1fr}}
