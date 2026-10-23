@@ -320,6 +320,7 @@ try {
   assert.equal(await editor.getByRole('link',{name:'Редактировать'}).count(),0,'No redundant Edit link');
   await editor.locator('.ad-tabs a[href$="/settings"]').click();
   await editor.locator('.ad-settings-nav').waitFor();
+  await editor.screenshot({path:'artifacts/ui/agent-settings-clean-form-option-1.png',fullPage:true});
   assert.ok(await editor.locator('.ad-settings-nav [data-value="instructions"]').isVisible(),'Settings have internal navigation');
   await editor.locator('[data-detail-setting="task"]').fill('Собирай запросы клиентов и уточняй детали проекта');
   await editor.locator('[data-detail-setting="company"]').fill('Студия дизайна, работаем с бизнес-клиентами');
