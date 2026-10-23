@@ -295,17 +295,27 @@ try {
   assert.ok(Math.abs(detailLayout.heroRight-detailLayout.mainRight)<3&&Math.abs(detailLayout.heroLeft-detailLayout.mainLeft)<3,'Hero is edge-to-edge within workspace');
   const coverFixture=await editor.evaluate(()=>{
     const canvas=document.createElement('canvas');canvas.width=500;canvas.height=240;
-    const c=canvas.getContext('2d');c.fillStyle='#365d46';c.fillRect(0,0,500,240);
+    const c=canvas.getContext('2d');c.fillStyle='#fff';c.fillRect(0,0,500,240);
     return canvas.toDataURL('image/png').split(',')[1];
   });
+  await editor.getByRole('button',{name:'Редактировать',exact:true}).click();
+  await editor.getByRole('dialog',{name:'Редактировать агента'}).waitFor();
   await editor.locator('[data-detail-cover-file]').setInputFiles({name:'custom-cover.png',mimeType:'image/png',buffer:Buffer.from(coverFixture,'base64')});
   await editor.locator('.ad-cover-image').waitFor();
-  await editor.reload();
-  assert.ok(await editor.locator('.ad-cover-image').count(),'Per-agent cover persists after reload');
-  await editor.locator('.ad-cover-menu summary').click();
-  await editor.locator('[data-detail-action="cover-position"][data-value="top"]').click();
+  await editor.locator('[data-detail-avatar-file]').setInputFiles({name:'custom-avatar.png',mimeType:'image/png',buffer:Buffer.from(coverFixture,'base64')});
+  assert.ok(await editor.locator('.ad-hero-avatar img').isVisible(),'Custom avatar displayed in cover');
+  await editor.locator('[data-detail-select="cover-position"]').selectOption('top');
   assert.equal(await editor.locator('.ad-visual-hero').getAttribute('data-cover-position'),'top','Cover position is persisted');
-
+  await editor.locator('[data-detail-input="description"]').fill('Новая информация в профиле');
+  await editor.locator('[data-detail-input="group"]').selectOption('Поддержка');
+  await editor.locator('[data-detail-action="toggle-tag"][data-value="Москва"]').click();
+  assert.ok((await editor.locator('.ad-hero-tags').innerText()).includes('Москва'));
+  await editor.getByRole('dialog',{name:'Редактировать агента'}).getByRole('button',{name:'Готово'}).click();
+  await editor.reload();
+  await editor.locator('.ad-cover-image').waitFor();
+  assert.ok(await editor.locator('.ad-hero-avatar img').count(),'Per-agent avatar survives reload');
+  assert.equal(await editor.locator('.ad-visual-hero').getAttribute('data-cover-position'),'top');
+  assert.ok((await editor.locator('.ad-hero-copy>p').innerText()).includes('Новая информация'));
   assert.equal(await editor.getByRole('link',{name:'Редактировать'}).count(),0,'No redundant Edit link');
   await editor.getByRole('link',{name:'Настройки',exact:true}).click();
   await editor.locator('[data-editor-input="description"]').fill('Настройки прямо в карточке');
@@ -313,6 +323,10 @@ try {
   await editor.locator('.ad-status.enabled').waitFor();
   await editor.getByRole('link',{name:'Настройки',exact:true}).click();
   assert.equal(await editor.locator('[data-editor-input]').count(),0,'Active agent is read-only');
+  await editor.getByRole('button',{name:'Редактировать',exact:true}).click();
+  assert.ok(await editor.locator('[data-detail-input="name"]').isDisabled(),'Active agent metadata locked');
+  assert.ok(await editor.locator('[data-detail-action="avatar-upload"]').isDisabled(),'Active agent avatar locked');
+  await editor.getByRole('dialog',{name:'Редактировать агента'}).getByRole('button',{name:'Готово'}).click();
   await editor.getByRole('button',{name:'Остановить',exact:true}).click();
   await editor.getByRole('alertdialog').waitFor();
   await editor.getByRole('button',{name:'Отмена'}).click();
