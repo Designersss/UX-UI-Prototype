@@ -198,6 +198,7 @@ function updateSearch(q){
  el.innerHTML=matches.length?matches.map(m=>'<a href="#/'+escapeHtml(m.route)+'"><span>'+escapeHtml(m.name)+'</span><small>'+escapeHtml(m.type)+'</small></a>').join(''):'<p>'+T("noMatches")+'</p>';
 }
 document.addEventListener("change",async e=>{
+ if(e.target.matches('select[data-detail-setting]')){Detail.settingInput(e.target,org(),route().id,state.locale);return;}
  if(e.target.matches("[data-detail-cover-file],[data-detail-avatar-file]")){
   const file=e.target.files?.[0],avatar=e.target.matches("[data-detail-avatar-file]");
   e.target.value="";
@@ -218,6 +219,11 @@ document.addEventListener("click",e=>{
  const pickerButton=e.target.closest("[data-pick-action]");
  if(pickerButton&&route().sub==="pick"){Picker.click(pickerButton,org(),state.locale);return;}
  if(e.target.matches("[data-detail-overlay]")){Detail.click({dataset:{detailAction:"close-edit"}},org(),route().id);render();return;}
+ if(e.target.matches("[data-detail-settings-backdrop]")){Detail.settingClick({dataset:{detailSettingAction:"close-examples"}},org(),route().id);render();return;}
+ const settingButton=e.target.closest("[data-detail-setting-action]");
+ if(settingButton&&route().section==="agents"){
+  if(Detail.settingClick(settingButton,org(),route().id))render();return;
+ }
  const detailButton=e.target.closest("[data-detail-action]");
  if(detailButton&&route().section==="agents"){if(Detail.click(detailButton,org(),route().id))render();return;}
  const editorButton=e.target.closest("[data-editor-action]");
@@ -305,6 +311,7 @@ document.addEventListener("click",e=>{
  else if("reconnect" in el.dataset){const btn=el;btn.textContent=state.locale==="ru"?"Откройте Integration Hub для переподключения":"Open Integration Hub to reconnect";btn.disabled=true;}
 });
 document.addEventListener("input",e=>{
+ if(e.target.matches('textarea[data-detail-setting]')){Detail.settingInput(e.target,org(),route().id,state.locale);return;}
  if(e.target.matches("[data-detail-tag-search]")){
   const query=e.target.value.trim().toLocaleLowerCase();
   e.target.closest(".ad-edit-tag-dropdown")?.querySelectorAll("[data-detail-action='toggle-tag']").forEach(button=>{button.hidden=!button.dataset.value.toLocaleLowerCase().includes(query)});
@@ -354,6 +361,7 @@ document.addEventListener("change",e=>{
  if(select&&route().section==="agents"&&!route().id&&Agents.setFilter(select.dataset.agentFilter,select.value))render();
 });
 document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"&&document.querySelector(".ad-settings-examples")){e.preventDefault();Detail.settingClick({dataset:{detailSettingAction:"close-examples"}},org(),route().id);render();return;}
  if(e.key==="Escape"&&document.querySelector(".ad-edit-dialog")){e.preventDefault();Detail.click({dataset:{detailAction:"close-edit"}},org(),route().id);render();return;}
  if(e.key==="Escape"&&document.querySelector("[data-wizard-select][open]")){document.querySelector("[data-wizard-select][open]").open=false;e.preventDefault();return;}
  if(e.key==="Escape"&&document.querySelector("[data-agent-dropdown][open]")){document.querySelector("[data-agent-dropdown][open]").open=false;e.preventDefault();return;}
