@@ -76,8 +76,8 @@ function click(el,o,loc,icon){
    const patch={
      type:profession.id,
      rolePreferences:previous,
-     group:!d.group||d.group===oldDefault?selectedGroup:d.group,
-     handoffTarget:!d.handoffTarget||d.handoffTarget===oldDefault?selectedGroup:d.handoffTarget,
+     group:d.group===oldDefault?"":d.group,
+     handoffTarget:d.handoffTarget===oldDefault?"":d.handoffTarget,
      task:typeof saved.task==="string"?saved.task:"",
      handoff:typeof saved.handoff==="string"?saved.handoff:"",
      quickRules:Array.isArray(saved.quickRules)?[...saved.quickRules]:[],
