@@ -308,6 +308,7 @@ try {
   assert.equal(await editor.locator('.ad-visual-hero').getAttribute('data-cover-position'),'top','Cover position is persisted');
   await editor.locator('[data-detail-input="description"]').fill('Новая информация в профиле');
   await editor.locator('[data-detail-input="group"]').selectOption('Поддержка');
+  await editor.locator('.ad-edit-tag-dropdown summary').click();
   await editor.locator('[data-detail-action="toggle-tag"][data-value="Москва"]').click();
   assert.ok((await editor.locator('.ad-hero-tags').innerText()).includes('Москва'));
   await editor.getByRole('dialog',{name:'Редактировать агента'}).getByRole('button',{name:'Готово'}).click();
