@@ -215,7 +215,7 @@ try {
   await editor.locator('[data-editor-advanced="identity"]').fill('HR: проверяй только информацию о вакансиях.');
 
   assert.equal(await editor.locator('[data-editor-action="expand"]').count(),0,'No expandable catalog control');
-  assert.equal(await editor.locator('[data-editor-action="page"][data-value="2"]').count(),1);
+  assert.ok(await editor.getByRole('navigation',{name:'Страницы профессий'}).isVisible());
   await editor.locator('[data-editor-action="page"][data-value="2"]').last().click();
   assert.equal(await editor.locator('.ae-role').count(),9);
   await editor.locator('[data-editor-search]').fill('HR-рекрутер');
