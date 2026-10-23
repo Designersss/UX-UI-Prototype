@@ -115,5 +115,5 @@ function page(o,loc,icon,key){
  '<div class="ae-sections">'+basic(d,loc,icon,o)+professions(d,loc,icon)+instructions(d,loc,icon)+tools(d,o,loc,icon)+access(d,loc,icon)+'</div>'+
  '<div class="ae-form-error" data-editor-error role="alert" hidden></div><footer class="ae-footer"><span>'+icon("check",14)+' '+L(loc,"Автоматическое сохранение черновика","Draft autosaves")+'</span><div><a href="#/agents">'+L(loc,"Отмена","Cancel")+'</a><button data-editor-action="'+(editing?"done":"create")+'" class="ae-publish">'+(editing?L(loc,"Готово","Done"):L(loc,"Создать агента","Create agent"))+'</button></div></footer>';
 }
-globalThis.AIMockApprovedEditor={ui,L,X,id,get,model,page,advancedPage,examplesModal,roleList,matching,logo:logos,roleName,tagList,storeTags,tagsPage,toolsSection:tools,instructionsSection:instructions,accessSection:access,preset,agentIntegrationIds};
+globalThis.AIMockApprovedEditor={ui,L,X,id,get,model,page,advancedPage,examplesModal,roleList,matching,logo:logos,roleName,tagList,storeTags,tagsPage,tagPicker,toolsSection:tools,instructionsSection:instructions,accessSection:access,preset,agentIntegrationIds};
 })();
