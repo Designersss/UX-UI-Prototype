@@ -43,7 +43,10 @@ check:'<path d="m5 12 4 4L19 6"/>',
 sparkles:'<path d="m12 2 2.1 6.4L21 11l-6.9 2.3L12 20l-2.1-6.7L3 11l6.9-2.6z"/><path d="m19 19 .7 1.3L21 21l-1.3.6L19 23l-.7-1.4L17 21l1.3-.7z"/>',
 message:'<path d="M4 5h16v12H9l-5 4z"/>',
 clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-info:'<circle cx="12" cy="12" r="9"/><path d="M12 10v7m0-10h.01"/>'
+info:'<circle cx="12" cy="12" r="9"/><path d="M12 10v7m0-10h.01"/>',
+image:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m3 17 6-5 4 3 3-4 5 6"/>',
+'more-horizontal':'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+lock:'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'
 };
 const icon=(name,size=18)=>'<svg aria-hidden="true" viewBox="0 0 24 24" width="'+size+'" height="'+size+'" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+(icons[name]||icons.overview)+'</svg>';
 const org=()=>data.orgs.find(o=>o.id===state.org)||data.orgs[0];
