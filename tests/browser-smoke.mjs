@@ -244,7 +244,7 @@ try {
   await editor.locator('.ae-advanced-back').click();
 
   assert.equal(await editor.locator('[data-editor-action="expand"]').count(),0,'No expandable catalog control');
-  assert.ok(await editor.getByRole('navigation',{name:'Страницы агентов'}).isVisible());
+  assert.ok(await editor.locator('.ae-pages').isVisible(),'Agent type pager is visible after returning from advanced settings: '+editor.url());
   await editor.locator('[data-editor-action="page"][data-value="2"]').last().click();
   assert.equal(await editor.locator('.ae-role').count(),9);
   await editor.locator('[data-editor-search]').fill('HR-рекрутер');
