@@ -3,7 +3,7 @@ const L=(l,a,b)=>l==="en"?b:a;
 function page(o,l,icon,id){
  const steps=[
  [L(l,"Дайте имя","Name your agent"),L(l,"Назовите агента понятно для команды и кратко опишите его задачу.","Give your teammate a descriptive name and purpose.")],
- [L(l,"Выберите профессию","Choose a profession"),L(l,"Профессия задаёт направление и отправные настройки. Позже всё можно изменить.","The role defines initial settings that you can customize.")],
+ [L(l,"Выберите агента","Choose a agent"),L(l,"Выбранный агент задаёт направление и отправные настройки. Позже всё можно изменить.","The agent type defines initial settings that you can customize.")],
  [L(l,"Настройте поведение","Configure behavior"),L(l,"Укажите, что агент должен делать, что ему известно и когда передавать вопросы человеку.","Describe what the agent does, what it knows and when to hand off.")],
  [L(l,"Выберите знания и интеграции","Choose knowledge and integrations"),L(l,"В отдельном каталоге выберите материалы и доступные подключения.","Use the picker to choose materials and connected services.")],
  [L(l,"Проверьте доступ","Review access"),L(l,"Определите группу управления и команду, которой передаются сложные вопросы.","Choose which team manages the agent and receives handoffs.")],
