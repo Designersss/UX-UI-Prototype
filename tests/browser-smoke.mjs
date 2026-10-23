@@ -195,6 +195,10 @@ try {
   await editor.locator('#ae-block-1 [data-field="group"][data-value="HR"]').click();
   assert.ok((await editor.locator('.ae-preview').innerText()).includes('Новый HR агент'));
   assert.equal(await editor.locator('.ae-preview-checklist-items>div').count(),7);
+  await editor.setViewportSize({width:1280,height:720});
+  const railFit=await editor.locator('.ae-preview').evaluate(el=>({overflow:el.scrollHeight-el.clientHeight}));
+  assert.ok(railFit.overflow<=4,'Readiness rail must fit standard laptop viewport without nested scroll: '+JSON.stringify(railFit));
+  await editor.setViewportSize({width:1440,height:900});
   assert.equal(await editor.locator('.ae-preview-stats,.ae-mock-chat').count(),0,'Old cards and sample chat removed');
   assert.ok(await editor.locator('.ae-hero-guide').isVisible(),'Instruction CTA is visible');
   const guideStyle=await editor.locator('.ae-hero-guide').evaluate(el=>getComputedStyle(el).backgroundColor);
@@ -279,6 +283,8 @@ try {
   await mobile.goto('http://127.0.0.1:4173/#/agents/new');
   await mobile.locator('[data-editor-input="name"]').fill('Мобильный агент');
   assert.ok(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'No horizontal document overflow');
+  const createButtonFit=await mobile.locator('[data-editor-action="create"]').evaluate(el=>{const r=el.getBoundingClientRect();return {top:r.top,bottom:r.bottom,height:innerHeight};});
+  assert.ok(createButtonFit.top>=0&&createButtonFit.bottom<=createButtonFit.height,'Create button must remain fully visible on mobile: '+JSON.stringify(createButtonFit));
   await mobile.screenshot({path:'artifacts/ui/approved-create-agent-option-1-mobile.png',fullPage:true});
   assert.deepEqual(mobileErrors,[]);
   await mobile.close();
