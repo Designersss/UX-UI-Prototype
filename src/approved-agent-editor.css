@@ -221,3 +221,18 @@ body[data-theme=dark] .ae-hero{border-color:var(--line);background:linear-gradie
  .ae-advanced-footer button{width:100%}
  .ae-hero .ae-hero-guide{font-size:11px}
 }
+
+/* Keep the primary creation action fully reachable on narrow viewports. */
+@media(max-width:760px){
+ .main-scroll.ae-main{padding-bottom:84px}
+ .ae-main .ae-footer{
+  position:fixed;bottom:0;left:0;right:0;z-index:65;
+  display:flex;align-items:center;flex-wrap:nowrap;
+  margin:0;padding:9px 14px calc(9px + env(safe-area-inset-bottom));
+  background:var(--panel);box-shadow:0 -8px 28px #13231917
+ }
+ .ae-main .ae-footer>span{display:none}
+ .ae-main .ae-footer>div{width:100%;display:flex;align-items:center;justify-content:space-between}
+ .ae-main .ae-footer>div>a{margin-right:auto}
+ .ae-main .ae-footer .ae-publish{margin-left:auto}
+}
