@@ -335,7 +335,23 @@ function upsertEditorDraft(o,changes,id){
  if("knowledge" in valid)valid.knowledge=valid.knowledge.filter(x=>typeof x==="string");
  if("connections" in valid)valid.connections=valid.connections.filter(x=>o.integrations.some(i=>i.id===x&&i.status==="connected"));
  // Preserve optional professional overrides independently for each role.
- if(Object.prototype.hasOwnProperty.call(changes||{},"advancedRoleOverrides")){
+ if(Object.prototype.hasOwnProperty.call(changes||{},"rolePreferences")){
+   const source=changes.rolePreferences;
+   if(source&&typeof source==="object"&&!Array.isArray(source)){
+     const prefs={};
+     for(const [role,options] of Object.entries(source)){
+       if(!professions.some(p=>p.id===role&&p.available)||!options||typeof options!=="object"||Array.isArray(options))continue;
+       const saved={};
+       for(const key of ["task","handoff","communicationStyle"]){
+         if(typeof options[key]==="string")saved[key]=options[key].slice(0,2500);
+       }
+       if(Array.isArray(options.quickRules))saved.quickRules=options.quickRules.filter(v=>typeof v==="string").slice(0,30);
+       prefs[role]=saved;
+     }
+     valid.rolePreferences=prefs;
+   }
+ }
+  if(Object.prototype.hasOwnProperty.call(changes||{},"advancedRoleOverrides")){
    const raw=changes.advancedRoleOverrides;
    if(raw&&typeof raw==="object"&&!Array.isArray(raw)){
      const result={};
