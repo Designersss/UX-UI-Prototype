@@ -60,7 +60,7 @@ function tools(d,o,loc,icon){
  return block(4,L(loc,"Знания и интеграции","Knowledge and integrations"),L(loc,"Добавьте материалы и сервисы, с которыми работает агент.","Attach reference materials and connected services."),
  '<div class="ae-tools-grid"><div class="ae-tool"><h3>'+icon("knowledge",17)+L(loc,"База знаний","Knowledge base")+'</h3><p>'+L(loc,"Материалы для ответов","Reference materials")+'</p>'+items(docs,"knowledge")+
  '<a href="#/agents/'+encodeURIComponent(id())+'/pick/knowledge">'+L(loc,"Выбрать материалы из каталога","Choose knowledge from catalog")+' →</a></div>'+
- '<div class="ae-tool"><h3>'+icon("integrations",17)+L(loc,"Интеграции","Integrations")+'</h3><p>'+L(loc,"Подключения организации","Organization connections")+'</p>'+(conn.length?items(conn,"connections"):'<p class="ae-empty">'+L(loc,"Пока нет подключений","No connections yet")+'</p>')+
+ '<div class="ae-tool"><h3>'+icon("integrations",17)+L(loc,"Интеграции","Integrations")+'</h3><p>'+L(loc,"Подключения организации","Organization connections")+'</p>'+(conn.length?items(conn.slice(0,3),"connections"):'<p class="ae-empty">'+L(loc,"Пока нет подключений","No connections yet")+'</p>')+
  '<a href="#/agents/'+encodeURIComponent(id())+'/pick/integrations">'+L(loc,"Выбрать подключения из каталога","Choose connected services")+' →</a></div></div>',L(loc,"Выбираются отдельно","Choose individually"));
 }
 function access(d,loc,icon){
