@@ -283,6 +283,7 @@ try {
   await editor.locator('[data-editor-action="create"]').click();
   assert.match(editor.url(),new RegExp('#/agents/'+draftId+'$'),'Created agent must open detail route');
   await editor.getByRole('heading',{name:'Новый HR агент',exact:true}).waitFor();
+  await editor.locator('.ad-visual-hero').waitFor({state:'visible'});
   assert.equal(await editor.locator('.right-rail').count(),0,'Agent detail has no right rail');
   const detailLayout=await editor.evaluate(()=>{
     const shell=document.querySelector('.shell').getBoundingClientRect();
