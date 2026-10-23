@@ -4,6 +4,7 @@ const E=globalThis.AIMockApprovedEditor,C=globalThis.AIMockCreator;
 const ui=E.ui,L=E.L;
 function persist(o,update){
  const key=E.id();
+ if(key!=="new"&&["active","financial_paused","paused","archived"].includes(C.draft(o,key)?.status))return {saved:false,error:"configuration_locked"};
  const result=C.upsertEditorDraft(o,update,key&&key!=="new"?key:null);
  ui.fail=!result.saved;
  if(result.saved&&key==="new"){
