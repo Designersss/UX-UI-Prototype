@@ -103,10 +103,29 @@ function click(el,o,loc,icon){
    return true;
  }
  if(action==="example"){
-  const field=el.dataset.field;
-  const data=field==="company"?"Мы консультируем клиентов по услугам, ценам и срокам.":"Передавай разговор человеку при жалобах и вопросах без подтверждённого ответа.";
-  const input=document.querySelector('[data-editor-input="'+field+'"]');
-  if(input){input.value=data;persist(o,{[field]:data});input.focus({preventScroll:true});E.refresh(o,loc,icon);}return true;
+   const field=el.dataset.field,p=E.preset(d,loc);
+   if(!["company","task","handoff"].includes(field)||!p?.examples[field])return true;
+   const textarea=document.querySelector('[data-editor-input="'+field+'"]');
+   if(textarea){
+     textarea.value=p.examples[field];
+     if(persist(o,{[field]:textarea.value}).saved){
+       textarea.focus({preventScroll:true});
+       E.refresh(o,loc,icon);
+     }
+   }
+   return true;
+ }
+ if(action==="reset-advanced"){
+   if(!d.type)return true;
+   const next={...(d.advancedRoleOverrides||{})};
+   delete next[d.type];
+   if(persist(o,{advancedRoleOverrides:next}).saved){
+     const p=E.preset(d,loc);
+     document.querySelectorAll("[data-editor-advanced]").forEach(input=>{
+       input.value=p?.advanced[input.dataset.editorAdvanced]||"";
+     });
+   }
+   return true;
  }
  if(action==="select-value"){
    const field=el.dataset.field;
@@ -129,5 +148,14 @@ function click(el,o,loc,icon){
  }
  return false;
 }
-E.input=input;E.search=search;E.click=click;E.renderRoles=renderRoles;
+function advancedInput(el,o,loc,icon){
+  const field=el.dataset.editorAdvanced,d=E.model(o,E.id());
+  if(!d.type||!["identity","workflow","restrictions","escalation"].includes(field))return false;
+  const next={...(d.advancedRoleOverrides||{})};
+  next[d.type]={...(next[d.type]||{}),[field]:el.value};
+  const result=persist(o,{advancedRoleOverrides:next});
+  if(result.saved)E.refresh(o,loc,icon);
+  return result.saved;
+}
+E.input=input;E.advancedInput=advancedInput;E.search=search;E.click=click;E.renderRoles=renderRoles;
 })();
