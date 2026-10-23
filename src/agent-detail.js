@@ -1,7 +1,7 @@
 (function(){
 "use strict";
 const C=globalThis.AIMockCreator;
-const v={confirm:null,message:"",reply:""};
+const v={confirm:null,edit:null,message:"",reply:"",coverMessage:"",editMessage:""};
 const H=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const L=(l,a,b)=>l==="en"?b:a;
 const coverKey="aimock-agent-covers-v1";
@@ -29,9 +29,46 @@ async function coverFile(file,o,id){
   let encoded=canvas.toDataURL("image/jpeg",.82);
   if(encoded.length>750000)encoded=canvas.toDataURL("image/jpeg",.64);
   if(encoded.length>1200000){v.coverMessage="size";return false}
-  return saveCover(o,id,{image:encoded,position:coverFor(o,id)?.position||"center"});
+  return saveCover(o,id,{...coverFor(o,id),image:encoded,position:coverFor(o,id)?.position||"center"});
  }catch(_){v.coverMessage="type";return false}
  finally{URL.revokeObjectURL(url)}
+}
+
+const editableAgent=(o,id)=>{const d=C.draft(o,id);return !!d&&!["active","financial_paused","paused","archived"].includes(d.status)};
+async function avatarFile(file,o,id){
+ if(!file)return false;
+ if(!editableAgent(o,id))return false;
+ if(!["image/jpeg","image/png","image/webp","image/avif"].includes(file.type)||file.size>12*1024*1024){v.editMessage="image_type";return false}
+ const url=URL.createObjectURL(file);
+ try{
+  const img=new Image();
+  await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});
+  const scale=Math.min(1,500/img.naturalWidth,500/img.naturalHeight);
+  const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+  const ctx=canvas.getContext("2d");if(!ctx)throw Error("canvas");
+  ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  const image=canvas.toDataURL("image/jpeg",.8);
+  if(image.length>600000){v.editMessage="image_size";return false}
+  if(!saveCover(o,id,{...coverFor(o,id),avatar:image})){v.editMessage="save";return false}
+  v.editMessage="";return true;
+ }catch(_){v.editMessage="image_type";return false}
+ finally{URL.revokeObjectURL(url)}
+}
+function updateMeta(input,o,id,loc){
+ if(!editableAgent(o,id))return false;
+ const field=input.dataset.detailInput;
+ if(!["name","description","group"].includes(field))return false;
+ const value=input.value;
+ if(field==="name"&&!value.trim()){v.editMessage="name";document.querySelector("[data-detail-save]")?.replaceChildren(document.createTextNode(loc==="en"?"Name is required":"Введите название агента"));return false}
+ const result=C.upsertEditorDraft(o,{[field]:value},id);
+ v.editMessage=result.saved?"":"save";
+ const status=document.querySelector("[data-detail-save]");
+ if(status)status.textContent=result.saved?(loc==="en"?"✓ Saved":"✓ Сохранено"):(loc==="en"?"Save failed":"Ошибка сохранения");
+ if(result.saved){
+  if(field==="name")document.querySelector(".ad-hero-title h1")?.replaceChildren(document.createTextNode(value));
+  if(field==="description")document.querySelector(".ad-hero-copy>p")?.replaceChildren(document.createTextNode(value));
+ }
+ return result.saved;
 }
 
 function page(o,l,icon,id,sub){
@@ -47,9 +84,9 @@ function page(o,l,icon,id,sub){
  const nav='<nav class="ad-tabs" aria-label="'+L(l,"Разделы агента","Agent sections")+'">'+tabs.map(([slug,ru,en])=>'<a href="'+base+(slug==="overview"?"":"/"+slug)+'" '+(key===slug?'aria-current="page"':'')+'>'+L(l,ru,en)+'</a>').join("")+'</nav>';
  const action=demo?'':active?'<button class="ad-danger" type="button" data-detail-action="confirm-stop">'+L(l,"Остановить","Stop")+'</button>':d.status==="financial_paused"?'<button class="ad-danger" type="button" data-detail-action="confirm-stop">'+L(l,"Остановить","Stop")+'</button>':'<button class="ad-primary" type="button" data-detail-action="enable">'+L(l,"Запустить","Start")+'</button>';
  const cover=coverFor(o,id),coverPosition=["top","center","bottom"].includes(cover?.position)?cover.position:"center";
- const coverControls='<div class="ad-cover-controls"><button type="button" class="ad-cover-upload" data-detail-action="cover-upload">'+icon("image",15)+L(l,"Изменить обложку","Change cover")+'</button><input class="ad-cover-file" type="file" id="ad-cover-file" data-detail-cover-file accept="image/jpeg,image/png,image/webp,image/avif" aria-label="'+L(l,"Загрузить обложку агента","Upload agent cover")+'"><details class="ad-cover-menu"><summary aria-label="'+L(l,"Настройки обложки","Cover settings")+'">'+icon("more-horizontal",17)+'</summary><div><strong>'+L(l,"Положение изображения","Image position")+'</strong>'+[["top","Сверху","Top"],["center","По центру","Center"],["bottom","Снизу","Bottom"]].map(([value,ru,en])=>'<button type="button" data-detail-action="cover-position" data-value="'+value+'" aria-pressed="'+(value===coverPosition)+'">'+L(l,ru,en)+(value===coverPosition?" ✓":"")+'</button>').join("")+'<button type="button" data-detail-action="cover-reset" '+(cover?.image?"":"disabled")+'>'+L(l,"Убрать изображение","Remove image")+'</button></div></details></div>';
+ const coverControls='<div class="ad-cover-controls"><button type="button" class="ad-cover-upload" data-detail-action="open-edit">'+icon("settings",15)+L(l,"Редактировать","Edit")+'</button></div>';
  const coverError=v.coverMessage?'<div class="ad-cover-error" role="alert">'+L(l,v.coverMessage==="save"?"Не удалось сохранить обложку. Возможно, закончилось место в браузере.":v.coverMessage==="size"?"Изображение слишком большое после обработки.":"Используйте JPG, PNG, WebP или AVIF размером до 12 МБ.",v.coverMessage==="save"?"Could not save cover. Browser storage may be full.":v.coverMessage==="size"?"Image is too large after processing.":"Choose JPG, PNG, WebP or AVIF, up to 12 MB.")+'</div>':"";
- const head='<header class="ad-visual-hero" data-cover-position="'+coverPosition+'">'+(cover?.image?'<img class="ad-cover-image" src="'+H(cover.image)+'" alt="" aria-hidden="true">':'<div class="ad-default-cover" aria-hidden="true"></div>')+'<div class="ad-hero-shade" aria-hidden="true"></div><div class="ad-hero-top"><a class="ad-back" href="#/agents">← '+L(l,"Все агенты","All agents")+'</a>'+coverControls+'</div><div class="ad-hero-line"><span class="ad-hero-avatar">'+icon("agents",26)+'</span><div class="ad-hero-copy"><div class="ad-hero-title"><h1>'+H(d.name)+'</h1><span class="ad-status '+(active?"enabled":"")+'">'+status+'</span></div><p>'+H(d.description||role)+'</p><div class="ad-hero-tags"><span>'+role+'</span>'+(d.tags||[]).map(t=>'<span>'+H(t)+'</span>').join("")+'</div></div><div class="ad-actions">'+action+'</div></div>'+coverError+'</header>'+nav;
+ const head='<header class="ad-visual-hero" data-cover-position="'+coverPosition+'">'+(cover?.image?'<img class="ad-cover-image" src="'+H(cover.image)+'" alt="" aria-hidden="true">':'<div class="ad-default-cover" aria-hidden="true"></div>')+'<div class="ad-hero-shade" aria-hidden="true"></div><div class="ad-hero-top"><a class="ad-back" href="#/agents">← '+L(l,"Все агенты","All agents")+'</a>'+coverControls+'</div><div class="ad-hero-line"><span class="ad-hero-avatar">'+(cover?.avatar?'<img src="'+H(cover.avatar)+'" alt="">':icon("agents",26))+'</span><div class="ad-hero-copy"><div class="ad-hero-title"><h1>'+H(d.name)+'</h1><span class="ad-status '+(active?"enabled":"")+'">'+status+'</span></div><p>'+H(d.description||role)+'</p><div class="ad-hero-tags"><span>'+role+'</span>'+(d.tags||[]).map(t=>'<span>'+H(t)+'</span>').join("")+'</div></div><div class="ad-actions">'+action+'</div></div>'+coverError+'</header>'+nav;
  const total=(d.connections||[]).length,know=(d.knowledge||[]).length;
  const stats='<div class="ad-kpis">'+[[L(l,"Обращения","Inquiries"),"—"],[L(l,"Обработано","Handled"),"—"],[L(l,"Передано сотруднику","Handed off"),"—"],[L(l,"Успешность","Success rate"),"—"]].map(([name,n])=>'<div class="ad-kpi"><strong>'+n+'</strong><span>'+name+'</span></div>').join("")+'</div>';
  const readiness=C.creationChecks(d),passed=readiness.filter(x=>x.ok).length;
