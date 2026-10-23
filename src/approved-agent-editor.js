@@ -64,7 +64,7 @@ function tools(d,o,loc,icon){
 }
 function access(d,loc,icon){
  return block(5,L(loc,"Доступ и передача диалогов","Access and human handoff"),L(loc,"Кто управляет агентом и кому он передаёт сложные случаи.","Choose who manages the agent and receives complex cases."),
- '<div class="ae-two">'+["group","handoffTarget"].map((key,i)=>'<label class="ae-field"><strong>'+L(loc,i?"Кому передавать диалоги?":"Кто управляет агентом?",i?"Who receives escalated conversations?":"Who manages the agent?")+'</strong>'+groupSelect(key,d[key]||"",loc)+'</label>').join("")+'</div>'+
+ '<div class="ae-two">'+["group","handoffTarget"].map((key,i)=>'<div class="ae-field"><strong>'+L(loc,i?"Кому передавать диалоги?":"Кто управляет агентом?",i?"Who receives escalated conversations?":"Who manages the agent?")+'</strong>'+groupSelect(key,d[key]||"",loc)+'</div>').join("")+'</div>'+
  '');
 }
 function readiness(d,o,loc,icon){
