@@ -7,7 +7,7 @@ const L=(l,a,b)=>l==="en"?b:a;
 function page(o,l,icon,id,sub){
  const live=C.draft(o,id),sample=o.agents.find(a=>a.id===id),d=live||(sample?{...sample,status:sample.state,description:sample.description||"",connections:[],knowledge:[],quickRules:[],handoff:"",task:""}:null);
  if(!d||d.status==="draft")return '<div class="ad-missing"><h1>'+L(l,"Агент не найден","Agent not found")+'</h1><a href="#/agents">'+L(l,"Вернуться в каталог","Back to catalog")+'</a></div>';
- const E=globalThis.AIMockApprovedEditor,active=d.status==="active",locked=active||d.status==="financial_paused"||d.status==="paused",editable=!locked&&d.status!=="archived";
+ const E=globalThis.AIMockApprovedEditor,demo=!live,active=d.status==="active",locked=demo||active||d.status==="financial_paused"||d.status==="paused",editable=!locked&&d.status!=="archived";
  const status=active?L(l,"Активен","Active"):d.status==="financial_paused"?L(l,"Пауза · нет AI-средств","Paused · insufficient balance"):d.status==="stopped"?L(l,"Остановлен","Stopped"):L(l,"Не запущен","Not running");
  const role=H(C.professions.find(x=>x.id===d.type)?.[l==="en"?"en":"ru"]||"—");
  const tabs=[["overview","Обзор","Overview"],["settings","Настройки","Settings"],["integrations","Интеграции","Integrations"],["knowledge","База знаний","Knowledge"],["testing","Тестирование","Testing"],["journal","Журнал","Activity log"]];
@@ -15,7 +15,7 @@ function page(o,l,icon,id,sub){
  const key=tabs.find(x=>x[0]===sub)?.[0]||"overview";
  const base="#/agents/"+encodeURIComponent(id);
  const nav='<nav class="ad-tabs" aria-label="'+L(l,"Разделы агента","Agent sections")+'">'+tabs.map(([slug,ru,en])=>'<a href="'+base+(slug==="overview"?"":"/"+slug)+'" '+(key===slug?'aria-current="page"':'')+'>'+L(l,ru,en)+'</a>').join("")+'</nav>';
- const action=active?'<button class="ad-danger" type="button" data-detail-action="confirm-stop">'+L(l,"Остановить","Stop")+'</button>':d.status==="financial_paused"?'<button class="ad-danger" type="button" data-detail-action="confirm-stop">'+L(l,"Остановить","Stop")+'</button>':'<button class="ad-primary" type="button" data-detail-action="enable">'+L(l,"Запустить","Start")+'</button>';
+ const action=demo?'':active?'<button class="ad-danger" type="button" data-detail-action="confirm-stop">'+L(l,"Остановить","Stop")+'</button>':d.status==="financial_paused"?'<button class="ad-danger" type="button" data-detail-action="confirm-stop">'+L(l,"Остановить","Stop")+'</button>':'<button class="ad-primary" type="button" data-detail-action="enable">'+L(l,"Запустить","Start")+'</button>';
  const head='<div class="ad-visual-hero"><a class="ad-back" href="#/agents">← '+L(l,"Все агенты","All agents")+'</a><div class="ad-hero-line"><span class="ad-hero-avatar">'+icon("agents",26)+'</span><div class="ad-hero-copy"><div class="ad-hero-title"><h1>'+H(d.name)+'</h1><span class="ad-status '+(active?"enabled":"")+'">'+status+'</span></div><p>'+H(d.description||role)+'</p><div class="ad-hero-tags"><span>'+role+'</span>'+(d.tags||[]).map(t=>'<span>'+H(t)+'</span>').join("")+'</div></div><div class="ad-actions">'+action+'</div></div></div>'+nav;
  const total=(d.connections||[]).length,know=(d.knowledge||[]).length;
  const stats='<div class="ad-kpis">'+[[L(l,"Обращения","Inquiries"),"—"],[L(l,"Обработано","Handled"),"—"],[L(l,"Передано сотруднику","Handed off"),"—"],[L(l,"Успешность","Success rate"),"—"]].map(([name,n])=>'<div class="ad-kpi"><strong>'+n+'</strong><span>'+name+'</span></div>').join("")+'</div>';
