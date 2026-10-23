@@ -97,7 +97,7 @@ function access(d,loc,icon){
 }
 function page(o,loc,icon,key){
  const d=model(o,key);
- if(location.hash.split("/")[3]==="advanced")return advancedPage(o,loc,icon,key);
+ if(location.hash.split("/")[3]==="advanced")return d.type?advancedPage(o,loc,icon,key):'<div class="ae-advanced-page"><a href="#/agents/'+encodeURIComponent(key)+'/edit">← '+L(loc,"К настройке","Back to editor")+'</a><h1>'+L(loc,"Сначала выберите агента","Choose an agent first")+'</h1></div>';
  const editing=get(o,key)&&get(o,key).status!=="draft";
  return '<header class="ae-head"><div><h1>'+(editing?L(loc,"Редактирование агента","Edit agent"):L(loc,"Создание агента","Create agent"))+'</h1><p>'+L(loc,"Настройте агента под задачи вашей команды. Все изменения сохраняются автоматически.","Set up an agent for your team. Changes save automatically.")+'</p></div><div class="ae-head-actions"><a href="#/agents" aria-label="'+L(loc,"Закрыть","Close")+'">'+icon("close",17)+'</a></div></header>'+
  '<section class="ae-hero"><div class="ae-hero-text"><span class="ae-spark">'+icon("sparkles",22)+'</span><div><h2>'+L(loc,"Создайте AI-сотрудника для вашей команды","Build an AI teammate for your team")+'</h2><p>'+L(loc,"Выберите агента, настройте поведение и подключите нужные инструменты.","Choose an agent, configure behavior and connect useful tools.")+'</p><a class="ae-hero-guide" href="#/help/from-agent/'+encodeURIComponent(key)+'">'+L(loc,"Пошаговая инструкция по настройке","Step-by-step setup guide")+' →</a></div></div><div class="ae-hero-art" aria-hidden="true"><span>'+icon("agents",26)+'</span><i>'+icon("message",17)+'</i><i>'+icon("integrations",17)+'</i><i>'+icon("knowledge",17)+'</i></div></section>'+
