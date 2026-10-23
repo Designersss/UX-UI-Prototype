@@ -16,8 +16,8 @@ function saveCover(o,id,cover){
  catch(_){if(before)covers[key]=before;else delete covers[key];v.coverMessage="save";return false}
 }
 async function coverFile(file,o,id){
- if(!file)return false;
- if(!["image/jpeg","image/png","image/webp","image/avif"].includes(file.type)||file.size>12*1024*1024){v.coverMessage="type";return false}
+ if(!file||!editableAgent(o,id))return false;
+ if(!["image/jpeg","image/png","image/webp","image/avif"].includes(file.type)||file.size>12*1024*1024){v.coverMessage="type";v.editMessage="image_type";return false}
  const url=URL.createObjectURL(file);
  try{
   const img=new Image();
@@ -28,9 +28,10 @@ async function coverFile(file,o,id){
   ctx.drawImage(img,0,0,canvas.width,canvas.height);
   let encoded=canvas.toDataURL("image/jpeg",.82);
   if(encoded.length>750000)encoded=canvas.toDataURL("image/jpeg",.64);
-  if(encoded.length>1200000){v.coverMessage="size";return false}
-  return saveCover(o,id,{...coverFor(o,id),image:encoded,position:coverFor(o,id)?.position||"center"});
- }catch(_){v.coverMessage="type";return false}
+  if(encoded.length>1200000){v.coverMessage="size";v.editMessage="image_size";return false}
+  const saved=saveCover(o,id,{...coverFor(o,id),image:encoded,position:coverFor(o,id)?.position||"center"});
+  v.editMessage=saved?"":"save";return saved;
+ }catch(_){v.coverMessage="type";v.editMessage="image_type";return false}
  finally{URL.revokeObjectURL(url)}
 }
 
@@ -173,5 +174,6 @@ function click(el,o,id){
  if(action==="test"){v.message=document.querySelector("[data-detail-test]")?.value.trim()||"";if(v.message)v.reply="Спасибо! Уточните, пожалуйста, детали запроса, чтобы я мог помочь.";return true}
  return false;
 }
-globalThis.AIMockAgentDetail={page,panel,click,coverFile,avatarFile,updateMeta,editableAgent};
+function closePopup(){v.edit=null;v.editMessage="";v.confirm=null}
+globalThis.AIMockAgentDetail={page,panel,click,coverFile,avatarFile,updateMeta,editableAgent,closePopup};
 })();
