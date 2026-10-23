@@ -176,9 +176,9 @@ try {
   await editor.goto('http://127.0.0.1:4173/#/agents/new');
   await editor.getByRole('heading',{name:'Создание агента',exact:true}).waitFor();
   assert.equal(await editor.locator('.ae-hero').count(),1);
-  assert.equal(await editor.locator('.ae-block').count(),6);
+  assert.equal(await editor.locator('.ae-block').count(),5,'Readiness checklist lives in right rail only');
   assert.equal(await editor.locator('.ae-preview').count(),1);
-  assert.equal(await editor.locator('.ae-role').count(),6);
+  assert.equal(await editor.locator('.ae-role').count(),9,'Profession pagination shows immediately');
   assert.equal(await editor.getByText('Сохранить черновик',{exact:true}).count(),0,'No manual Save Draft button');
   assert.ok((await editor.locator('.ae-footer').innerText()).includes('Автоматическое сохранение'));
   await editor.screenshot({path:'artifacts/ui/approved-create-agent-option-1-desktop.png',fullPage:true});
@@ -194,20 +194,37 @@ try {
   await editor.locator('#ae-block-1 .ae-dropdown summary').click();
   await editor.locator('#ae-block-1 [data-field="group"][data-value="HR"]').click();
   assert.ok((await editor.locator('.ae-preview').innerText()).includes('Новый HR агент'));
+  assert.equal(await editor.locator('.ae-preview-checklist-items>div').count(),7);
+  assert.equal(await editor.locator('.ae-preview-stats,.ae-mock-chat').count(),0,'Old cards and sample chat removed');
+  assert.ok(await editor.locator('.ae-hero-guide').isVisible(),'Instruction CTA is visible');
+  const guideStyle=await editor.locator('.ae-hero-guide').evaluate(el=>getComputedStyle(el).backgroundColor);
+  assert.notEqual(guideStyle,'rgba(0, 0, 0, 0)','Instruction CTA has button-like fill');
+  await editor.locator('.ae-hero-guide').click();
+  await editor.getByRole('heading',{name:'Как создать агента'}).waitFor();
+  await editor.locator('.ag-head>a').click();
+  await editor.locator('#ae-block-3').waitFor();
   await editor.locator('[data-editor-action="role"][data-value="hr"]').click();
   assert.equal(await editor.locator('[data-editor-action="role"][data-value="hr"]').getAttribute('aria-pressed'),'true');
   assert.ok((await editor.locator('.ae-preview').innerText()).includes('HR-рекрутер'));
-  await editor.locator('[data-editor-action="expand"]').click();
-  assert.equal(await editor.locator('.ae-role').count(),9);
+  assert.ok((await editor.locator('[data-editor-input="task"]').inputValue()).includes('вакансию'),'HR task preset applied');
+  await editor.locator('.ae-details summary').click();
+  assert.ok((await editor.locator('.ae-example-grid').innerText()).includes('кандидата'),'HR-specific examples');
+  await editor.locator('.ae-advanced summary').click();
+  assert.equal(await editor.locator('[data-editor-advanced]').count(),4,'Four editable role-specific advanced prompts');
+  assert.ok((await editor.locator('[data-editor-advanced="identity"]').inputValue()).includes('подбора персонала'));
+  await editor.locator('[data-editor-advanced="identity"]').fill('HR: проверяй только информацию о вакансиях.');
+
+  assert.equal(await editor.locator('[data-editor-action="expand"]').count(),0,'No expandable catalog control');
+  assert.equal(await editor.locator('[data-editor-action="page"][data-value="2"]').count(),1);
   await editor.locator('[data-editor-action="page"][data-value="2"]').last().click();
   assert.equal(await editor.locator('.ae-role').count(),9);
   await editor.locator('[data-editor-search]').fill('HR-рекрутер');
   assert.equal(await editor.locator('.ae-role').count(),1);
   await editor.locator('[data-editor-search]').fill('');
-  await editor.locator('[data-editor-action="collapse"]').click();
+  
   await editor.locator('[data-editor-input="task"]').fill('Уточняй вакансию, опыт и формат работы');
-  await editor.locator('[data-editor-action="rule"][data-value="verify"]').click();
-  assert.equal(await editor.locator('[data-editor-action="rule"][data-value="verify"]').getAttribute('aria-pressed'),'true');
+  await editor.locator('[data-editor-action="rule"][data-value="followup"]').click();
+  assert.equal(await editor.locator('[data-editor-action="rule"][data-value="followup"]').getAttribute('aria-pressed'),'true');
   await editor.locator('[data-editor-action="knowledge"][data-value="vacancies"]').click();
   assert.equal(await editor.locator('[data-editor-action="knowledge"][data-value="vacancies"]').getAttribute('aria-pressed'),'true');
   await editor.locator('[data-editor-action="connection"][data-value="max"]').click();
@@ -215,9 +232,12 @@ try {
   assert.ok((await editor.locator('.ae-preview').innerText()).includes('MAX'));
   await editor.reload();
   assert.equal(await editor.locator('[data-editor-input="name"]').inputValue(),'Новый HR агент');
+  await editor.locator('.ae-advanced summary').click();
+  assert.equal(await editor.locator('[data-editor-advanced="identity"]').inputValue(),'HR: проверяй только информацию о вакансиях.','Edited advanced prompt survives reload');
+
   assert.equal(await editor.locator('[data-editor-action="knowledge"][data-value="vacancies"]').getAttribute('aria-pressed'),'true');
   assert.equal(await editor.locator('[data-editor-action="connection"][data-value="max"]').getAttribute('aria-pressed'),'true');
-  assert.equal(await editor.locator('[data-editor-action="rule"][data-value="verify"]').getAttribute('aria-pressed'),'true');
+  assert.equal(await editor.locator('[data-editor-action="rule"][data-value="followup"]').getAttribute('aria-pressed'),'true');
   await editor.locator('.ae-tool a[href*="/pick/knowledge"]').click();
   await editor.locator('.ap-head h1').waitFor();
   await editor.locator('.ap-done').click();
