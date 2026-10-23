@@ -33,7 +33,7 @@ function input(el,o,loc,icon){
  const key=el.dataset.editorInput;
  if(!["name","description","company","task","handoff","group","handoffTarget","communicationStyle","tags"].includes(key))return false;
  const draft=E.model(o,E.id());
- const result=persist(o,withRolePreference(draft,{[key]:key==="tags"?el.value.split(",").map(v=>v.trim().replace(/\\s+/g," ")).filter(Boolean).slice(0,12):el.value}));
+ const result=persist(o,withRolePreference(draft,{[key]:key==="tags"?el.value.split(",").map(v=>v.trim().replace(/\s+/g," ")).filter(Boolean).slice(0,12):el.value}));
  if(result.saved){
    if(key==="group")document.querySelectorAll('[data-editor-input="group"]').forEach(s=>{if(s!==el)s.value=el.value;});
    E.refresh(o,loc,icon);
