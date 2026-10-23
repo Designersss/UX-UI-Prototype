@@ -84,6 +84,7 @@ function click(el,o,loc,icon){
      communicationStyle:saved.communicationStyle||nextPreset.tone,
      knowledge:[]
    };
+   patch.connections=(d.connections||[]).filter(id=>o.integrations.some(i=>i.id===id&&(E.agentIntegrationIds(profession.id).includes(i.id)||E.agentIntegrationIds(profession.id).includes(i.brand))));
    const result=persist(o,patch);
    if(result.saved){
      const updated=result.draft;
@@ -109,7 +110,7 @@ function click(el,o,loc,icon){
  }
  if(action==="knowledge"||action==="connection"){
    const k=action==="knowledge"?"knowledge":"connections";
-   if(k==="connections"&&!o.integrations.some(i=>i.id===value&&i.status==="connected"))return true;
+   if(k==="connections"&&!o.integrations.some(i=>i.id===value&&i.status==="connected"&&(E.agentIntegrationIds(d.type).includes(i.id)||E.agentIntegrationIds(d.type).includes(i.brand))))return true;
    const set=new Set(d[k]||[]);if(set.has(value))set.delete(value);else set.add(value);
    const res=persist(o,{[k]:[...set]});
    if(res.saved){
@@ -125,7 +126,7 @@ function click(el,o,loc,icon){
    const result=C.finalizeAgent(o,saved.id);
    if(result.ok){location.hash="#/agents/"+result.id;return true;}
    const missing=result.missing||[];
-   const locs={name:"название",type:"профессию",task:"инструкции"};
+   const locs={name:"название",type:"агента",task:"инструкции"};
    const msg=loc==="ru"?"Заполните: "+missing.map(k=>locs[k]||k).join(", "):"Complete: "+missing.join(", ");
    const alert=document.querySelector("[data-editor-error]");
    if(alert){alert.textContent=msg;alert.hidden=false;}
