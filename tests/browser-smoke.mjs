@@ -218,6 +218,8 @@ try {
   assert.equal(await editor.locator('[data-editor-advanced]').count(),4,'Four editable role-specific advanced prompts');
   await editor.locator('#ae-block-3').scrollIntoViewIfNeeded();
   await editor.screenshot({path:'artifacts/ui/create-agent-hr-advanced-settings.png',fullPage:true});
+  await editor.locator('[data-editor-advanced="identity"]').scrollIntoViewIfNeeded();
+  await editor.screenshot({path:'artifacts/ui/create-agent-hr-prompt-fields.png',fullPage:true});
   assert.ok((await editor.locator('[data-editor-advanced="identity"]').inputValue()).includes('подбора персонала'));
   await editor.locator('[data-editor-advanced="identity"]').fill('HR: проверяй только информацию о вакансиях.');
   await editor.locator('[data-editor-input="task"]').fill('Индивидуальная инструкция HR');
