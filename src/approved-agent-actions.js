@@ -12,10 +12,23 @@ function persist(o,update){
  }
  return result;
 }
+function withRolePreference(d,changes){
+ if(!d.type)return changes;
+ const prefs={...(d.rolePreferences||{})};
+ const before=prefs[d.type]||{};
+ const update={};
+ for(const key of ["task","handoff","quickRules","communicationStyle"]){
+   if(Object.prototype.hasOwnProperty.call(changes,key))update[key]=changes[key];
+ }
+ if(!Object.keys(update).length)return changes;
+ prefs[d.type]={...before,...update};
+ return {...changes,rolePreferences:prefs};
+}
 function input(el,o,loc,icon){
  const key=el.dataset.editorInput;
  if(!["name","description","company","task","handoff","group","handoffTarget","communicationStyle"].includes(key))return false;
- const result=persist(o,{[key]:el.value});
+ const draft=E.model(o,E.id());
+ const result=persist(o,withRolePreference(draft,{[key]:el.value}));
  if(result.saved){
    if(key==="group")document.querySelectorAll('[data-editor-input="group"]').forEach(s=>{if(s!==el)s.value=el.value;});
    E.refresh(o,loc,icon);
@@ -73,7 +86,7 @@ function click(el,o,loc,icon){
  }
  if(action==="rule"){
    const rules=new Set(d.quickRules||[]);if(rules.has(value))rules.delete(value);else rules.add(value);
-   const res=persist(o,{quickRules:[...rules]});
+   const res=persist(o,withRolePreference(d,{quickRules:[...rules]}));
    if(res.saved){el.setAttribute("aria-pressed",String(rules.has(value)));E.refresh(o,loc,icon);}return true;
  }
  if(action==="knowledge"||action==="connection"){
@@ -130,7 +143,7 @@ function click(el,o,loc,icon){
  if(action==="select-value"){
    const field=el.dataset.field;
    if(!["group","handoffTarget","communicationStyle"].includes(field))return true;
-   const changed=persist(o,{[field]:value});
+   const changed=persist(o,withRolePreference(d,{[field]:value}));
    if(changed.saved){
       document.querySelectorAll('[data-editor-dropdown="'+field+'"]').forEach(d=>{
         d.querySelector("summary span").textContent=el.textContent.trim();
