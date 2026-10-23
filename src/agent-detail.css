@@ -144,3 +144,80 @@
 .ad-readiness-items span{border:1px solid var(--line);border-radius:99px;padding:8px 11px;font-size:11px;color:var(--muted);background:var(--soft)}
 .ad-readiness-items span.complete{background:var(--sage);color:var(--sage-ink);border-color:#cce0d2}
 @media(max-width:760px){.ad-main-full .ad-full-scroll{padding:14px 13px 35px}.ad-main-full .ad-overview-grid{grid-template-columns:1fr}}
+
+
+/* Agent card gets the entire area to the right of the main workspace navigation. */
+.shell.shell-agent-detail{grid-template-columns:255px minmax(0,1fr)}
+.shell-agent-detail .main{grid-column:2;min-width:0}
+.ad-main-full .ad-full-scroll{box-sizing:border-box;width:100%;max-width:none;margin:0;padding:0;scrollbar-gutter:auto;overflow-x:hidden}
+.ad-main-full .ad-overview-grid{grid-template-columns:minmax(0,1.65fr) minmax(290px,1fr)}
+.ad-main-full .ad-tabs{margin:0;padding:0 32px;border-bottom:1px solid var(--line);background:var(--panel);gap:12px}
+.ad-main-full .ad-content{width:100%;max-width:none;padding:23px 32px 42px}
+
+/* Personalized edge-to-edge agent cover, shared by every tab. */
+.ad-main-full .ad-visual-hero{
+ position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:space-between;
+ width:100%;max-width:none;min-height:clamp(315px,39vh,430px);
+ padding:22px 32px 28px;margin:0;border:0;border-radius:0;overflow:visible;
+ background:linear-gradient(140deg,#315a42 0%,#6da17a 50%,#223d33 100%);
+ color:#fff
+}
+.ad-visual-hero:after{display:none!important}
+.ad-default-cover,.ad-cover-image,.ad-hero-shade{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.ad-default-cover{z-index:0;background:
+ radial-gradient(ellipse at 75% 25%,rgba(173,217,168,.52) 0,transparent 45%),
+ radial-gradient(ellipse at 16% 12%,rgba(54,96,84,.8) 0,transparent 50%),
+ linear-gradient(110deg,#274738,#7ca88d 55%,#314939)}
+.ad-cover-image{z-index:0;object-fit:cover;object-position:center center}
+.ad-visual-hero[data-cover-position=top] .ad-cover-image{object-position:center top}
+.ad-visual-hero[data-cover-position=bottom] .ad-cover-image{object-position:center bottom}
+.ad-hero-shade{z-index:1;background:linear-gradient(180deg,rgba(8,23,20,.25) 0%,rgba(8,23,20,.13) 29%,rgba(7,22,19,.46) 62%,rgba(6,17,15,.88) 100%)}
+.ad-hero-top{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.ad-visual-hero .ad-back{display:inline-flex;align-items:center;color:#fff;font-weight:700;font-size:11.5px;text-shadow:0 1px 8px #12271d7a}
+.ad-cover-controls{display:flex;align-items:center;gap:8px}
+.ad-cover-upload,.ad-cover-menu>summary{
+ display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ height:34px;padding:0 13px;border:1px solid #ffffff60;border-radius:9px;
+ background:#101d1ac0;backdrop-filter:blur(8px);color:#fff;
+ font-size:11px;font-weight:700;cursor:pointer
+}
+.ad-cover-upload:hover,.ad-cover-menu>summary:hover{background:#172c24f0}
+.ad-cover-file{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none}
+.ad-cover-menu{position:relative}
+.ad-cover-menu>summary{list-style:none;width:36px;padding:0}
+.ad-cover-menu>summary::-webkit-details-marker{display:none}
+.ad-cover-menu>div{position:absolute;z-index:20;top:calc(100% + 8px);right:0;display:grid;gap:3px;width:190px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:0 15px 35px #0004;color:var(--ink)}
+.ad-cover-menu strong{font-size:10px;padding:6px 8px;color:var(--muted)}
+.ad-cover-menu button{border:0;border-radius:7px;background:transparent;text-align:left;color:var(--ink);padding:9px 10px;font-size:11px}
+.ad-cover-menu button:hover,.ad-cover-menu button[aria-pressed=true]{background:var(--sage)}
+.ad-cover-menu button:disabled{opacity:.35;cursor:not-allowed}
+.ad-main-full .ad-hero-line{position:relative;z-index:2;width:100%;margin-top:auto;gap:17px;align-items:flex-end;min-width:0}
+.ad-main-full .ad-hero-copy{flex:1;min-width:0}
+.ad-main-full .ad-hero-title{gap:12px;align-items:center}
+.ad-main-full .ad-hero-title h1{font-size:clamp(25px,2.4vw,35px);letter-spacing:-.9px;text-shadow:0 1px 8px #0004}
+.ad-main-full .ad-hero-copy>p{color:#ffffffd4;font-size:12px;max-width:740px}
+.ad-main-full .ad-hero-tags{gap:7px;margin-top:13px}
+.ad-main-full .ad-hero-tags span{border:1px solid #ffffff50;background:#ffffff20;color:#fff;backdrop-filter:blur(5px)}
+.ad-main-full .ad-hero-avatar{height:58px;width:58px;background:#ffffff30;border:1px solid #ffffff55;color:white;backdrop-filter:blur(6px)}
+.ad-main-full .ad-visual-hero .ad-status{background:#ffffff28;border:1px solid #ffffff50;color:#fff;padding:7px 10px;backdrop-filter:blur(6px)}
+.ad-main-full .ad-visual-hero .ad-status.enabled{background:#bde9c6;color:#204c30;border-color:#bde9c6}
+.ad-main-full .ad-visual-hero .ad-actions{align-self:flex-end;flex:none;margin:0}
+.ad-main-full .ad-visual-hero .ad-actions button{box-shadow:0 5px 19px #0002}
+.ad-main-full .ad-visual-hero .ad-primary{background:#fff;color:#21472f;border-color:#fff}
+.ad-main-full .ad-visual-hero .ad-danger{background:#fceae7;color:#9b3d36;border-color:#fceae7}
+.ad-cover-error{position:relative;z-index:4;align-self:flex-start;margin-top:12px;padding:9px 12px;border:1px solid #ffd0c9;border-radius:9px;background:#531e1edc;color:#fff;font-size:11px}
+@media(max-width:1390px){.shell.shell-agent-detail{grid-template-columns:227px minmax(0,1fr)}}
+@media(max-width:1100px){.shell.shell-agent-detail{grid-template-columns:226px minmax(0,1fr)}.ad-main-full .ad-visual-hero .ad-actions{margin:0}}
+@media(max-width:760px){
+ .shell.shell-agent-detail{display:block}
+ .shell-agent-detail .main{width:100%;height:100dvh}
+ .ad-main-full .ad-full-scroll{height:calc(100% - 49px);padding:0}
+ .ad-main-full .ad-visual-hero{min-height:330px;padding:16px 17px 22px}
+ .ad-main-full .ad-hero-line{flex-wrap:wrap;align-items:center;gap:10px}
+ .ad-main-full .ad-hero-title h1{font-size:23px}
+ .ad-main-full .ad-hero-avatar{height:44px;width:44px}
+ .ad-main-full .ad-visual-hero .ad-actions{width:100%;justify-content:flex-start;margin-top:5px}
+ .ad-main-full .ad-tabs{padding:0 12px}
+ .ad-main-full .ad-content{padding:15px 13px 30px}
+ .ad-cover-upload{padding:0 9px;font-size:10px}
+}
