@@ -283,6 +283,28 @@ try {
   await editor.locator('[data-editor-action="create"]').click();
   assert.match(editor.url(),new RegExp('#/agents/'+draftId+'$'),'Created agent must open detail route');
   await editor.getByRole('heading',{name:'Новый HR агент',exact:true}).waitFor();
+  assert.equal(await editor.locator('.right-rail').count(),0,'Agent detail has no right rail');
+  const detailLayout=await editor.evaluate(()=>{
+    const shell=document.querySelector('.shell').getBoundingClientRect();
+    const main=document.querySelector('.ad-main-full').getBoundingClientRect();
+    const hero=document.querySelector('.ad-visual-hero').getBoundingClientRect();
+    return {shellRight:shell.right,mainRight:main.right,mainLeft:main.left,heroRight:hero.right,heroLeft:hero.left};
+  });
+  assert.ok(Math.abs(detailLayout.mainRight-detailLayout.shellRight)<3,'Detail fills grid without reserved rail: '+JSON.stringify(detailLayout));
+  assert.ok(Math.abs(detailLayout.heroRight-detailLayout.mainRight)<3&&Math.abs(detailLayout.heroLeft-detailLayout.mainLeft)<3,'Hero is edge-to-edge within workspace');
+  const coverFixture=await editor.evaluate(()=>{
+    const canvas=document.createElement('canvas');canvas.width=500;canvas.height=240;
+    const c=canvas.getContext('2d');c.fillStyle='#365d46';c.fillRect(0,0,500,240);
+    return canvas.toDataURL('image/png').split(',')[1];
+  });
+  await editor.locator('[data-detail-cover-file]').setInputFiles({name:'custom-cover.png',mimeType:'image/png',buffer:Buffer.from(coverFixture,'base64')});
+  await editor.locator('.ad-cover-image').waitFor();
+  await editor.reload();
+  assert.ok(await editor.locator('.ad-cover-image').count(),'Per-agent cover persists after reload');
+  await editor.locator('.ad-cover-menu summary').click();
+  await editor.locator('[data-detail-action="cover-position"][data-value="top"]').click();
+  assert.equal(await editor.locator('.ad-visual-hero').getAttribute('data-cover-position'),'top','Cover position is persisted');
+
   assert.equal(await editor.getByRole('link',{name:'Редактировать'}).count(),0,'No redundant Edit link');
   await editor.getByRole('link',{name:'Настройки',exact:true}).click();
   await editor.locator('[data-editor-input="description"]').fill('Настройки прямо в карточке');
