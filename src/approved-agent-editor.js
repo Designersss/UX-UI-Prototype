@@ -46,11 +46,11 @@ function professions(d,loc,icon){
 function instructions(d,loc,icon){
  const options=[["friendly","Дружелюбный и профессиональный","Friendly and professional"],["formal","Формальный и точный","Formal and precise"],["calm","Спокойный и заботливый","Calm and supportive"]];
  return block(3,L(loc,"Поведение и инструкции","Behavior and instructions"),L(loc,"Как агент должен общаться и выполнять задачи.","How your agent should communicate and work."),
- '<div class="ae-two ae-instructions"><div class="ae-field"><strong>'+L(loc,"Стиль общения","Communication style")+'</strong>'+styledDropdown("communicationStyle",d.communicationStyle||"friendly",loc,options)+'</div>>'+
+ '<div class="ae-two ae-instructions"><div class="ae-field"><strong>'+L(loc,"Стиль общения","Communication style")+'</strong>'+styledDropdown("communicationStyle",d.communicationStyle||"friendly",loc,options)+'</div>'+
  input("task",L(loc,"Инструкции для агента","Agent instructions"),d.task,L(loc,"Какие вопросы задавать и что делать?","What should the agent ask and do?"),3)+'</div>'+
  '<div class="ae-quick"><strong>'+L(loc,"Быстрые правила","Quick rules")+'</strong><div>'+suggestions.map(x=>'<button data-editor-action="rule" data-value="'+x[0]+'" aria-pressed="'+((d.quickRules||[]).includes(x[0]))+'">'+L(loc,x[1],x[2])+'</button>').join("")+'</div></div>'+
- '<details class="ae-details"><summary>'+L(loc,"Нужна помощь? Откройте примеры заполнения","Need help? Open guided examples")+'</summary><div>'+input("company",L(loc,"Чем занимается компания?","What does your company do?"),d.company,L(loc,"Продукты, услуги, ваши клиенты…","Products, services and customers…"),2)+
- input("handoff",L(loc,"Когда подключать сотрудника?","When to involve a person?"),d.handoff,L(loc,"Жалоба, вопрос без ответа, просьба о сотруднике…","Complaints, unknown answers or requests for a person…"),2)+'</div></details>');
+ '<div class="ae-two ae-instructions-extra">'+input("company",L(loc,"Чем занимается компания?","What does your company do?"),d.company,L(loc,"Продукты, услуги, ваши клиенты…","Products, services and customers…"),2)+
+ input("handoff",L(loc,"Когда подключать сотрудника?","When to involve a person?"),d.handoff,L(loc,"Жалоба, вопрос без ответа, просьба о сотруднике…","Complaints, unknown answers or requests for a person…"),2)+'</div>');
 }
 function tools(d,o,loc,icon){
  const docs=[{id:d.type==="hr"?"vacancies":"services",name:L(loc,d.type==="hr"?"Вакансии":"Услуги и цены",d.type==="hr"?"Vacancies":"Services and pricing")},{id:d.type==="hr"?"candidate-guide":"faqs",name:L(loc,d.type==="hr"?"Правила найма":"Частые вопросы",d.type==="hr"?"Hiring guidelines":"FAQ")}];
