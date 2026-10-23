@@ -173,7 +173,7 @@ function render(){
  const editor=r.section==="agents"&&(r.id==="new"||["edit","guide","pick","advanced"].includes(r.sub)||(saved&&saved.status==="draft"&&r.sub!=="testing"));
  const wizard=r.section==="agents"&&!editor&&!detail&&(r.sub==="setup"||r.sub==="testing");
  const catalogOrg=catalog?{...o,agents:[...o.agents,...Creator.catalogRecords(o)]}:o;
- const content=r.section==="help"&&r.id==="from-agent"&&r.sub?Guide.page(o,state.locale,icon,r.sub):r.section==="overview"?overview(o):catalog?Agents.page(catalogOrg,state.locale,icon):editor?(r.sub==="guide"?Guide.page(o,state.locale,icon,r.id):r.sub==="pick"?Picker.page(o,state.locale,icon,r.id,r.step):Editor.page(o,state.locale,icon,r.id,r.sub,r.step)):detail?Detail.page(o,state.locale,icon,r.id,r.sub):wizard?Creator.page(o,state.locale,icon,r.id,r.sub,r.step):placeholder(r.section,r.id,r.sub,r.step);
+ const content=r.section==="settings"&&r.id==="tags"?Editor.tagsPage(o,state.locale):r.section==="help"&&r.id==="from-agent"&&r.sub?Guide.page(o,state.locale,icon,r.sub):r.section==="overview"?overview(o):catalog?Agents.page(catalogOrg,state.locale,icon):editor?(r.sub==="guide"?Guide.page(o,state.locale,icon,r.id):r.sub==="pick"?Picker.page(o,state.locale,icon,r.id,r.step):Editor.page(o,state.locale,icon,r.id,r.sub,r.step)):detail?Detail.page(o,state.locale,icon,r.id,r.sub):wizard?Creator.page(o,state.locale,icon,r.id,r.sub,r.step):placeholder(r.section,r.id,r.sub,r.step);
  const panel=catalog?Agents.panel(catalogOrg,state.locale,icon,state.panelOpen):editor?Editor.panel(o,state.locale,icon,r.id,state.panelOpen):detail?Detail.panel(o,state.locale,icon,r.id,state.panelOpen):wizard?Creator.panel(o,state.locale,icon,r.id,state.panelOpen):controlPanel(o);
  root.innerHTML='<div class="shell">'+sidebar(r.section,o)+'<main class="main" id="main"><div class="mobile-toolbar"><button type="button" data-menu="1" aria-label="Menu">'+icon("menu")+'</button><strong>AIMock</strong><button type="button" data-mobile-panel="1" aria-label="'+T("control")+'">'+icon("notifications")+'</button></div><div class="main-scroll'+(editor?" ae-main":wizard?" wizard-main":"")+'">'+content+'</div></main>'+panel+'</div>'+
  (catalog?Agents.modal(catalogOrg,state.locale):"")+
@@ -198,7 +198,7 @@ document.addEventListener("click",e=>{
  const detailButton=e.target.closest("[data-detail-action]");
  if(detailButton&&route().section==="agents"){if(Detail.click(detailButton,org(),route().id))render();return;}
  const editorButton=e.target.closest("[data-editor-action]");
- if(editorButton&&route().section==="agents"){Editor.click(editorButton,org(),state.locale,icon);return;}
+ if(editorButton&&(route().section==="agents"||(route().section==="settings"&&route().id==="tags")) ){Editor.click(editorButton,org(),state.locale,icon);return;}
  const wizardButton=e.target.closest("[data-wizard-action]");
  if(wizardButton&&route().section==="agents"){
    const result=Creator.handleClick(wizardButton,org());
