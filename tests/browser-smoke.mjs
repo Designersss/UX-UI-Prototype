@@ -365,6 +365,7 @@ try {
   await editor.getByRole('button',{name:'Остановить',exact:true}).click();
   await editor.getByRole('alertdialog').getByRole('button',{name:'Остановить'}).click();
   await editor.locator('.ad-tabs a[href$="/settings"]').click();
+  await editor.locator('[data-detail-setting-action="section"][data-value="instructions"]').click();
   assert.ok(await editor.locator('[data-detail-setting="task"]').isEnabled(),'Stopped agent instructions are editable');
   assert.deepEqual(editorErrors,[],'New editor has no JavaScript runtime errors');
   const mobile=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
