@@ -2,6 +2,11 @@
 "use strict";
 const data=globalThis.AIMockData;
 const Agents=globalThis.AIMockAgents;
+const Creator=globalThis.AIMockCreator;
+const Editor=globalThis.AIMockApprovedEditor;
+const Detail=globalThis.AIMockAgentDetail;
+const Guide=globalThis.AIMockAgentGuide;
+const Picker=globalThis.AIMockPicker;
 const storageKey="aimock-premium-calm-preferences-v1";
 let stored={};
 try{stored=JSON.parse(localStorage.getItem(storageKey)||"{}");}catch(_){}
@@ -34,12 +39,19 @@ menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
 close:'<path d="M5 5 19 19M19 5 5 19"/>',
 sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2m0-14-2 2M7 17l-2 2"/>',
 moon:'<path d="M20 14A8 8 0 0 1 10 4 8 8 0 1 0 20 14"/>',
-check:'<path d="m5 12 4 4L19 6"/>'
+check:'<path d="m5 12 4 4L19 6"/>',
+sparkles:'<path d="m12 2 2.1 6.4L21 11l-6.9 2.3L12 20l-2.1-6.7L3 11l6.9-2.6z"/><path d="m19 19 .7 1.3L21 21l-1.3.6L19 23l-.7-1.4L17 21l1.3-.7z"/>',
+message:'<path d="M4 5h16v12H9l-5 4z"/>',
+clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+info:'<circle cx="12" cy="12" r="9"/><path d="M12 10v7m0-10h.01"/>',
+image:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m3 17 6-5 4 3 3-4 5 6"/>',
+'more-horizontal':'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
+lock:'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'
 };
 const icon=(name,size=18)=>'<svg aria-hidden="true" viewBox="0 0 24 24" width="'+size+'" height="'+size+'" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+(icons[name]||icons.overview)+'</svg>';
 const org=()=>data.orgs.find(o=>o.id===state.org)||data.orgs[0];
 const persisted=()=>{try{localStorage.setItem(storageKey,JSON.stringify({org:state.org,theme:state.theme,locale:state.locale,period:state.period}));}catch(_){}};
-const route=()=>{const p=(location.hash||"#/overview").slice(2).split("/").filter(Boolean);return {section:p[0]||"overview",id:p[1]||null};};
+const route=()=>{const p=(location.hash||"#/overview").slice(2).split("/").filter(Boolean);return {section:p[0]||"overview",id:p[1]||null,sub:p[2]||null,step:p[3]||null};};
 const nav=[["overview","overview"],["agents","agents"],["inbox","inbox",4],["approvals","approvals",2],["contacts","contacts"],["knowledge","knowledge"],["integrations","integrations"],["analytics","analytics"],["journal","journal"],["notifications","notifications",3],["help","help"],["finance","finance"],["settings","settings"]];
 function sidebar(section,o){
  return '<aside class="sidebar '+(state.menu?"is-open":"")+'" aria-label="Workspace navigation">'+
@@ -138,9 +150,16 @@ function controlPanel(o){
  '<div class="queue-list">'+(rowList||'<p class="empty">'+T("empty")+'</p>')+'</div>'+subHtml+
  '<div class="rail-billing"><p class="eyebrow">'+T("balanceTitle")+'</p><strong>'+escapeHtml(o.plan)+' · '+ (state.locale==="ru"?"до ":"until ")+escapeHtml(o.periodEnd)+'</strong><div class="balance-row"><span>'+T("aiBalance")+'</span><a href="#/finance">'+T("openFinance")+'</a></div><div class="balance-number">'+o.balance.toLocaleString("ru-RU")+' ₽</div></div></aside>';
 }
-function placeholder(section,id){
+function placeholder(section,id,sub,step){
  const n=T(section)||section;
- return '<header class="page-head"><div><h1>'+escapeHtml(n)+'</h1><p>'+T("mockLabel")+'</p></div></header><div class="surface coming-page"><span class="coming-icon">'+icon(section==="agents"?"agents":section==="integrations"?"integrations":"overview",32)+'</span><h2>'+T("underConstruction")+'</h2><p>'+T("underConstructionDesc")+'</p>'+(id?'<p class="placeholder-id">ID: '+escapeHtml(id)+'</p>':'')+'<a class="btn btn-dark" href="#/overview">'+T("back")+'</a></div>';
+ const fromAgent=id==="from-agent"&&sub&&(sub==="new"||Creator.draft(org(),sub))&&["knowledge","integrations","help"].includes(section);
+ const target=fromAgent&&sub==="new"?"#/agents/new":fromAgent&&Creator.draft(org(),sub)?"#/agents/"+encodeURIComponent(sub)+"/edit/tools":fromAgent?"#/agents/"+encodeURIComponent(sub)+"/"+(section==="knowledge"?"setup/4":section==="integrations"?"setup/5":step==="testing"?"testing":"setup/"+Math.max(1,Math.min(7,Number(step)||2))):"#/overview";
+ const caption=fromAgent?(state.locale==="ru"?"Вернуться к настройке агента":"Back to agent setup"):T("back");
+ return '<header class="page-head"><div>'+(fromAgent?'<a class="wizard-back-link" href="'+target+'">← '+caption+'</a>':'')+
+ '<h1>'+escapeHtml(n)+'</h1><p>'+T("mockLabel")+'</p></div></header>'+
+ '<div class="surface coming-page"><span class="coming-icon">'+icon(section==="agents"?"agents":section==="integrations"?"integrations":"overview",32)+'</span><h2>'+T("underConstruction")+'</h2><p>'+T("underConstructionDesc")+'</p>'+
+ (id&&!fromAgent?'<p class="placeholder-id">ID: '+escapeHtml(id)+'</p>':'')+
+ '<a class="btn btn-dark" href="'+target+'">← '+caption+'</a></div>';
 }
 function render(){
  const o=org(),r=route();
@@ -152,13 +171,21 @@ function render(){
  const previousMain=root.querySelector(".main-scroll")?.scrollTop||0;
  const previousRail=root.querySelector(".right-rail")?.scrollTop||0;
  const catalog=r.section==="agents"&&!r.id;
- const content=r.section==="overview"?overview(o):catalog?Agents.page(o,state.locale,icon):placeholder(r.section,r.id);
- const panel=catalog?Agents.panel(o,state.locale,icon,state.panelOpen):controlPanel(o);
- root.innerHTML='<div class="shell">'+sidebar(r.section,o)+'<main class="main" id="main"><div class="mobile-toolbar"><button type="button" data-menu="1" aria-label="Menu">'+icon("menu")+'</button><strong>AIMock</strong><button type="button" data-mobile-panel="1" aria-label="'+T("control")+'">'+icon("notifications")+'</button></div><div class="main-scroll">'+content+'</div></main>'+panel+'</div>'+
- (catalog?Agents.modal(o,state.locale):"")+
+ const saved=r.section==="agents"&&r.id?Creator.draft(o,r.id):null;
+ const detail=(!!saved&&saved.status!=="draft"||!saved&&o.agents.some(a=>a.id===r.id&&a.state!=="draft"))&&!["guide","pick","advanced"].includes(r.sub);
+ const editor=r.section==="agents"&&(r.id==="new"||["guide","pick","advanced"].includes(r.sub)||(saved&&saved.status==="draft"&&r.sub!=="testing"));
+ const wizard=r.section==="agents"&&!editor&&!detail&&(r.sub==="setup"||r.sub==="testing");
+ const catalogOrg=catalog?{...o,agents:[...o.agents,...Creator.catalogRecords(o)]}:o;
+ const content=r.section==="settings"&&r.id==="tags"?Editor.tagsPage(o,state.locale):r.section==="help"&&r.id==="from-agent"&&r.sub?Guide.page(o,state.locale,icon,r.sub):r.section==="overview"?overview(o):catalog?Agents.page(catalogOrg,state.locale,icon):editor?(r.sub==="guide"?Guide.page(o,state.locale,icon,r.id):r.sub==="pick"?Picker.page(o,state.locale,icon,r.id,r.step):Editor.page(o,state.locale,icon,r.id,r.sub,r.step)):detail?Detail.page(o,state.locale,icon,r.id,r.sub==="edit"?"settings":r.sub):wizard?Creator.page(o,state.locale,icon,r.id,r.sub,r.step):placeholder(r.section,r.id,r.sub,r.step);
+ const panel=catalog?Agents.panel(catalogOrg,state.locale,icon,state.panelOpen):editor?Editor.panel(o,state.locale,icon,r.id,state.panelOpen):detail?"":wizard?Creator.panel(o,state.locale,icon,r.id,state.panelOpen):controlPanel(o);
+ root.innerHTML='<div class="shell'+(detail?' shell-agent-detail':'')+'">'+sidebar(r.section,o)+'<main class="main'+(detail?' ad-main-full':'')+'" id="main"><div class="mobile-toolbar"><button type="button" data-menu="1" aria-label="Menu">'+icon("menu")+'</button><strong>AIMock</strong><button type="button" data-mobile-panel="1" aria-label="'+T("control")+'">'+icon("notifications")+'</button></div><div class="main-scroll'+(detail?" ad-full-scroll":editor?" ae-main":wizard?" wizard-main":"")+'">'+content+'</div></main>'+panel+'</div>'+
+ (catalog?Agents.modal(catalogOrg,state.locale):"")+
  '<dialog class="search-dialog" id="search-dialog"><div class="search-modal-head">'+icon("search")+'<input aria-label="'+T("search")+'" placeholder="'+T("searchPlaceholder")+'" autocomplete="off" data-search-input><button data-close-search type="button" aria-label="Close">'+icon("close")+'</button></div><div class="search-results" id="search-results"></div></dialog>';
  root.querySelector(".main-scroll").scrollTop=previousMain;
- root.querySelector(".right-rail").scrollTop=previousRail;
+ if(editor&&r.step==="tools")root.querySelector("#ae-block-4")?.scrollIntoView({block:"start"});
+ if(root.querySelector(".ad-edit-dialog"))root.querySelector(".ad-edit-dialog").focus({preventScroll:true});
+ const railAfterRender=root.querySelector(".right-rail");
+ if(railAfterRender)railAfterRender.scrollTop=previousRail;
  root.querySelectorAll('.queue-item').forEach(b=>{b.addEventListener('click',()=>{state.context=null;state.selected=b.dataset.select;render();});});
 }
 function showSearch(){
@@ -170,7 +197,76 @@ function updateSearch(q){
  const matches=[...o.agents.map(a=>({name:a.name,route:"agents/"+a.id,type:T("agents")})),...o.integrations.map(i=>({name:i.name,route:"integrations/"+i.id,type:T("integrations")}))].filter(i=>i.name.toLocaleLowerCase().includes(query)).slice(0,12);
  el.innerHTML=matches.length?matches.map(m=>'<a href="#/'+escapeHtml(m.route)+'"><span>'+escapeHtml(m.name)+'</span><small>'+escapeHtml(m.type)+'</small></a>').join(''):'<p>'+T("noMatches")+'</p>';
 }
+document.addEventListener("change",async e=>{
+ if(e.target.matches("[data-lead-filter]")){globalThis.AIMockAgentLeads.input(e.target,org(),route().id,state.locale);return;}
+
+ if(e.target.matches('select[data-detail-setting]')){Detail.settingInput(e.target,org(),route().id,state.locale);return;}
+ if(e.target.matches("[data-detail-cover-file],[data-detail-avatar-file]")){
+  const file=e.target.files?.[0],avatar=e.target.matches("[data-detail-avatar-file]");
+  e.target.value="";
+  if(!file||route().section!=="agents"||!route().id)return;
+  if(avatar)await Detail.avatarFile(file,org(),route().id);
+  else if(Detail.editableAgent(org(),route().id))await Detail.coverFile(file,org(),route().id);
+  render();
+  return;
+ }
+ if(e.target.matches('[data-detail-select="cover-position"]')){
+  if(Detail.click({dataset:{detailAction:"cover-position",value:e.target.value}},org(),route().id))render();
+ }
+});
 document.addEventListener("click",e=>{
+ const pickerButton=e.target.closest("[data-pick-action]");
+ if(pickerButton&&route().sub==="pick"){Picker.click(pickerButton,org(),state.locale);return;}
+ if(e.target.matches("[data-detail-overlay]")){Detail.click({dataset:{detailAction:"close-edit"}},org(),route().id);render();return;}
+ if(e.target.matches("[data-detail-settings-backdrop]")){Detail.settingClick({dataset:{detailSettingAction:"close-examples"}},org(),route().id);render();return;}
+ const settingButton=e.target.closest("[data-detail-setting-action]");
+ if(settingButton&&route().section==="agents"){
+  if(Detail.settingClick(settingButton,org(),route().id))render();return;
+ }
+ const leadButton=e.target.closest("[data-lead-action]");
+ if(leadButton&&route().section==="agents"){
+  if(globalThis.AIMockAgentLeads.action(leadButton,org(),route().id,state.locale))render();return;
+ }
+ const detailButton=e.target.closest("[data-detail-action]");
+ if(detailButton&&route().section==="agents"){if(Detail.click(detailButton,org(),route().id))render();return;}
+ const editorButton=e.target.closest("[data-editor-action]");
+ if(editorButton&&(route().section==="agents"||(route().section==="settings"&&route().id==="tags")) ){Editor.click(editorButton,org(),state.locale,icon);return;}
+ const wizardButton=e.target.closest("[data-wizard-action]");
+ if(wizardButton&&route().section==="agents"){
+   const result=Creator.handleClick(wizardButton,org());
+   if(result?.navigate)location.hash=result.navigate;
+   else if(result?.professionList)Creator.refreshProfessionList(org(),state.locale,icon);
+   else if(result?.exampleField){
+     const field=document.querySelector('[data-wizard-field="'+result.exampleField+'"]');
+     if(field){field.value=result.exampleValue;Creator.handleInput(field,org());field.focus({preventScroll:true});}
+     Creator.refreshRail(org(),state.locale,icon);
+   }
+   else if(result?.choiceField){
+     const dropdown=wizardButton.closest("[data-wizard-select]");
+     if(dropdown){
+       const text=wizardButton.firstChild?.textContent?.trim()||wizardButton.textContent.replace("✓","").trim();
+       dropdown.querySelector(".wizard-select-current").textContent=text;
+       dropdown.querySelectorAll('[data-wizard-action="select-choice"]').forEach(b=>{
+         b.setAttribute("aria-pressed",String(b===wizardButton));
+         b.querySelector("span")?.remove();
+       });
+       const mark=document.createElement("span");mark.setAttribute("aria-hidden","true");mark.textContent="✓";wizardButton.append(mark);
+       dropdown.open=false;dropdown.querySelector("summary")?.focus({preventScroll:true});
+     }
+     Creator.refreshRail(org(),state.locale,icon);
+   }
+   else if(result?.integrationButton){
+     wizardButton.classList.toggle("selected",result.selected);
+     wizardButton.setAttribute("aria-pressed",String(result.selected));
+     const iconSlot=wizardButton.querySelector(".wizard-integration-action");
+     if(iconSlot)iconSlot.innerHTML=result.selected?icon("check",19):"+";
+     Creator.refreshRail(org(),state.locale,icon);
+   }
+   else if(result?.rerender)render();
+   return;
+ }
+ const wizardDropdown=e.target.closest("[data-wizard-select]");
+ document.querySelectorAll("[data-wizard-select][open]").forEach(d=>{if(d!==wizardDropdown)d.open=false;});
  const option=e.target.closest("[data-agent-filter-option]");
  if(option&&route().section==="agents"&&!route().id){
    const field=option.dataset.agentFilterOption;
@@ -193,14 +289,14 @@ document.addEventListener("click",e=>{
  const agentAction=e.target.closest("[data-agent-action]");
  if(agentAction&&route().section==="agents"&&!route().id){
    const action=agentAction.dataset.agentAction;
-   if(Agents.handleClick(agentAction,org())){
+   if(Agents.handleClick(agentAction,{...org(),agents:[...org().agents,...Creator.catalogRecords(org())]})){
      if(action==="select")state.panelOpen=matchMedia("(max-width: 1100px)").matches;
      render();
      if(action==="stop-open")document.querySelector('[data-agent-action="stop-cancel"]')?.focus();
    }
    return;
  }
- const el=e.target.closest("[data-preview],[data-back-control],[data-period],[data-theme],[data-locale],[data-org],[data-account],[data-search],[data-close-search],[data-menu],[data-mobile-panel],[data-close-panel],[data-queue],[data-reconnect]");
+ const el=e.target.closest("[data-preview],[data-back-control],[data-period],button[data-theme],[data-locale],[data-org],[data-account],[data-search],[data-close-search],[data-menu],[data-mobile-panel],[data-close-panel],[data-queue],[data-reconnect]");
  if(!el)return;
  if(el.dataset.preview){const [type,id]=el.dataset.preview.split(":");state.context={type,id};state.panelOpen=matchMedia("(max-width: 1100px)").matches;render();document.querySelector(".right-rail").scrollTop=0;}
  else if("backControl" in el.dataset){state.context=null;render();document.querySelector(".right-rail").scrollTop=0;}
@@ -218,6 +314,41 @@ document.addEventListener("click",e=>{
  else if("reconnect" in el.dataset){const btn=el;btn.textContent=state.locale==="ru"?"Откройте Integration Hub для переподключения":"Open Integration Hub to reconnect";btn.disabled=true;}
 });
 document.addEventListener("input",e=>{
+ if(e.target.matches("[data-lead-search]")){globalThis.AIMockAgentLeads.input(e.target,org(),route().id,state.locale);return;}
+
+ if(e.target.matches("[data-detail-access-tag-search]")){
+  const search=e.target.value.trim().toLocaleLowerCase();
+  e.target.closest(".ad-access-tag-picker")?.querySelectorAll('[data-detail-setting-action="toggle-access-tag"]').forEach(button=>{
+   button.hidden=!button.dataset.value.toLocaleLowerCase().includes(search);
+  });
+  return;
+ }
+ if(e.target.matches('textarea[data-detail-setting]')){Detail.settingInput(e.target,org(),route().id,state.locale);return;}
+ if(e.target.matches("[data-detail-tag-search]")){
+  const query=e.target.value.trim().toLocaleLowerCase();
+  e.target.closest(".ad-edit-tag-dropdown")?.querySelectorAll("[data-detail-action='toggle-tag']").forEach(button=>{button.hidden=!button.dataset.value.toLocaleLowerCase().includes(query)});
+  return;
+ }
+ if(e.target.matches('[data-detail-input="name"],[data-detail-input="description"]')){Detail.updateMeta(e.target,org(),route().id,state.locale);return}
+
+ if(e.target.matches("[data-tag-search]")){
+   const query=e.target.value.trim().toLocaleLowerCase();
+   e.target.closest(".ae-tag-options")?.querySelectorAll("[data-editor-action='toggle-tag']").forEach(b=>{b.hidden=!b.dataset.value.toLocaleLowerCase().includes(query)});
+   return;
+ }
+
+ if(e.target.matches('[data-editor-advanced]')){Editor.advancedInput(e.target,org(),state.locale,icon);return;}
+ if(e.target.matches('[data-pick-search],[data-pick-only]')){Picker.input(e.target,org(),state.locale);return;}
+ if(e.target.matches('[data-editor-input]:not(select)')){Editor.input(e.target,org(),state.locale,icon);return;}
+ if(e.target.matches('[data-editor-search]')){Editor.search(e.target.value,org(),state.locale,icon);return;}
+ if(e.target.matches("[data-wizard-field]")){
+   // Keep the active text control mounted throughout typing. Only persist the value here.
+   Creator.handleInput(e.target,org());
+ }
+ if(e.target.matches("[data-profession-search]")){
+   Creator.setProfessionSearch(e.target.value);
+   Creator.refreshProfessionList(org(),state.locale,icon);
+ }
  if(e.target.matches("[data-search-input]"))updateSearch(e.target.value);
  if(e.target.matches("[data-agents-search]")){
   Agents.setSearch(e.target.value);
@@ -229,21 +360,40 @@ document.addEventListener("input",e=>{
  }
 });
 document.addEventListener("change",e=>{
+ if(e.target.matches('select[data-editor-input]')){Editor.input(e.target,org(),state.locale,icon);return;}
+ if(e.target.matches("[data-wizard-field]")&&e.target.dataset.wizardField!=="group"){
+   // Update readiness after the user commits a field, never in its input event.
+   Creator.refreshRail(org(),state.locale,icon);
+   return;
+ }
+ if(e.target.matches("[data-wizard-toggle]")){if(Creator.handleToggle(e.target,org()))Creator.refreshRail(org(),state.locale,icon);return;}
+ if(e.target.matches("[data-profession-category]")){Creator.setProfessionCategory(e.target.value);Creator.refreshProfessionList(org(),state.locale,icon);return;}
+ if(e.target.matches('[data-wizard-field="group"]')){Creator.handleInput(e.target,org());Creator.refreshRail(org(),state.locale,icon);return;}
  const select=e.target.closest("[data-agent-filter]");
  if(select&&route().section==="agents"&&!route().id&&Agents.setFilter(select.dataset.agentFilter,select.value))render();
 });
 document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"&&document.querySelector(".ad-settings-examples")){e.preventDefault();Detail.settingClick({dataset:{detailSettingAction:"close-examples"}},org(),route().id);render();return;}
+ if(e.key==="Escape"&&document.querySelector(".ad-edit-dialog")){e.preventDefault();Detail.click({dataset:{detailAction:"close-edit"}},org(),route().id);render();return;}
+ if(e.key==="Escape"&&document.querySelector("[data-wizard-select][open]")){document.querySelector("[data-wizard-select][open]").open=false;e.preventDefault();return;}
  if(e.key==="Escape"&&document.querySelector("[data-agent-dropdown][open]")){document.querySelector("[data-agent-dropdown][open]").open=false;e.preventDefault();return;}
  if(e.key==="Escape"&&Agents.hasModal()){e.preventDefault();Agents.dismiss();render();return;}
  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==="k"){e.preventDefault();showSearch();}
  if(e.key==="Escape"&&state.menu){state.menu=false;render();}
 });
-window.addEventListener("hashchange",()=>{state.menu=false;state.account=false;state.panelOpen=false;state.context=null;render();const main=document.querySelector(".main-scroll");if(main)main.scrollTop=0;});
+window.addEventListener("hashchange",()=>{Detail.closePopup();state.menu=false;state.account=false;state.panelOpen=false;state.context=null;render();const main=document.querySelector(".main-scroll");if(main)main.scrollTop=0;});
 const viewportCategory=()=>innerWidth<=760?"mobile":innerHeight<800?"compact":innerHeight<980?"standard":"large";
 let lastViewport=viewportCategory();
 window.addEventListener("resize",()=>{
  const current=viewportCategory();
- if(current!==lastViewport){lastViewport=current;render();}
+ if(current===lastViewport)return;
+ lastViewport=current;
+ // The browser's virtual keyboard and responsive chrome can resize the viewport
+ // while an input has focus. Rebuilding #app here would detach the active field.
+ if(document.activeElement?.matches('input,textarea,select,[contenteditable="true"]'))return;
+ // Only the paginated catalog needs JS-driven viewport capacity changes.
+ // All other screens are responsive through CSS without a full repaint.
+ if(route().section==="agents"&&!route().id)render();
 });
 render();
 })();

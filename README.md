@@ -47,3 +47,18 @@ node --test tests/*.test.mjs
 ## Workflow
 
 One reviewed page at a time; no feature PR is merged without approval. The old source remains available on branch `archive/legacy-prototype-2026-10-22`. The new source **replaces** all previous files, so no legacy CSS cascade is carried forward.
+
+## Create Agent — approved option #1 (under code review)
+
+**Reference:** `docs/CREATE_AGENT_APPROVED_OPTION_1.md`. This is the **light, full-page editor with numbered stacked sections and a detailed preview on the right**, not the previously rejected dark wizard. The approved Overview and Agents Catalog are unchanged.
+
+- `#/agents/new`: single-page editor with a visual introductory banner and inline sections for basics, profession selection, behavior, knowledge and integrations, access and readiness.
+- `#/agents/:id/edit`: same page reopening a locally autosaved organization-scoped draft. Typing or selecting a role creates the draft automatically; there is **no Save Draft button**.
+- Profession catalog starts compact and expands into searchable, category-filterable paginated results. Only the two validated mock professions can be selected.
+- Knowledge and connected provider choices work across whole rows and show updates in the right preview. Original provider icons are used where available.
+- `#/agents/:id/testing`: a separate scripted simulation, not a live AI call. Production activation stays disabled.
+- Links into Knowledge Base and Integration Hub preserve a contextual back action.
+- Full central page scrolls as one coherent document; individual cards do not scroll on their own.
+- Local browser state is **not** server/cloud storage. Backend writes, production integration requests, access permissions and real publishing are deliberately out of scope.
+
+Review and merge policy: code stays in draft PR until the user has inspected and approved the working implementation.
