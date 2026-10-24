@@ -208,9 +208,6 @@ document.addEventListener("change",async e=>{
   render();
   return;
  }
- if(e.target.matches('[data-detail-input="group"]')){
-  Detail.updateMeta(e.target,org(),route().id,state.locale);return;
- }
  if(e.target.matches('[data-detail-select="cover-position"]')){
   if(Detail.click({dataset:{detailAction:"cover-position",value:e.target.value}},org(),route().id))render();
  }
@@ -311,6 +308,13 @@ document.addEventListener("click",e=>{
  else if("reconnect" in el.dataset){const btn=el;btn.textContent=state.locale==="ru"?"Откройте Integration Hub для переподключения":"Open Integration Hub to reconnect";btn.disabled=true;}
 });
 document.addEventListener("input",e=>{
+ if(e.target.matches("[data-detail-access-tag-search]")){
+  const search=e.target.value.trim().toLocaleLowerCase();
+  e.target.closest(".ad-access-tag-picker")?.querySelectorAll('[data-detail-setting-action="toggle-access-tag"]').forEach(button=>{
+   button.hidden=!button.dataset.value.toLocaleLowerCase().includes(search);
+  });
+  return;
+ }
  if(e.target.matches('textarea[data-detail-setting]')){Detail.settingInput(e.target,org(),route().id,state.locale);return;}
  if(e.target.matches("[data-detail-tag-search]")){
   const query=e.target.value.trim().toLocaleLowerCase();
