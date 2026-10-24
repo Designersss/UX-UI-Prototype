@@ -13,26 +13,56 @@ const fixtures=[
  {id:"1042",name:"Виктория Соколова",company:"Vika Beauty",status:"new",channel:"telegram",date:"21 окт · 16:08",topic:"Продвижение и дизайн",summary:"Первичный запрос о визуальных материалах для продвижения. Агент ожидает список задач.",need:"Посты и рекламные макеты",budget:"Не указан",deadline:"Не указан",next:"Уточнить объём",owner:"AI-агент",qualification:"Не хватает данных",notes:"Планируется серия кампаний"},
  {id:"1041",name:"Павел Егоров",company:"Egorov Tech",status:"working",channel:"web",date:"20 окт · 12:11",topic:"Дизайн приложения",summary:"Запрос на разработку дизайна мобильного приложения. Собраны требования к основным пользовательским сценариям.",need:"UI/UX мобильного приложения",budget:"200–350 тыс. ₽",deadline:"2 месяца",next:"Уточнить количество платформ",owner:"AI-агент",qualification:"В процессе",notes:"Есть прототип экранов"}
 ];
-const statuses={new:["Новая","New"],working:["В работе","In progress"],qualified:["Квалифицирована","Qualified"],human:["Нужен человек","Needs human"],closed:["Завершена","Completed"]};
+/* Sales qualification parameters are record-specific; the backend will supply configured fields. */
+const qualificationExtras={
+ "1048":{status:"qualified",region:"Москва",contact:"Контакт подтверждён в диалоге",connection:"Telegram · Sales Bot",conversation:"human",needsHuman:false,crm:"demo_pending",custom:{ru:"Количество страниц",en:"Number of pages",value:null,required:false}},
+ "1047":{status:"working",region:"Казань",contact:"Контакт в исходном диалоге",connection:"MAX · Northline Bot",conversation:"human",needsHuman:true,crm:"demo_error",custom:{ru:"Тип партнёрства",en:"Partnership type",value:null,required:true}},
+ "1046":{region:"",contact:"Контакт в веб-чате",connection:"Сайт · Web Chat",conversation:"ai",needsHuman:false,crm:"unavailable",custom:{ru:"Направление бизнеса",en:"Business category",value:null,required:true}},
+ "1045":{region:"Санкт-Петербург",contact:"Контакт в исходном диалоге",connection:"Telegram · Design Bot",conversation:"ai",needsHuman:false,crm:"demo_pending",custom:{ru:"Количество экранов",en:"Number of screens",value:null,required:true}},
+ "1044":{region:"Москва",contact:"Контакт в веб-чате",connection:"Сайт · Web Chat",conversation:"human",needsHuman:false,crm:"demo_success",custom:{ru:"Формат меню",en:"Menu format",value:"Цифровое меню",required:false}},
+ "1043":{region:"Екатеринбург",contact:"Контакт в исходном диалоге",connection:"MAX · Sales Bot",conversation:"closed",needsHuman:false,crm:"unavailable",custom:{ru:"Формат презентации",en:"Presentation type",value:"PDF",required:false}},
+ "1042":{region:"",contact:"Контакт в исходном диалоге",connection:"Telegram · Design Bot",conversation:"ai",needsHuman:false,crm:"unavailable",custom:{ru:"Количество макетов",en:"Number of assets",value:null,required:true}},
+ "1041":{region:"Москва",contact:"Контакт в веб-чате",connection:"Сайт · Web Chat",conversation:"ai",needsHuman:false,crm:"demo_pending",custom:{ru:"Платформы",en:"Platforms",value:null,required:true}}
+};
+for(const row of fixtures)Object.assign(row,qualificationExtras[row.id]);
+const statuses={new:["Новая","New"],working:["В работе","In progress"],qualified:["Квалифицирована","Qualified"],closed:["Завершена","Completed"]};
+const conversationStates={ai:["Обрабатывает ИИ","AI handling"],human:["У сотрудника","Human handling"],closed:["Завершён","Closed"]};
+const crmStates={unavailable:["Не подключена","Not connected"],demo_pending:["Пример: ожидает","Sample: pending"],demo_success:["Пример: успешно","Sample: successful"],demo_error:["Пример: ошибка","Sample: error"]};
+const isKnown=v=>Boolean(v&&v!=="Не указан"&&v!=="Обсуждается"&&v!=="Не срочно");
+function criteria(row){
+ const base=[
+ {ru:"Потребность",en:"Need",value:row.need,required:true},
+ {ru:"Бюджет",en:"Budget",value:row.budget,required:true},
+ {ru:"Срок",en:"Timeline",value:row.deadline,required:true},
+ {ru:"Регион",en:"Region",value:row.region,required:true}
+ ];
+ if(row.custom)base.push({ru:row.custom.ru,en:row.custom.en,value:row.custom.value,required:row.custom.required});
+ return base.map(item=>({...item,complete:isKnown(item.value)}));
+}
 const channels={telegram:["Telegram","Telegram"],max:["MAX","MAX"],web:["Сайт","Website"]};
 const store={};
 function state(o,id,hasSaved){
  const key=o.id+":"+id;
- if(!store[key])store[key]={q:"",status:"all",channel:"all",selection:null,page:1,demo:!hasSaved};
+ if(!store[key])store[key]={q:"",status:"all",channel:"all",handoff:"all",selection:null,page:1,demo:!hasSaved};
  return store[key];
 }
 function data(s){return s.demo?fixtures:[]}
 function filtered(s){
  const q=s.q.toLocaleLowerCase().trim();
- return data(s).filter(x=>(s.status==="all"||s.status===x.status)&&(s.channel==="all"||s.channel===x.channel)&&(!q||[x.id,x.name,x.company,x.topic,x.need].some(t=>String(t).toLocaleLowerCase().includes(q))));
+ return data(s).filter(x=>(s.status==="all"||s.status===x.status)&&(s.channel==="all"||s.channel===x.channel)&&(s.handoff==="all"||(s.handoff==="human")===x.needsHuman)&&(!q||[x.id,x.name,x.company,x.topic,x.need].some(t=>String(t).toLocaleLowerCase().includes(q))));
 }
-function selected(rows,s){return rows.find(x=>x.id===s.selection)||rows[0]||null}
+function visibleRows(rows,s){
+ const pages=Math.max(1,Math.ceil(rows.length/5));
+ s.page=Math.min(Math.max(s.page,1),pages);
+ return rows.slice((s.page-1)*5,s.page*5);
+}
+function selected(rows,s){const page=visibleRows(rows,s);return page.find(x=>x.id===s.selection)||page[0]||null}
 function statusBadge(row,l){return '<span class="al-status al-status-'+row.status+'">'+escape(L(l,...statuses[row.status]))+'</span>'}
 function list(rows,s,l){
  const count=rows.length,pages=Math.max(1,Math.ceil(count/5));
  s.page=Math.min(Math.max(s.page,1),pages);
- const slice=rows.slice((s.page-1)*5,s.page*5),current=selected(rows,s);
- const items=slice.map(x=>'<button type="button" class="al-lead-item" data-lead-action="select" data-value="'+x.id+'" aria-pressed="'+(current?.id===x.id)+'"><span class="al-lead-top"><strong>'+escape(x.name)+'</strong>'+statusBadge(x,l)+'</span><span class="al-lead-company">'+escape(x.company)+' · #'+escape(x.id)+'</span><span class="al-lead-topic">'+escape(x.topic)+'</span><span class="al-lead-foot"><span>'+escape(L(l,...channels[x.channel]))+'</span><span>'+escape(x.date)+'</span></span></button>').join("");
+ const slice=visibleRows(rows,s),current=selected(rows,s);
+ const items=slice.map(x=>'<button type="button" class="al-lead-item" data-lead-action="select" data-value="'+x.id+'" aria-pressed="'+(current?.id===x.id)+'"><span class="al-lead-top"><strong>'+escape(x.name)+'</strong>'+statusBadge(x,l)+'</span><span class="al-lead-company">'+escape(x.company)+' · #'+escape(x.id)+'</span><span class="al-lead-topic">'+escape(x.topic)+'</span>'+(x.needsHuman?'<span class="al-lead-attention">'+L(l,"Нужен сотрудник","Needs human")+'</span>':'')+'<span class="al-lead-foot"><span>'+escape(L(l,...channels[x.channel]))+'</span><span>'+escape(x.date)+'</span></span></button>').join("");
  return '<div class="al-results" data-leads-results>'+(items||'<div class="al-list-empty">'+L(l,"Нет заявок по выбранным фильтрам.","No leads match these filters.")+'</div>')+'</div><footer class="al-pagination" data-leads-pagination><span>'+L(l,"Показано","Showing")+' '+(count?(s.page-1)*5+1:0)+'–'+Math.min(s.page*5,count)+' '+L(l,"из","of")+' '+count+'</span><div><button type="button" data-lead-action="page" data-value="'+(s.page-1)+'" '+(s.page<=1?"disabled":"")+' aria-label="'+L(l,"Предыдущая страница","Previous page")+'">‹</button><span>'+s.page+' / '+pages+'</span><button type="button" data-lead-action="page" data-value="'+(s.page+1)+'" '+(s.page>=pages?"disabled":"")+' aria-label="'+L(l,"Следующая страница","Next page")+'">›</button></div></footer>';
 }
 function detail(x,l){
