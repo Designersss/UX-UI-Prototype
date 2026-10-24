@@ -211,7 +211,7 @@ function settingInput(el,o,id,l){
   const overrides={...(d.advancedRoleOverrides||{})};
   overrides[d.type]={...(overrides[d.type]||{}),[field]:el.value};
   updates={advancedRoleOverrides:overrides};
- }else if(["task","company","handoff","communicationStyle"].includes(key)){
+ }else if(["task","company","handoff","communicationStyle","group"].includes(key)){
   updates={[key]:el.value};
  }else return false;
  const result=C.upsertEditorDraft(o,updates,id);
@@ -234,6 +234,17 @@ function settingClick(el,o,id){
  if(action==="examples"){settingsState.examples=id;return true}
  if(action==="close-examples"){settingsState.examples=null;return true}
  if(!editableAgent(o,id))return false;
+ if(action==="toggle-access-tag"){
+  const tag=el.dataset.value;
+  const d=C.draft(o,id),available=globalThis.AIMockApprovedEditor.tagList(o);
+  const tags=new Set(d?.tags||[]);
+  if(tags.has(tag))tags.delete(tag);
+  else if(available.includes(tag)&&tags.size<12)tags.add(tag);
+  else return false;
+  const result=C.upsertEditorDraft(o,{tags:[...tags]},id);
+  settingsState.saveError=!result.saved;
+  return true;
+ }
  if(action==="toggle-rule"){
   const name=el.dataset.value;
   if(!settingRules.some(x=>x[0]===name))return false;
