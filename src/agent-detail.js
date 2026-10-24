@@ -1,6 +1,7 @@
 (function(){
 "use strict";
 const C=globalThis.AIMockCreator;
+const Leads=globalThis.AIMockAgentLeads;
 const v={confirm:null,edit:null,message:"",reply:"",coverMessage:"",editMessage:""};
 const settingsState={sectionById:{},examples:null,saveError:false};
 const H=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -189,7 +190,7 @@ function page(o,l,icon,id,sub){
  const test='<section class="ad-card"><h2>'+L(l,"Тестирование агента","Agent testing")+'</h2><p>'+L(l,"Демонстрационная симуляция. Реальных отправок и действий во внешних сервисах нет.","Local simulation only. No live external messages or actions.")+'</p><div class="ad-chat"><p>'+L(l,"Пример: клиент задаёт вопрос об услуге.","Example: a customer asks about a service.")+'</p>'+(v.message?'<p class="ad-sent">'+H(v.message)+'</p>':"")+(v.reply?'<p>'+H(v.reply)+'</p>':"")+'</div><div class="ad-test-controls"><input data-detail-test value="'+H(v.message)+'" placeholder="'+L(l,"Введите тестовое сообщение","Enter a test message")+'"><button data-detail-action="test">'+L(l,"Отправить","Send")+'</button></div></section>';
  const journal='<section class="ad-card"><h2>'+L(l,"Журнал действий","Activity log")+'</h2><p>'+L(l,"История запусков, остановок, изменений конфигурации и действий будет показана здесь после подключения backend.","Launch, stop, configuration and agent activity events will appear after backend integration.")+'</p></section>';
  const special='<section class="ad-card"><h2>'+L(l,d.type==="hr"?"Кандидаты":"Заявки",d.type==="hr"?"Candidates":"Leads")+'</h2><p>'+L(l,"Связанные записи агента появятся после подключения источников и обработки реальных событий.","Agent records appear here when connected sources begin processing events.")+'</p></section>';
- const body=key==="settings"?settings:key==="integrations"?integrations:key==="knowledge"?knowledge:key==="testing"?test:key==="journal"?journal:key==="leads"||key==="candidates"?special:overview;
+ const body=key==="settings"?settings:key==="integrations"?integrations:key==="knowledge"?knowledge:key==="testing"?test:key==="journal"?journal:key==="leads"?Leads.section(o,l,icon,id,!!live):key==="candidates"?special:overview;
  return head+'<div class="ad-content">'+body+'</div>'+(v.edit===id?editModal(o,l,icon,id,d,editable):'')+(v.confirm===id?'<div class="ad-overlay"><section role="alertdialog" aria-modal="true" aria-labelledby="ad-stop-title"><h2 id="ad-stop-title">'+L(l,"Остановить агента?","Stop this agent?")+'</h2><p>'+L(l,"Агент прекратит автоматические действия. Настройки станут доступны для изменения. Для возобновления потребуется повторный запуск.","Automation will stop. Settings become editable until you explicitly restart.")+'</p><div><button data-detail-action="cancel-stop">'+L(l,"Отмена","Cancel")+'</button><button class="ad-danger" data-detail-action="stop">'+L(l,"Остановить","Stop")+'</button></div></section></div>':"");
 }
 function panel(o,l,icon,id,open){
