@@ -303,6 +303,7 @@ try {
   await editor.locator('[data-detail-cover-file]').setInputFiles({name:'custom-cover.png',mimeType:'image/png',buffer:Buffer.from(coverFixture,'base64')});
   await editor.locator('.ad-cover-image').waitFor();
   await editor.locator('[data-detail-avatar-file]').setInputFiles({name:'custom-avatar.png',mimeType:'image/png',buffer:Buffer.from(coverFixture,'base64')});
+  await editor.locator('.ad-hero-avatar img').waitFor({state:'visible'});
   assert.ok(await editor.locator('.ad-hero-avatar img').isVisible(),'Custom avatar displayed in cover');
   await editor.locator('[data-detail-select="cover-position"]').selectOption('top');
   assert.equal(await editor.locator('.ad-visual-hero').getAttribute('data-cover-position'),'top','Cover position is persisted');
