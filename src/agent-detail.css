@@ -395,3 +395,34 @@
 @media(max-width:1180px){.ad-settings-workspace{grid-template-columns:178px minmax(0,1fr)}.ad-settings-nav{padding:9px}.ad-settings-nav button{gap:7px;padding:10px 8px;font-size:10.5px}.ad-settings-content-head{flex-wrap:wrap}.ad-settings-save{margin-top:0}}
 @media(max-width:940px){.ad-settings-workspace{grid-template-columns:1fr}.ad-settings-nav{flex-direction:row;overflow-x:auto;white-space:nowrap}.ad-settings-nav button{width:auto;flex:none}.ad-settings-content-head{padding:16px}.ad-settings-panel-body{padding:0 16px 16px}}
 @media(max-width:650px){.ad-setting-two,.ad-setting-advanced,.ad-access-grid,.ad-settings-links{grid-template-columns:1fr}.ad-settings-nav{padding:7px;gap:1px}.ad-settings-nav button{min-height:40px}.ad-settings-content-head{gap:8px}.ad-settings-advanced-footer{flex-direction:column;align-items:flex-start}.ad-settings-examples{padding:14px}}
+
+
+/* Agent profile dialog now contains presentation details only. */
+.ad-edit-dialog{width:min(720px,100%)}
+.ad-edit-fields{grid-template-columns:minmax(0,1fr);gap:13px}
+.ad-edit-description{grid-column:1}
+.ad-edit-description textarea{min-height:98px}
+
+/* All permission grouping and organization tags live in Settings > Access & Tags. */
+.ad-access-editor{align-content:start;gap:13px}
+.ad-access-group-field{padding:0;border:0;background:transparent}
+.ad-access-group-field select{min-height:43px}
+.ad-access-note{color:var(--muted);font-size:10.5px;line-height:1.65}
+.ad-access-tags{display:flex;flex-wrap:wrap;align-items:center;gap:7px;min-height:30px}
+.ad-access-tags>span{display:flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid #c7dfce;border-radius:22px;background:var(--sage);font-size:11px;font-weight:650;color:var(--sage-ink)}
+.ad-access-tags>span>button{border:0;background:transparent;color:inherit;font-size:15px;line-height:1;cursor:pointer}
+.ad-access-tags>small{color:var(--muted);font-size:11px}
+.ad-access-tag-picker{min-width:0}
+.ad-access-tag-picker>summary{display:flex;align-items:center;min-height:42px;cursor:pointer;border:1px solid var(--line);border-radius:9px;padding:10px 13px;background:var(--panel);color:var(--text);font-size:11.5px;font-weight:670;list-style:none}
+.ad-access-tag-picker>summary::-webkit-details-marker{display:none}
+.ad-access-tag-picker[open]>summary{border-color:#90b89c}
+.ad-access-tag-picker>div{display:grid;gap:4px;border:1px solid var(--line);border-radius:9px;background:var(--panel);max-height:225px;overflow:auto;padding:9px;margin-top:5px}
+.ad-access-tag-picker input{border:1px solid var(--line);border-radius:8px;min-height:37px;padding:9px;background:var(--panel);color:var(--ink);font-size:11px}
+.ad-access-tag-picker button{display:flex;justify-content:space-between;gap:8px;border:0;border-radius:7px;padding:9px;background:transparent;text-align:left;color:var(--text);font-size:11.5px}
+.ad-access-tag-picker button:not(:disabled):hover,.ad-access-tag-picker button[aria-pressed=true]{background:var(--sage);color:var(--sage-ink)}
+.ad-access-tag-picker button[hidden]{display:none}
+.ad-access-tag-picker button:disabled{cursor:not-allowed;opacity:.65}
+.ad-access-tag-picker[aria-disabled=true]>summary{opacity:.65;cursor:default}
+.ad-settings-tag-manage{align-self:start;color:var(--sage-ink);font-size:11px;font-weight:700}
+.ad-settings-tag-manage:hover{text-decoration:underline}
+@media(max-width:650px){.ad-access-grid{grid-template-columns:1fr}.ad-access-editor{min-width:0}}
